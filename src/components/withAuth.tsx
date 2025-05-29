@@ -9,9 +9,11 @@ export default function withAuth(Component: React.ComponentType) {
 
         useEffect(() => {
             const token = localStorage.getItem('token');
-            if (!token) {
+            if (typeof window === "undefined" || !token) {
+                // safe to access localStorage, window, etc.
                 router.replace('/login');
             }
+
         }, [router]);
 
         return <Component {...props} />;

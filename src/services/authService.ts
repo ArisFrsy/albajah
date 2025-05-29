@@ -53,6 +53,7 @@ export async function verifyCodeService(email: string, code: string) {
   });
 
   if (!loginCode) {
+    localStorage.removeItem("token");
     return { success: false, message: "Invalid or expired code" };
   }
 

@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 import { verifyCodeController } from "../../../../controllers/loginController";
+import { checkAuth } from "@/utils/auth";
 
 export async function POST(request: Request) {
+  const unauthorizedResponse = checkAuth(request);
+  if (unauthorizedResponse) return unauthorizedResponse;
+
   const { email, code } = await request.json();
   const result = await verifyCodeController(email, code);
 

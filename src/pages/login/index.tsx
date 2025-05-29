@@ -5,6 +5,7 @@ import Head from 'next/head'
 // import ReCAPTCHA from 'react-google-recaptcha'
 import DummyReCaptcha from '../../components/DummyReCaptcha';
 import { useRouter } from 'next/router';
+import Spinner from '@/components/Spinner';
 
 
 export default function LoginPage() {
@@ -13,6 +14,7 @@ export default function LoginPage() {
     const [password, setPassword] = useState('')
     const [message, setMessage] = useState('')
     const [captchaToken, setCaptchaToken] = useState('');
+    const [loading, setLoading] = useState(false);
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault()
@@ -22,6 +24,8 @@ export default function LoginPage() {
             return;
         }
 
+        setLoading(true);
+
         const res = await fetch('/api/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -30,8 +34,12 @@ export default function LoginPage() {
 
         const data = await res.json()
         setMessage(data.message)
+
+        setLoading(false);
+
         if (data.success) {
             localStorage.setItem('token', data.token)
+            localStorage.setItem('user', JSON.stringify(data.user))
             // Redirect or navigate...
             router.push('/verify-code'); // Ganti dengan rute yang sesuai
         }
@@ -47,7 +55,6 @@ export default function LoginPage() {
             <Head>
                 <title>Login | My App</title>
             </Head>
-
             <div className="min-h-screen flex items-center justify-center bg-gradient-to-tr from-white to-indigo-100">
                 <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 border border-gray-300">
                     <h2 className="text-3xl font-extrabold text-center text-gray-900 mb-6">Welcome</h2>
@@ -105,6 +112,7 @@ export default function LoginPage() {
                         </a>
                     </p>
                 </div>
+                {loading && <Spinner />}
             </div>
         </>
     )

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { jwtDecode } from 'jwt-decode';
+import Spinner from '@/components/Spinner';
 
 
 export default function VerifyCodePage() {
@@ -36,7 +37,7 @@ export default function VerifyCodePage() {
 
         const res = await fetch('/api/login/verify-code', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
             body: JSON.stringify({ email, code }),
         });
 
@@ -48,12 +49,12 @@ export default function VerifyCodePage() {
             return;
         }
 
-        localStorage.setItem('token', data.token);
         router.replace('/dashboard');
     };
 
     return (
         <div className="flex min-h-screen items-center justify-center bg-gray-100">
+            {loading && <Spinner />}
             <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
                 <h1 className="text-2xl font-bold mb-4 text-gray-900">Verify Code</h1>
                 <p className="text-sm text-gray-600 mb-4">
