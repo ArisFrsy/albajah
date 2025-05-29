@@ -1,36 +1,158 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🚀 Next.js + Prisma + PostgreSQL Auth Project
 
-## Getting Started
+Ini adalah proyek autentikasi menggunakan **Next.js**, **Prisma ORM**, dan **PostgreSQL**. Fitur-fitur utama:
 
-First, run the development server:
+- Autentikasi dengan JWT
+- Google reCAPTCHA
+- Middleware untuk proteksi halaman
+- Struktur folder terorganisir
 
+---
+
+## ✅ Requirements
+
+Pastikan sudah terinstal:
+
+- **Node.js**: `v20.11.1`
+- **PostgreSQL**: `v15.13.1`
+- **npm**: `v10+`
+
+---
+
+## 🛠️ Instalasi
+
+### 1. Clone proyek
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repo-url>
+cd <nama-folder-project>
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Install dependencies
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## ⚙️ Konfigurasi Environment
 
-## Learn More
+Buat file `.env` di root folder dan isi dengan:
 
-To learn more about Next.js, take a look at the following resources:
+```env
+DATABASE_URL="postgresql://USER:PASSWORD@localhost:5432/NAMA_DATABASE"
+JWT_SECRET="secret-key-yang-kuat"
+NEXT_PUBLIC_RECAPTCHA_SITE_KEY="site-key-dari-google"
+RECAPTCHA_SECRET_KEY="secret-key-dari-google"
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Ganti `USER`, `PASSWORD`, dan `NAMA_DATABASE` sesuai pengaturan PostgreSQL-mu.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## 🧬 Setup Prisma
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 1. Generate Prisma Client
+```bash
+npx prisma generate
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 2. Jalankan migrasi database
+```bash
+npx prisma migrate dev --name init
+```
+
+### 3. (Opsional) Buka antarmuka visual DB
+```bash
+npx prisma studio
+```
+
+---
+
+## ▶️ Menjalankan Project
+
+### Mode Development
+```bash
+npm run dev
+```
+
+Akses di browser: [http://localhost:3000](http://localhost:3000)
+
+---
+
+## 🧪 Struktur Folder
+
+```
+src/
+├── controllers/          # Controller API (ex: login)
+│   └── api/
+├── generated/            # Hasil generate Prisma Client
+│   └── prisma/
+├── lib/                  # Prisma helper
+│   └── prisma.ts
+├── middleware/           # Auth middleware (token validator)
+│   └── withAuth.ts
+├── pages/                # Halaman Next.js
+│   └── api/              # API routes Next.js
+├── services/             # Business logic (ex: loginService.ts)
+├── types/                # Tambahan deklarasi TypeScript
+│   └── react-google-recaptcha.d.ts
+├── utils/                # Fungsi bantu
+└── styles/               # Global styles (jika ada)
+```
+
+---
+
+## 🔐 Keamanan
+
+- **JWT Authentication**: Token disimpan di `localStorage`
+- **Google reCAPTCHA**: Lindungi form login
+- **Middleware**: Proteksi halaman dengan pengecekan token
+
+---
+
+## 🧩 Instalasi Tambahan
+
+### Google reCAPTCHA
+```bash
+npm install react-google-recaptcha
+npm install --save-dev @types/react-google-recaptcha
+```
+
+### Jika error deklarasi:
+Buat file `src/types/react-google-recaptcha.d.ts`:
+
+```ts
+declare module "react-google-recaptcha" {
+  import * as React from "react";
+
+  export interface ReCAPTCHAProps {
+    sitekey: string;
+    onChange?: (token: string | null) => void;
+  }
+
+  export default class ReCAPTCHA extends React.Component<ReCAPTCHAProps> {
+    public getValue(): string | null;
+    public reset(): void;
+  }
+}
+```
+
+---
+
+## 💬 Perintah Tambahan
+
+### Reset database
+```bash
+npx prisma migrate reset
+```
+
+### Re-generate Prisma Client (setiap update schema)
+```bash
+npx prisma generate
+```
+
+---
+
+## 📄 Lisensi
+
+Proyek ini bebas dikembangkan. Silakan gunakan dan modifikasi sesuai kebutuhan. Jangan lupa jaga keamanan JWT dan reCAPTCHA kamu!
