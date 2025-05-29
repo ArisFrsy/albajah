@@ -4,9 +4,11 @@ import { useState, useRef } from 'react'
 import Head from 'next/head'
 // import ReCAPTCHA from 'react-google-recaptcha'
 import DummyReCaptcha from '../../components/DummyReCaptcha';
+import { useRouter } from 'next/router';
 
 
 export default function LoginPage() {
+    const router = useRouter();
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [message, setMessage] = useState('')
@@ -31,6 +33,7 @@ export default function LoginPage() {
         if (data.success) {
             localStorage.setItem('token', data.token)
             // Redirect or navigate...
+            router.push('/verify-code'); // Ganti dengan rute yang sesuai
         }
     }
 
