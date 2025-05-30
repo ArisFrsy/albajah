@@ -35,9 +35,14 @@ function MasterPaketPage() {
     const { paket, page, limit, setPage, setLimit, orderByDirection, setOrderByDirection, orderByField, setOrderByField, fetchPaket, loading, setLoading } = usePaketPagination();
 
     const headers: Header<Paket>[] = [
-        { column: 'idPaket', label: 'ID PAKET', orderable: true, align: 'left' },
+        // { column: 'idPaket', label: 'ID PAKET', orderable: true, align: 'left' },
         { column: 'nama', label: 'Nama Paket', orderable: true, align: 'left' },
         { column: 'deskripsi', label: 'Deskripsi', orderable: false, align: 'left' },
+        {
+            column: 'actions', label: 'Foto', orderable: false, align: 'left', render: (row: Paket) => (
+                <img src={row.pathFoto || '/images/no-image.png'} alt={row.nama} className="w-16 h-16 object-cover rounded" />
+            )
+        },
         {
             column: 'actions', // this is allowed because we define 'actions' in Header<T>
             label: 'Actions',
@@ -68,16 +73,25 @@ function MasterPaketPage() {
     ]
 
 
-    const handleInsert = async (data: { nama: string; deskripsi?: string }) => {
+    const handleInsert = async (data: { nama: string; deskripsi?: string, fileFoto?: File | null }) => {
         try {
             setLoading(true);
+            // new form data
+            const formData = new FormData();
+            formData.append('nama', data.nama);
+            if (data.deskripsi) {
+                formData.append('deskripsi', data.deskripsi);
+            }
+            if (data.fileFoto) {
+                formData.append('fileFoto', data.fileFoto);
+            }
+
             const res = await fetch('/api/master/paket', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
                     Authorization: `Bearer ${localStorage.getItem('token')}`,
                 },
-                body: JSON.stringify(data),
+                body: formData,
             })
             setLoading(false);
             if (!res.ok) throw new Error('Failed to insert')
@@ -90,16 +104,26 @@ function MasterPaketPage() {
     }
 
 
-    const handleUpdate = async (data: { idPaket: number; nama: string; deskripsi?: string }) => {
+    const handleUpdate = async (data: { idPaket: number; nama: string; deskripsi?: string; fileFoto?: File | null }) => {
         try {
             setLoading(true);
+            // new form data
+            const formData = new FormData();
+            formData.append('id', data.idPaket.toString());
+            formData.append('nama', data.nama);
+            if (data.deskripsi) {
+                formData.append('deskripsi', data.deskripsi);
+            }
+            if (data.fileFoto) {
+                formData.append('fileFoto', data.fileFoto);
+            }
+
             const res = await fetch(`/api/master/paket`, {
                 method: 'PUT',
                 headers: {
-                    'Content-Type': 'application/json',
                     Authorization: `Bearer ${localStorage.getItem('token')}`,
                 },
-                body: JSON.stringify(data),
+                body: formData,
             })
             setLoading(false);
             if (!res.ok) throw new Error('Failed to update')

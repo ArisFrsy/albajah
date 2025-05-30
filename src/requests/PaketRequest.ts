@@ -6,4 +6,5 @@ export interface PaketRequest {
   perPage?: number;
   search?: string;
   filter?: string;
+  fileFoto?: File | null; // Optional file upload, can be null
 }

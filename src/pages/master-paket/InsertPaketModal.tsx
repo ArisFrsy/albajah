@@ -5,16 +5,25 @@ import { useState } from 'react'
 interface InsertPaketModalProps {
     isOpen: boolean
     onClose: () => void
-    onSubmit: (data: { nama: string; deskripsi?: string }) => void
+    onSubmit: (data: { nama: string; deskripsi?: string; fileFoto: File | null }) => void
 }
 
 export default function InsertPaketModal({ isOpen, onClose, onSubmit }: InsertPaketModalProps) {
     const [nama, setNama] = useState('')
     const [deskripsi, setDeskripsi] = useState('')
+    const [file, setFile] = useState<File | null>(null)
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files.length > 0) {
+            setFile(e.target.files[0])
+        } else {
+            setFile(null)
+        }
+    }
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
-        onSubmit({ nama, deskripsi })
+        onSubmit({ nama, deskripsi, fileFoto: file || null })
         setNama('')
         setDeskripsi('')
         onClose()
@@ -44,6 +53,15 @@ export default function InsertPaketModal({ isOpen, onClose, onSubmit }: InsertPa
                             onChange={(e) => setDeskripsi(e.target.value)}
                             rows={3}
                             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-gray-800 text-sm p-2"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Upload Gambar</label>
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleFileChange}
+                            className="mt-1 block w-full text-sm text-gray-800 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
                         />
                     </div>
                     <div className="flex justify-end gap-2">

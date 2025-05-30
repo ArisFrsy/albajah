@@ -1,5 +1,8 @@
 import { Prisma } from "@/generated/prisma"; // path to your generated Prisma client folder
 import prisma from "@/lib/prisma"; // your prisma client instance, make sure it uses the same generated client
+import { saveFileToLocal } from "./UploadService";
+import { get } from "http";
+import { Paket } from "@/models/Paket";
 
 export async function getAllPaketService({
   page = 1,
@@ -100,13 +103,24 @@ export async function getPaketByIdService(id: number) {
 export async function createPaketService({
   nama,
   deskripsi,
+  fileFoto = null, // Optional file upload, can be null
 }: {
   nama: string;
   deskripsi?: string;
+  fileFoto?: File | null; // Use File type if you are using a file input, or null if no file is provided
 }) {
   try {
+    let filePath: string = "";
+
+    // save fileFoto if provided (not implemented here, but you can use a file upload service)
+    if (fileFoto !== null) {
+      // Implement file upload logic here
+      const getPath = await saveFileToLocal(fileFoto);
+      getPath ? (filePath = getPath) : (filePath = "");
+    }
+
     const paket = await prisma.paket.create({
-      data: { nama, deskripsi },
+      data: { nama, deskripsi, pathFoto: filePath },
     });
 
     return {
@@ -128,9 +142,18 @@ export async function updatePaketService(
   data: {
     nama?: string;
     deskripsi?: string;
+    fileFoto?: File | null; // Optional file upload, can be null
   }
 ) {
   try {
+    let filePath: string = "";
+    // If fileFoto is provided, save it
+    if (data.fileFoto !== undefined && data.fileFoto !== null) {
+      // Implement file upload logic here
+      const getPath = await saveFileToLocal(data.fileFoto);
+      getPath ? (filePath = getPath) : (filePath = "");
+    }
+
     const existing = await prisma.paket.findUnique({ where: { idPaket: id } });
     if (!existing) {
       return {
@@ -139,9 +162,15 @@ export async function updatePaketService(
       };
     }
 
+    const updateData = {
+      nama: data.nama ?? existing.nama,
+      deskripsi: data.deskripsi ?? existing.deskripsi,
+      pathFoto: filePath !== "" ? filePath : existing.pathFoto, // Use existing path if no new file is provided
+    };
+
     const updated = await prisma.paket.update({
       where: { idPaket: id },
-      data,
+      data: updateData,
     });
 
     return {

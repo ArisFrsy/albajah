@@ -33,6 +33,7 @@ model LoginCode {
 model Paket {
   idPaket   Int       @id @default(autoincrement())
   nama      String
+  pathFoto  String?
   deskripsi String?
 
   subpakets Subpaket[]

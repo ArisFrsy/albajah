@@ -124,64 +124,76 @@ function DataTable<T extends Record<string, any>>({
                 </tbody>
             </table>
 
-            <div className="mt-4 flex justify-between items-center">
-                <div className="flex items-center">
-                    <span className="text-gray-700">
+            <div className="mt-4 flex justify-between items-center text-sm">
+                {/* Left section: Information like "Showing X-Y of Z" or "X row(s) selected" */}
+                <div>
+                    <span className="text-gray-600"> {/* Adjusted text color to be slightly lighter as in image example */}
                         Showing {(page - 1) * perPage + 1}–{Math.min(page * perPage, data.length)} of {data.length}
                     </span>
-                    <select
-                        value={perPage}
-                        onChange={(e) => {
-                            setPerPage(Number(e.target.value))
-                            setPage(1) // reset to first page
-                        }}
-                        className="border rounded p-1 text-sm text-gray-700 ml-4"
-                    >
-                        {[10, 25, 50, 100].map((n) => (
-                            <option key={n} value={n}>
-                                {n} per page
-                            </option>
-                        ))}
-                    </select>
                 </div>
 
-                <ul className="flex gap-1 text-gray-900">
-                    <li>
+                {/* Right section: All pagination controls */}
+                <div className="flex items-center space-x-4"> {/* Controls spacing between "Rows per page", "Page X of Y", and buttons */}
+                    {/* Rows per page dropdown */}
+                    <div className="flex items-center">
+                        <span className="mr-2 text-gray-700">Rows per page</span>
+                        <select
+                            value={perPage}
+                            onChange={(e) => {
+                                setPerPage(Number(e.target.value));
+                                setPage(1); // Reset to first page when items per page changes
+                            }}
+                            className="border border-gray-300 rounded px-2 py-1 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-gray-700"
+                        >
+                            {[10, 25, 50, 100].map((n) => (
+                                <option key={n} value={n}>
+                                    {n}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {/* Page X of Y display */}
+                    <span className="text-gray-700">
+                        Page {page} of {totalPages === 0 ? 1 : totalPages} {/* Handles case where totalPages might be 0 */}
+                    </span>
+
+                    {/* Navigation Buttons: Styled to be text-like and close together */}
+                    <div className="flex items-center"> {/* Container for tight grouping of navigation buttons */}
+                        <button
+                            onClick={() => handlePageChange(1)} // Assuming handlePageChange can navigate to a specific page number
+                            disabled={page === 1 || totalPages === 0}
+                            className="px-2 py-1 text-gray-700 hover:text-blue-600 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none"
+                            aria-label="First page"
+                        >
+                            &lt;&lt;
+                        </button>
                         <button
                             onClick={() => handlePageChange(page - 1)}
-                            disabled={page === 1}
-                            className="grid size-8 place-content-center rounded border border-gray-200 transition-colors hover:bg-gray-50 disabled:opacity-50"
+                            disabled={page === 1 || totalPages === 0}
+                            className="px-2 py-1 text-gray-700 hover:text-blue-600 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none"
                             aria-label="Previous page"
                         >
-                            ←
+                            &lt;
                         </button>
-                    </li>
-
-                    {[...Array(totalPages)].map((_, i) => (
-                        <li key={i}>
-                            <button
-                                onClick={() => handlePageChange(i + 1)}
-                                className={`block size-8 rounded text-center text-sm/8 font-medium ${page === i + 1
-                                    ? 'bg-green-600 border border-green-600 text-white'
-                                    : 'border border-gray-200 hover:bg-gray-50'
-                                    }`}
-                            >
-                                {i + 1}
-                            </button>
-                        </li>
-                    ))}
-
-                    <li>
                         <button
                             onClick={() => handlePageChange(page + 1)}
-                            disabled={page === totalPages}
-                            className="grid size-8 place-content-center rounded border border-gray-200 transition-colors hover:bg-gray-50 disabled:opacity-50"
+                            disabled={page === totalPages || totalPages === 0}
+                            className="px-2 py-1 text-gray-700 hover:text-blue-600 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none"
                             aria-label="Next page"
                         >
-                            →
+                            &gt;
                         </button>
-                    </li>
-                </ul>
+                        <button
+                            onClick={() => handlePageChange(totalPages)}
+                            disabled={page === totalPages || totalPages === 0}
+                            className="px-2 py-1 text-gray-700 hover:text-blue-600 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none"
+                            aria-label="Last page"
+                        >
+                            &gt;&gt;
+                        </button>
+                    </div>
+                </div>
             </div>
         </>
     )

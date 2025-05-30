@@ -44,8 +44,12 @@ export async function POST(request: Request) {
   if (unauthorizedResponse) return unauthorizedResponse;
 
   try {
-    const { nama, deskripsi } = await request.json();
-    const result = await createPaketController(nama, deskripsi);
+    const formData = await request.formData();
+    const nama = formData.get("nama") as string;
+    const deskripsi = formData.get("deskripsi") as string | undefined;
+    const fileFoto = formData.get("fileFoto") as File | null;
+    const result = await createPaketController(nama, deskripsi, fileFoto);
+
     return NextResponse.json(result, { status: 201 });
   } catch (error) {
     return NextResponse.json(
@@ -60,10 +64,16 @@ export async function PUT(request: Request) {
   if (unauthorizedResponse) return unauthorizedResponse;
 
   try {
-    const { idPaket, nama, deskripsi } = await request.json();
-    const result = await updatePaketController(idPaket, nama, deskripsi);
+    const formData = await request.formData();
+    const id = parseInt(formData.get("id") as string, 10);
+    const nama = formData.get("nama") as string;
+    const deskripsi = formData.get("deskripsi") as string | undefined;
+    const fileFoto = formData.get("fileFoto") as File | null;
+    const result = await updatePaketController(id, nama, deskripsi, fileFoto);
+
     return NextResponse.json(result, { status: 200 });
   } catch (error) {
+    console.error("Error updating paket:", error);
     return NextResponse.json(
       { error: "Failed to update paket" },
       { status: 500 }

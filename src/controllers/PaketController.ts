@@ -34,18 +34,25 @@ export async function getPaketByIdController(id: number) {
   return await getPaketByIdService(id);
 }
 
-export async function createPaketController(nama: string, deskripsi?: string) {
+export async function createPaketController(
+  nama: string,
+  deskripsi?: string,
+  fileFoto?: File | null
+) {
   if (!nama) {
     throw new Error("Nama is required to create a paket");
   }
 
-  return await createPaketService({ nama, deskripsi });
+  console.log("Creating paket with:", { nama, deskripsi, fileFoto });
+
+  return await createPaketService({ nama, deskripsi, fileFoto });
 }
 
 export async function updatePaketController(
   id: number,
   nama: string,
-  deskripsi?: string
+  deskripsi?: string,
+  fileFoto?: File | null
 ) {
   if (!id) {
     throw new Error("ID is required to update a paket");
@@ -54,6 +61,7 @@ export async function updatePaketController(
   const paketRequest: PaketRequest = {
     nama,
     deskripsi,
+    fileFoto,
   };
   return await updatePaketService(id, paketRequest);
 }
