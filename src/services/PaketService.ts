@@ -1,6 +1,8 @@
 import { Prisma } from "@/generated/prisma"; // path to your generated Prisma client folder
 import prisma from "@/lib/prisma"; // your prisma client instance, make sure it uses the same generated client
 import { saveFileToLocal } from "./UploadService";
+import fs from "fs";
+import path from "path";
 import { get } from "http";
 import { Paket } from "@/models/Paket";
 
@@ -195,6 +197,15 @@ export async function deletePaketService(id: number) {
         success: false,
         message: "Paket not found",
       };
+    }
+
+    // Optionally, you can delete the file associated with the paket if needed
+    if (existing.pathFoto) {
+      // use fs to remove the file if it exists
+      const filePath = path.join(process.cwd(), "public", existing.pathFoto);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
     }
 
     await prisma.paket.delete({ where: { idPaket: id } });

@@ -157,7 +157,7 @@ export const Sidebar = () => {
 
                     {/* Footer */}
                     <div className="border-t border-gray-100 p-4">
-                        {!collapsed && (
+                        {/* {!collapsed && (
                             <div className="flex items-center gap-3 mb-3">
                                 <img
                                     alt="User"
@@ -179,7 +179,7 @@ export const Sidebar = () => {
                         >
                             <LogOut size={16} />
                             {!collapsed && 'Logout'}
-                        </button>
+                        </button> */}
                     </div>
                 </div>
             </div>

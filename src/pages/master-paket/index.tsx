@@ -12,7 +12,8 @@ import InsertPaketModal from "./InsertPaketModal";
 import Loading from "@/components/Spinner";
 import DetailPaketModal from "./DetailPaketModal";
 import EditPaketModal from "./EditPaketModal";
-import { Eye, Edit, Delete } from "lucide-react";
+import { Eye, Edit, Delete, Plus, Search } from "lucide-react";
+import Swal from "sweetalert2";
 
 function MasterPaketPage() {
     const router = useRouter();
@@ -32,7 +33,7 @@ function MasterPaketPage() {
         setShowDetailModal(true);
     }
 
-    const { paket, page, limit, setPage, setLimit, orderByDirection, setOrderByDirection, orderByField, setOrderByField, fetchPaket, loading, setLoading } = usePaketPagination();
+    const { paket, page, limit, setPage, setLimit, orderByField, setOrderByField, fetchPaket, loading, setLoading, setSearch } = usePaketPagination();
 
     const headers: Header<Paket>[] = [
         // { column: 'idPaket', label: 'ID PAKET', orderable: true, align: 'left' },
@@ -50,19 +51,19 @@ function MasterPaketPage() {
             render: (row: Paket) => (
                 <>
                     <button
-                        className="text-indigo-600 hover:underline mx-1"
+                        className="bg-blue-500 text-blue-700 font-semibold text-white py-1 px-2 border border-blue-500 border-transparent rounded mr-2 "
                         onClick={() => handleDetail(row)}
                     >
                         <Eye size={16} className="inline" />
                     </button>
                     <button
-                        className="text-blue-600 hover:underline mx-1"
+                        className="bg-green-500 text-green-700 font-semibold text-white py-1 px-2 border border-green-500 border-transparent rounded mr-2"
                         onClick={() => handleEdit(row)}
                     >
                         <Edit size={16} className="inline" />
                     </button>
                     <button
-                        className="text-red-600 hover:underline mx-1"
+                        className="bg-red-500 text-red-700 font-semibold text-white py-1 px-2 border border-red-500 border-transparent rounded mr-2"
                         onClick={() => handleDelete(row)}
                     >
                         <Delete size={16} className="inline" />
@@ -75,6 +76,20 @@ function MasterPaketPage() {
 
     const handleInsert = async (data: { nama: string; deskripsi?: string, fileFoto?: File | null }) => {
         try {
+            // Show confirmation dialog
+            const result = await Swal.fire({
+                title: 'Konfirmasi',
+                text: 'Apakah Anda yakin ingin menambahkan paket ini?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ya',
+                cancelButtonText: 'Tidak',
+            });
+
+            if (!result.isConfirmed) {
+                return; // User canceled, do not proceed
+            }
+
             setLoading(true);
             // new form data
             const formData = new FormData();
@@ -94,18 +109,54 @@ function MasterPaketPage() {
                 body: formData,
             })
             setLoading(false);
-            if (!res.ok) throw new Error('Failed to insert')
+
+            if (!res.ok) {
+                Swal.fire({
+                    title: 'Gagal',
+                    text: 'Gagal menambahkan paket. Silakan coba lagi.',
+                    icon: 'error',
+                });
+
+                throw new Error('Failed to insert');
+            }
+
+            Swal.fire({
+                title: 'Berhasil',
+                text: 'Paket berhasil ditambahkan.',
+                icon: 'success',
+            });
+
             fetchPaket();
             // Optionally refresh list here
         } catch (err) {
             console.error('Error inserting:', err)
             setLoading(false);
+
+            Swal.fire({
+                title: 'Error',
+                text: 'Terjadi kesalahan saat menambahkan paket.',
+                icon: 'error',
+            });
+
         }
     }
 
 
     const handleUpdate = async (data: { idPaket: number; nama: string; deskripsi?: string; fileFoto?: File | null }) => {
         try {
+            // Show confirmation dialog
+            const result = await Swal.fire({
+                title: 'Konfirmasi',
+                text: 'Apakah Anda yakin ingin memperbarui paket ini?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ya',
+                cancelButtonText: 'Tidak',
+            });
+            if (!result.isConfirmed) {
+                return; // User canceled, do not proceed
+            }
+
             setLoading(true);
             // new form data
             const formData = new FormData();
@@ -126,16 +177,45 @@ function MasterPaketPage() {
                 body: formData,
             })
             setLoading(false);
-            if (!res.ok) throw new Error('Failed to update')
+            if (!res.ok) {
+                Swal.fire({
+                    title: 'Gagal',
+                    text: 'Gagal memperbarui paket. Silakan coba lagi.',
+                    icon: 'error',
+                });
+                throw new Error('Failed to update');
+            }
+            Swal.fire({
+                title: 'Berhasil',
+                text: 'Paket berhasil diperbarui.',
+                icon: 'success',
+            });
             fetchPaket();
         } catch (err) {
             console.error('Error updating:', err)
             setLoading(false);
+            Swal.fire({
+                title: 'Error',
+                text: 'Terjadi kesalahan saat memperbarui paket.',
+                icon: 'error',
+            });
         }
     }
 
     const handleDelete = async (data: { idPaket: number }) => {
         try {
+            // Show confirmation dialog
+            const result = await Swal.fire({
+                title: 'Konfirmasi',
+                text: 'Apakah Anda yakin ingin menghapus paket ini?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Hapus',
+                cancelButtonText: 'Tidak',
+            });
+            if (!result.isConfirmed) {
+                return; // User canceled, do not proceed
+            }
             setLoading(true);
             const res = await fetch(`/api/master/paket`, {
                 method: 'DELETE',
@@ -146,11 +226,31 @@ function MasterPaketPage() {
                 body: JSON.stringify({ id: data.idPaket }),
             })
             setLoading(false);
-            if (!res.ok) throw new Error('Failed to delete')
+            if (!res.ok) {
+                Swal.fire({
+                    title: 'Gagal',
+                    text: 'Gagal menghapus paket. Silakan coba lagi.',
+                    icon: 'error',
+                });
+                throw new Error('Failed to delete');
+            }
+
+            Swal.fire({
+                title: 'Berhasil',
+                text: 'Paket berhasil dihapus.',
+                icon: 'success',
+            });
+
             fetchPaket();
         } catch (err) {
             console.error('Error deleting:', err)
             setLoading(false);
+
+            Swal.fire({
+                title: 'Error',
+                text: 'Terjadi kesalahan saat menghapus paket.',
+                icon: 'error',
+            });
         }
     }
 
@@ -186,16 +286,30 @@ function MasterPaketPage() {
                 <hr className="my-4 border-gray-300" />
                 <br />
                 <div className="flex justify-between items-center mb-4">
-                    <a
+                    {/* <a
                         className="inline-block rounded-sm border border-green-600 px-6 py-2 text-sm font-medium text-green-600 hover:bg-green-600 hover:text-white focus:ring-3 focus:outline-hidden"
                         href="#"
                     >
                         Filter
-                    </a>
+                    </a> */}
+                    <div className="flex items-center gap-2">
+                        <input
+                            type="text"
+                            placeholder="Cari Paket..."
+                            className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-600 text-gray-800 text-sm"
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    setSearch((e.target as HTMLInputElement).value);
+                                }
+                            }}
+                        />
+                    </div>
+
                     <a
                         className="inline-block rounded-sm border border-green-600 px-6 py-2 text-sm font-medium text-green-600 hover:bg-green-600 hover:text-white focus:ring-3 focus:outline-hidden"
                         onClick={() => setShowModal(true)}
                     >
+                        <Plus className="inline mr-1" />
                         Tambah Data
                     </a>
                 </div>

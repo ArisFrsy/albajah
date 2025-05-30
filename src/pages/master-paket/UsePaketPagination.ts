@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Paket } from "@/models/Paket";
+import { set } from "date-fns";
 
 export function usePaketPagination(initialPage = 1, initialLimit = 10) {
   const [paket, setPaket] = useState<Paket[]>([]);
@@ -13,12 +14,15 @@ export function usePaketPagination(initialPage = 1, initialLimit = 10) {
     "desc"
   );
   const [loading, setLoading] = useState<boolean>(true);
+  const [search, setSearch] = useState<string>("");
 
   const fetchPaket = async () => {
     try {
       setLoading(true);
       const response = await fetch(
-        `/api/master/paket?page=${page}&perPage=${limit}&orderBy=${orderByField}&orderDir=${orderByDirection}`,
+        `/api/master/paket?page=${page}&perPage=${limit}&orderBy=${orderByField}&orderDir=${orderByDirection}&search=${encodeURIComponent(
+          search
+        )}`,
         {
           method: "GET",
           headers: {
@@ -44,7 +48,7 @@ export function usePaketPagination(initialPage = 1, initialLimit = 10) {
 
   useEffect(() => {
     fetchPaket();
-  }, [page, limit, orderByField, orderByDirection]);
+  }, [page, limit, orderByField, orderByDirection, search]);
 
   return {
     paket,
@@ -60,5 +64,6 @@ export function usePaketPagination(initialPage = 1, initialLimit = 10) {
     fetchPaket,
     loading,
     setLoading,
+    setSearch,
   };
 }
