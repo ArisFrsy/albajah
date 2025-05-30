@@ -84,8 +84,8 @@ function DataTable<T extends Record<string, any>>({
 
     return (
         <>
-            <table className="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-md overflow-hidden shadow-sm">
-                <thead className="bg-indigo-50 text-sky-700">
+            <table className="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-md overflow-hidden shadow-sm table-auto md:table-fixed">
+                <thead className="bg-green-50 text-zinc-700">
                     <tr className="*:font-semibold *:text-sm *:px-4 *:py-3">
                         {headers.map(({ column, label, orderable, align = 'left' }) => (
                             <th
@@ -162,7 +162,7 @@ function DataTable<T extends Record<string, any>>({
                             <button
                                 onClick={() => handlePageChange(i + 1)}
                                 className={`block size-8 rounded text-center text-sm/8 font-medium ${page === i + 1
-                                    ? 'bg-indigo-600 border border-indigo-600 text-white'
+                                    ? 'bg-green-600 border border-green-600 text-white'
                                     : 'border border-gray-200 hover:bg-gray-50'
                                     }`}
                             >

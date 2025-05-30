@@ -2,6 +2,8 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { Sidebar } from './Sidebar';
+import HeaderComponent from './HeaderComponent';
 
 export default function withAuth(Component: React.ComponentType) {
     return function ProtectedComponent(props: any) {
@@ -16,6 +18,16 @@ export default function withAuth(Component: React.ComponentType) {
 
         }, [router]);
 
-        return <Component {...props} />;
+        return (
+            <>
+                <div className="flex h-screen">
+                    <Sidebar />
+                    <div className="flex-1 overflow-auto">
+                        <HeaderComponent />
+                        <Component {...props} />
+                    </div>
+                </div>
+            </>
+        )
     };
 }

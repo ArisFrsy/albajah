@@ -1,49 +1,53 @@
-"use client";
-import withAuth from '@/components/withAuth';
-import { Sidebar } from '@/components/Sidebar';
+'use client';
 
-function index() {
+import type { Metadata } from "next";
+import withAuth from "@/components/withAuth";
+import { EcommerceMetrics } from "@/components/ecommerce/EcommerceMetrics";
+import MonthlyTarget from "@/components/ecommerce/MonthlyTarget";
+import MonthlySalesChart from "@/components/ecommerce/MonthlySalesChart";
+import StatisticsChart from "@/components/ecommerce/StatisticsChart";
+import RecentOrders from "@/components/ecommerce/RecentOrders";
+import DemographicCard from "@/components/ecommerce/DemographicCard";
+
+import React from "react";
+
+
+export const metadata: Metadata = {
+    title:
+        "Next.js E-commerce Dashboard | TailAdmin - Next.js Dashboard Template",
+    description: "This is Next.js Home for TailAdmin Dashboard Template",
+};
+
+function Ecommerce() {
     return (
-        <>
-            <div className="flex h-screen">
-                <Sidebar />
-                <main className="flex-1 p-6 overflow-auto bg-gray-100">
-                    <div className="overflow-x-auto">
-                        <nav aria-label="Breadcrumb">
-                            <ol className="flex items-center gap-1 text-sm text-gray-700">
-                                <li>
-                                    <a href="#" className="block transition-colors hover:text-gray-900"> Admin </a>
-                                </li>
+        <main className="flex-1 p-6 overflow-auto bg-gray-100">
+            <div className="max-w-7xl mx-auto bg-white rounded-lg shadow-md p-6 border border-gray-300 min-h-[calc(110vh-6rem)]">
+                <div className="grid grid-cols-12 gap-4 md:gap-6">
+                    <div className="col-span-12 space-y-6 xl:col-span-7 text-gray-900" >
+                        <EcommerceMetrics />
 
-                                <li className="rtl:rotate-180">
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        className="size-4"
-                                        viewBox="0 0 20 20"
-                                        fill="currentColor"
-                                    >
-                                        <path
-                                            fillRule="evenodd"
-                                            d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                                            clipRule="evenodd"
-                                        />
-                                    </svg>
-                                </li>
-
-                                <li>
-                                    <a href="#" className="block transition-colors hover:text-gray-900"> Dashboard </a>
-                                </li>
-
-                            </ol>
-                        </nav>
-                        <h1 className="mt-4 text-2xl font-bold text-gray-900 text-center">Dashboard</h1>
-                        <p className="mt-2 text-gray-600 text-center ">Welcome to your dashboard!</p>
-                        <br />
+                        <MonthlySalesChart />
                     </div>
-                </main>
+
+                    <div className="col-span-12 xl:col-span-5 text-gray-900">
+                        <MonthlyTarget />
+                    </div>
+
+                    <div className="col-span-12">
+                        <StatisticsChart />
+                    </div>
+
+                    <div className="col-span-12 xl:col-span-5">
+                        {/* <DemographicCard /> */}
+                    </div>
+
+                    <div className="col-span-12 xl:col-span-7">
+                        {/* <RecentOrders /> */}
+                    </div>
+                </div>
             </div>
-        </>
+        </main>
     );
 }
 
-export default withAuth(index);
+export default withAuth(Ecommerce);
