@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { verifyCodeController } from "../../../../controllers/loginController";
+import { verifyCodeController } from "../../../../controllers/LoginController";
 import { checkAuth } from "@/utils/auth";
 
 export async function POST(request: Request) {

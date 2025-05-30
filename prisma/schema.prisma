@@ -29,3 +29,57 @@ model LoginCode {
   createdAt DateTime @default(now())
   expiresAt DateTime
 }
+
+model Paket {
+  idPaket   Int       @id @default(autoincrement())
+  nama      String
+  deskripsi String?
+
+  subpakets Subpaket[]
+}
+
+model Subpaket {
+  idSubpaket   Int      @id @default(autoincrement())
+  idPaket      Int
+  namaSubPaket String
+  hargaIDR     Decimal
+  hargaUSD     Decimal
+  keberangkatan DateTime
+  durasiHari   Int
+  penerbangan  String
+  hotelMekkah  String
+  hotelMadinah String
+  fasilitas    String?
+  perlengkapan String?
+
+  paket Paket @relation(fields: [idPaket], references: [idPaket])
+}
+
+model Berita {
+  idBerita  Int     @id @default(autoincrement())
+  judul     String
+  deskripsi String?
+}
+
+model Region {
+  idProvinsi   Int
+  idKabupaten  Int
+  namaProvinsi String
+  namaKabupaten String
+
+  // composite primary key
+  @@id([idProvinsi, idKabupaten])
+
+  cabangs Cabang[]
+}
+
+model Cabang {
+  idCabang     Int    @id @default(autoincrement())
+  idProvinsi   Int
+  idKabupaten  Int
+  penanggungjawab String
+  email        String
+  noTelepon    String
+
+  region Region @relation(fields: [idProvinsi, idKabupaten], references: [idProvinsi, idKabupaten])
+}

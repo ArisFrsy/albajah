@@ -2,6 +2,15 @@
 import React from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import clsx from 'clsx';
+import {
+    Package,
+    PackageOpen,
+    Newspaper,
+    MapPin,
+    Building2,
+    LogOut,
+    Home
+} from 'lucide-react';
 
 export const Sidebar = () => {
     const router = useRouter();
@@ -13,57 +22,62 @@ export const Sidebar = () => {
     };
 
     const menus = [
-        { name: 'Master Paket', path: '/master-paket' },
-        { name: 'Master Sub Paket', path: '/master-sub-paket' },
-        { name: 'Master Berita', path: '/master-berita' },
-        { name: 'Master Region', path: '/master-region' },
-        { name: 'Master Cabang', path: '/master-cabang' },
+        { name: 'Dashboard', path: '/dashboard', icon: Home },
+        { name: 'Master Paket', path: '/master-paket', icon: Package },
+        { name: 'Master Sub Paket', path: '/master-sub-paket', icon: PackageOpen },
+        { name: 'Master Berita', path: '/master-berita', icon: Newspaper },
+        { name: 'Master Region', path: '/master-region', icon: MapPin },
+        { name: 'Master Cabang', path: '/master-cabang', icon: Building2 },
     ];
 
     return (
-        <div className="flex h-screen flex-col justify-between border-e border-gray-100 bg-white w-64">
+        <div className="flex h-screen flex-col justify-between border-e border-gray-200 bg-white w-64 shadow-sm">
             <div className="px-4 py-6">
-                <span className="grid h-10 w-32 place-content-center rounded-lg bg-gray-100 text-xs text-gray-600">
-                    Logo
+                <span className="grid h-10 w-32 place-content-center rounded-lg bg-indigo-100 text-sm text-indigo-700 font-semibold mb-4">
+                    MyApp Logo
                 </span>
 
-                <ul className="mt-6 space-y-1">
-                    {menus.map((item) => (
-                        <li key={item.path}>
-                            <button
-                                onClick={() => router.push(item.path)}
-                                className={clsx(
-                                    'block w-full text-left rounded-lg px-4 py-2 text-sm font-medium',
-                                    pathname === item.path
-                                        ? 'bg-gray-100 text-gray-700 font-semibold'
-                                        : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700'
-                                )}
-                            >
-                                {item.name}
-                            </button>
-                        </li>
-                    ))}
+                <ul className="space-y-1">
+                    {menus.map((item) => {
+                        const isActive = pathname === item.path;
+                        const Icon = item.icon;
+                        return (
+                            <li key={item.path}>
+                                <button
+                                    onClick={() => router.push(item.path)}
+                                    className={clsx(
+                                        'flex items-center gap-3 w-full rounded-lg px-4 py-2 text-sm transition-all',
+                                        isActive
+                                            ? 'bg-indigo-50 text-indigo-700 font-semibold border-l-4 border-indigo-600'
+                                            : 'text-gray-600 hover:bg-gray-100 hover:text-gray-800'
+                                    )}
+                                >
+                                    <Icon size={18} className="shrink-0" />
+                                    {item.name}
+                                </button>
+                            </li>
+                        );
+                    })}
                 </ul>
             </div>
 
-            <div className="sticky inset-x-0 bottom-0 border-t border-gray-100">
-                <div className="flex items-center gap-2 bg-white p-4 hover:bg-gray-50">
+            <div className="border-t border-gray-100 p-4">
+                <div className="flex items-center gap-3 mb-3">
                     <img
-                        alt=""
-                        src="https://images.unsplash.com/photo-1600486913747-55e5470d6f40?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
-                        className="size-10 rounded-full object-cover"
+                        alt="User"
+                        src="https://ui-avatars.com/api/?name=Eric+Frusciante"
+                        className="w-10 h-10 rounded-full object-cover"
                     />
                     <div>
-                        <p className="text-xs">
-                            <strong className="block font-medium">Eric Frusciante</strong>
-                            <span> eric@frusciante.com </span>
-                        </p>
+                        <p className="text-sm font-medium text-gray-900">Eric Frusciante</p>
+                        <p className="text-xs text-gray-500">eric@frusciante.com</p>
                     </div>
                 </div>
                 <button
                     onClick={handleLogout}
-                    className="w-full text-left px-4 py-3 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+                    className="flex items-center gap-2 text-sm text-gray-600 hover:text-red-600 hover:bg-red-50 w-full px-3 py-2 rounded-md transition"
                 >
+                    <LogOut size={16} />
                     Logout
                 </button>
             </div>
