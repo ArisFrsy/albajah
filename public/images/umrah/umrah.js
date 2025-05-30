@@ -1,0 +1,42 @@
+// Umroh Basic
+export { default as paket_umroh_qonaah } from "./paket_umroh_qonaah_juli_10.jpg";
+export { default as paket_umroh_qonaah_juli_5 } from "./paket_umroh_qonaah_qonaah_juli_5.jpg";
+export { default as paket_umroh_qonaah_juli_9 } from "./paket_umroh_qonaah_juli_9.png";
+export { default as paket_umroh_qonaah_juli_10 } from "./paket_umroh_qonaah_juli_10.jpg";
+export { default as paket_umroh_qonaah_juli_22 } from "./paket_umroh_qonaah_juli_22.png";
+export { default as paket_umroh_qonaah_juli_26 } from "./paket_umroh_qonaah_warahmah_juli_26.jpg";
+export { default as paket_umroh_reguler_agustus_3 } from "./paket_umroh_reguler_agustus_3.png";
+export { default as paket_umroh_qonaah_warahmah_agustus_14 } from "./paket_umroh_qonaah_warahmah_agustus.jpg";
+export { default as paket_umroh_qonaah_warahmah_september_13 } from "./paket_umroh_qonaah_september_13.png";
+export { default as paket_umroh_qonaah_warahmah_oktober_16 } from "./paket_umroh_qonaah_oktober_16.png";
+export { default as paket_umroh_munko_november_5 } from "./paket_umroh_munko_november_5.png";
+export { default as paket_umroh_munko_november_5_12 } from "./paket_umroh_munko_november_5_12.png";
+export { default as paket_umroh_munko_november_5_sakinah } from "./paket_umroh_munko_november_5_sakinah.png";
+export { default as paket_umroh_munko_november_5_12_sakinah } from "./paket_umroh_munko_november_5_12_sakinah.png";
+export { default as paket_umroh_qonaah_desember_4 } from "./paket_umroh_qonaah_desember_4.png";
+export { default as paket_umroh_qonaah_desember_14 } from "./paket_umroh_qonaah_desember_14.png";
+export { default as paket_umroh_qonaah_desember_20 } from "./paket_umroh_qonaah_desember_20.png";
+
+// Umroh Plus
+export { default as paket_umroh_plus_thoif_sakinah_juli_21 } from "./paket_umroh_plus_thoif_sakinah_juli_21.jpg";
+export { default as paket_umroh_plus_thoif_sakinah_juli_31 } from "./paket_umroh_plus_thoif_sakinah_juli_31.jpg";
+export { default as paket_umroh_plus_thoif_agustus_21 } from "./paket_umroh_plus_thoif_agustus_21.jpg";
+export { default as paket_umroh_plus_thoif_agustus_30 } from "./paket_umroh_plus_thoif_agustus_30.jpg";
+export { default as paket_umroh_plus_turki_sakinah } from "./paket_umroh_plus_turki_sakinah.jpg";
+export { default as paket_umroh_plus_dubai_agustus_9 } from "./paket_umroh_plus_dubai_agustus_9.jpg";
+export { default as paket_umroh_plus_kemerdekaan_agustus } from "./paket_umroh_plus_kemerdekaan_agustus.jpg";
+export { default as paket_umroh_spesial_kemerdekaan_agustus_11 } from "./paket_umroh_spesial_kemerdekaan_agustus_11.png";
+export { default as paket_umroh_spesial_maulid_september_3 } from "./paket_umroh_spesial_maulid_september_3.png";
+export { default as paket_umroh_spesial_maulid_september_3_12 } from "./paket_umroh_spesial_maulid_september_3_12.png";
+export { default as paket_umroh_plus_cairo_september_20 } from "./paket_umroh_plus_cairo_september_20.png";
+export { default as paket_umroh_plus_thoif_september_29 } from "./paket_umroh_plus_thoif_september_29.png";
+export { default as paket_umroh_plus_turki_oktober_5 } from "./paket_umroh_plus_turki_oktober_5.png";
+export { default as paket_umroh_plus_thoif_oktober_12 } from "./paket_umroh_plus_thoif_oktober_12.png";
+export { default as paket_umroh_plus_thoif_oktober_26 } from "./paket_umroh_plus_thoif_oktober_26.png";
+export { default as paket_umroh_plus_thoif_november_30 } from "./paket_umroh_plus_thoif_november_30.png";
+export { default as paket_umroh_plus_thoif_desember_24 } from "./paket_umroh_plus_thoif_desember_24.png";
+export { default as paket_umroh_plus_thoif_desember_24_12 } from "./paket_umroh_plus_thoif_desember_24_12.png";
+export { default as paket_umroh_plus_thoif_desember_24_qonaah } from "./paket_umroh_plus_thoif_desember_24_qonaah.png";
+export { default as paket_umroh_plus_thoif_desember_27 } from "./paket_umroh_plus_thoif_desember_27.png";
+export { default as paket_umroh_plus_thoif_desember_27_12 } from "./paket_umroh_plus_thoif_desember_27_12.png";
+export { default as paket_umroh_akhir_tahun } from "./paket_umroh_akhir_tahun.png";
