@@ -1,8 +1,8 @@
 type Header<T> = {
-  column: keyof T | "actions";
+  column: keyof T | string;
   label: string;
   orderable?: boolean;
-  align?: "left" | "center" | "right";
+  align?: "left" | "right" | "center";
   render?: (row: T) => React.ReactNode;
 };
 

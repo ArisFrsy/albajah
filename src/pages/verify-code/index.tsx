@@ -37,7 +37,7 @@ export default function VerifyCodePage() {
 
         const res = await fetch('/api/login/verify-code', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, code }),
         });
 
@@ -48,6 +48,10 @@ export default function VerifyCodePage() {
             setLoading(false);
             return;
         }
+
+        const { token } = data;
+
+        localStorage.setItem('token', token);
 
         router.replace('/dashboard');
     };

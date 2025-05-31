@@ -31,7 +31,7 @@ export const Sidebar = () => {
             children: [
                 {
                     name: 'Master Sub Paket',
-                    path: '/master-sub-paket',
+                    path: '/master-subpaket',
                     icon: PackageOpen
                 }
             ]

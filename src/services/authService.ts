@@ -26,7 +26,11 @@ export async function loginService({ email, password }: LoginRequest) {
     return loginResponse;
   }
 
-  const token = signJwt({ userId: user.id, email: user.email });
+  const token = signJwt({
+    userId: user.id,
+    email: user.email,
+    verified: false,
+  });
 
   const code = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit code
   const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // expires in 5 minutes
@@ -42,6 +46,12 @@ export async function loginService({ email, password }: LoginRequest) {
 }
 
 export async function verifyCodeService(email: string, code: string) {
+  const user = await prisma.user.findUnique({ where: { email } });
+
+  if (!user) {
+    return { success: false, message: "User not found" };
+  }
+
   const loginCode = await prisma.loginCode.findFirst({
     where: {
       email,
@@ -57,11 +67,18 @@ export async function verifyCodeService(email: string, code: string) {
     return { success: false, message: "Invalid or expired code" };
   }
 
+  const token = signJwt({
+    userId: user.id,
+    email: user.email,
+    verified: true,
+  });
+
   // Hapus kode setelah verifikasi
   await prisma.loginCode.delete({ where: { id: loginCode.id } });
 
   return {
     success: true,
     message: "Code verified successfully",
+    token,
   };
 }

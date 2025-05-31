@@ -1,7 +1,14 @@
 'use client'
 
-import React, { useState, useMemo } from 'react'
-import { Header } from './Header'
+import React, { useMemo } from 'react'
+
+export type Header<T> = {
+    column: keyof T | string
+    label: string
+    orderable?: boolean
+    align?: 'left' | 'right' | 'center'
+    render?: (row: T) => React.ReactNode
+}
 
 type DataTableProps<T> = {
     data: T[]
@@ -10,10 +17,15 @@ type DataTableProps<T> = {
     perPage: number
     setPage: (page: number) => void
     setPerPage: (perPage: number) => void
-    orderBy?: keyof T | null
+    orderBy?: string | null
     order?: 'asc' | 'desc'
-    setOrderBy?: (column: keyof T | null) => void
+    setOrderBy?: (column: string | null) => void
     setOrder?: (order: 'asc' | 'desc') => void
+}
+
+// Helper to access nested values like 'paket.nama'
+function getNestedValue(obj: any, path: string): any {
+    return path.split('.').reduce((acc, part) => acc?.[part], obj)
 }
 
 function DataTable<T extends Record<string, any>>({
@@ -30,13 +42,12 @@ function DataTable<T extends Record<string, any>>({
 }: DataTableProps<T>) {
     const totalPages = Math.ceil(data.length / perPage)
 
-    // Sorting logic
     const sortedData = useMemo(() => {
         if (!orderBy) return data
 
-        const sorted = [...data].sort((a, b) => {
-            const aVal = a[orderBy]
-            const bVal = b[orderBy]
+        return [...data].sort((a, b) => {
+            const aVal = getNestedValue(a, orderBy)
+            const bVal = getNestedValue(b, orderBy)
 
             if (aVal == null) return 1
             if (bVal == null) return -1
@@ -51,24 +62,20 @@ function DataTable<T extends Record<string, any>>({
                 return order === 'asc' ? aVal - bVal : bVal - aVal
             }
 
-            // fallback string comparison
             return order === 'asc'
                 ? String(aVal).localeCompare(String(bVal))
                 : String(bVal).localeCompare(String(aVal))
         })
-
-        return sorted
     }, [data, orderBy, order])
 
     const paginatedData = useMemo(() => {
         return sortedData.slice((page - 1) * perPage, page * perPage)
     }, [sortedData, page, perPage])
 
-    const handleSort = (col: keyof T) => {
+    const handleSort = (col: string) => {
         if (!setOrderBy || !setOrder) return
 
         if (orderBy === col) {
-            // toggle asc/desc
             setOrder(order === 'asc' ? 'desc' : 'asc')
         } else {
             setOrderBy(col)
@@ -90,8 +97,8 @@ function DataTable<T extends Record<string, any>>({
                         {headers.map(({ column, label, orderable, align = 'left' }) => (
                             <th
                                 key={String(column)}
-                                className={`text-${align} cursor-${orderable ? 'pointer' : 'default'}`}
-                                onClick={() => orderable && typeof column === 'string' && handleSort(column)}
+                                className={`text-${align} ${orderable ? 'cursor-pointer' : ''}`}
+                                onClick={() => orderable && handleSort(String(column))}
                                 style={{ userSelect: orderable ? 'none' : 'auto' }}
                             >
                                 <div className="flex items-center gap-1 select-none">
@@ -116,7 +123,7 @@ function DataTable<T extends Record<string, any>>({
                                     key={String(column)}
                                     className={`px-4 py-2 text-${align} text-gray-800`}
                                 >
-                                    {render ? render(row) : String(row[column as keyof T])}
+                                    {render ? render(row) : String(getNestedValue(row, String(column)) ?? '')}
                                 </td>
                             ))}
                         </tr>
@@ -125,23 +132,20 @@ function DataTable<T extends Record<string, any>>({
             </table>
 
             <div className="mt-4 flex justify-between items-center text-sm">
-                {/* Left section: Information like "Showing X-Y of Z" or "X row(s) selected" */}
                 <div>
-                    <span className="text-gray-600"> {/* Adjusted text color to be slightly lighter as in image example */}
+                    <span className="text-gray-600">
                         Showing {(page - 1) * perPage + 1}–{Math.min(page * perPage, data.length)} of {data.length}
                     </span>
                 </div>
 
-                {/* Right section: All pagination controls */}
-                <div className="flex items-center space-x-4"> {/* Controls spacing between "Rows per page", "Page X of Y", and buttons */}
-                    {/* Rows per page dropdown */}
+                <div className="flex items-center space-x-4">
                     <div className="flex items-center">
                         <span className="mr-2 text-gray-700">Rows per page</span>
                         <select
                             value={perPage}
                             onChange={(e) => {
-                                setPerPage(Number(e.target.value));
-                                setPage(1); // Reset to first page when items per page changes
+                                setPerPage(Number(e.target.value))
+                                setPage(1)
                             }}
                             className="border border-gray-300 rounded px-2 py-1 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-gray-700"
                         >
@@ -153,15 +157,13 @@ function DataTable<T extends Record<string, any>>({
                         </select>
                     </div>
 
-                    {/* Page X of Y display */}
                     <span className="text-gray-700">
-                        Page {page} of {totalPages === 0 ? 1 : totalPages} {/* Handles case where totalPages might be 0 */}
+                        Page {page} of {totalPages === 0 ? 1 : totalPages}
                     </span>
 
-                    {/* Navigation Buttons: Styled to be text-like and close together */}
-                    <div className="flex items-center"> {/* Container for tight grouping of navigation buttons */}
+                    <div className="flex items-center">
                         <button
-                            onClick={() => handlePageChange(1)} // Assuming handlePageChange can navigate to a specific page number
+                            onClick={() => handlePageChange(1)}
                             disabled={page === 1 || totalPages === 0}
                             className="px-2 py-1 text-gray-700 hover:text-blue-600 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none"
                             aria-label="First page"
