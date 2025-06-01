@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../src/generated/prisma"
@@ -31,57 +25,86 @@ model LoginCode {
 }
 
 model Paket {
-  idPaket   Int       @id @default(autoincrement())
+  idPaket   Int        @id @default(autoincrement())
   nama      String
-  pathFoto  String?
   deskripsi String?
-
+  pathFoto  String?
   subpakets Subpaket[]
 }
 
 model Subpaket {
-  idSubpaket   String      @id @default(uuid())
-  idPaket      Int
-  namaSubPaket String
-  hargaIDR     Decimal
-  hargaUSD     Decimal
+  idSubpaket    String   @id @default(uuid())
+  idPaket       Int
+  namaSubPaket  String
+  hargaIDR      Decimal
+  hargaUSD      Decimal
   keberangkatan DateTime
-  durasiHari   Int
-  penerbangan  String
-  hotelMekkah  String
-  hotelMadinah String
-  fasilitas    String?
-  perlengkapan String?
-
-  paket Paket @relation(fields: [idPaket], references: [idPaket])
+  durasiHari    Int
+  penerbangan   String
+  hotelMekkah   String
+  hotelMadinah  String
+  fasilitas     String?
+  perlengkapan  String?
+  paket         Paket    @relation(fields: [idPaket], references: [idPaket])
 }
 
 model Berita {
   idBerita  Int     @id @default(autoincrement())
   judul     String
-  deskripsi String? @db.Text
+  deskripsi String?
 }
 
-
 model Region {
-  idProvinsi   Int
-  idKabupaten  Int
-  namaProvinsi String
+  idProvinsi    Int
+  idKabupaten   Int
+  namaProvinsi  String
   namaKabupaten String
+  cabangs       Cabang[]
 
-  // composite primary key
   @@id([idProvinsi, idKabupaten])
-
-  cabangs Cabang[]
 }
 
 model Cabang {
-  idCabang     Int    @id @default(autoincrement())
-  idProvinsi   Int
-  idKabupaten  Int
+  idCabang        Int    @id @default(autoincrement())
+  idProvinsi      Int
+  idKabupaten     Int
   penanggungjawab String
-  email        String
-  noTelepon    String
+  email           String
+  noTelepon       String
+  region          Region @relation(fields: [idProvinsi, idKabupaten], references: [idProvinsi, idKabupaten])
+}
 
-  region Region @relation(fields: [idProvinsi, idKabupaten], references: [idProvinsi, idKabupaten])
+model districts {
+  id         String     @id @db.Char(7)
+  regency_id String     @db.Char(4)
+  name       String     @db.VarChar(50)
+  regencies  regencies  @relation(fields: [regency_id], references: [id], map: "districts_regency_id_foreign")
+  villages   villages[]
+}
+
+model migrations {
+  id        Int    @id @default(autoincrement())
+  migration String @db.VarChar(255)
+  batch     Int
+}
+
+model provinces {
+  id        String      @id @db.Char(2)
+  name      String      @db.VarChar(255)
+  regencies regencies[]
+}
+
+model regencies {
+  id          String      @id @db.Char(4)
+  province_id String      @db.Char(2)
+  name        String      @db.VarChar(50)
+  districts   districts[]
+  provinces   provinces   @relation(fields: [province_id], references: [id], map: "regencies_province_id_foreign")
+}
+
+model villages {
+  id          String    @id @db.Char(10)
+  district_id String    @db.Char(7)
+  name        String    @db.VarChar(50)
+  districts   districts @relation(fields: [district_id], references: [id], map: "villages_district_id_foreign")
 }
