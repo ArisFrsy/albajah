@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Sidebar } from './Sidebar';
 import HeaderComponent from './HeaderComponent';
+import { Toaster } from 'sonner';
 
 export default function withAuth(Component: React.ComponentType) {
     return function ProtectedComponent(props: any) {
@@ -26,6 +27,7 @@ export default function withAuth(Component: React.ComponentType) {
                         <HeaderComponent />
                         <Component {...props} />
                     </div>
+                    <Toaster position="top-right" richColors />
                 </div>
             </>
         )

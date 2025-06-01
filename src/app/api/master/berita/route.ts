@@ -41,39 +41,15 @@ export async function POST(request: Request) {
   if (unauthorizedResponse) return unauthorizedResponse;
 
   try {
-    const formData = await request.formData();
-    const judul = formData.get("judul") as string;
-    const deskripsi = formData.get("deskripsi") as string | undefined;
+    // get from json body
+
+    const { judul, deskripsi } = await request.json();
     const result = await createBeritaController(judul, deskripsi);
 
     return NextResponse.json(result, { status: 201 });
   } catch (error) {
     return NextResponse.json(
       { error: "Failed to create berita" },
-      { status: 500 }
-    );
-  }
-}
-
-export async function PUT(request: Request) {
-  const unauthorizedResponse = checkAuth(request);
-  if (unauthorizedResponse) return unauthorizedResponse;
-
-  try {
-    const formData = await request.formData();
-    const id = parseInt(formData.get("id") as string, 10);
-    const judul = formData.get("judul") as string;
-    const deskripsi = formData.get("deskripsi") as string | undefined;
-
-    if (isNaN(id)) {
-      return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
-    }
-
-    const result = await updateBeritaController(id, judul, deskripsi);
-    return NextResponse.json(result, { status: 200 });
-  } catch (error) {
-    return NextResponse.json(
-      { error: "Failed to update berita" },
       { status: 500 }
     );
   }

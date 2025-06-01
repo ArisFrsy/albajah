@@ -9,8 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@ckeditor/ckeditor5-build-classic": "^44.3.0",
-    "@ckeditor/ckeditor5-react": "^9.5.0",
+    "@ckeditor/ckeditor5-build-classic": "^35.4.0",
+    "@ckeditor/ckeditor5-react": "^5.0.5",
     "@hookform/resolvers": "^5.0.1",
     "@prisma/client": "^6.8.2",
     "@radix-ui/react-dialog": "^1.1.14",
@@ -22,6 +22,13 @@
     "@radix-ui/react-slot": "^1.2.3",
     "@react-jvectormap/core": "^1.0.4",
     "@react-jvectormap/world": "^1.1.2",
+    "@tiptap/extension-font-family": "^2.12.0",
+    "@tiptap/extension-image": "^2.12.0",
+    "@tiptap/extension-text-align": "^2.12.0",
+    "@tiptap/extension-underline": "^2.12.0",
+    "@tiptap/pm": "^2.12.0",
+    "@tiptap/react": "^2.12.0",
+    "@tiptap/starter-kit": "^2.12.0",
     "albajah1": "file:",
     "apexcharts": "^4.7.0",
     "bcryptjs": "^3.0.2",
@@ -47,12 +54,12 @@
     "sonner": "^2.0.4",
     "sweetalert2": "^11.22.0",
     "tailwind-merge": "^3.3.0",
+    "tiptap-extension-resize-image": "^1.2.2",
     "zod": "^3.25.42"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4.1.8",
-    "@types/ckeditor__ckeditor5-core": "^37.0.4",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/node": "^20.17.52",
     "@types/nodemailer": "^6.4.17",

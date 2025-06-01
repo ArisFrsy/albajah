@@ -1,8 +1,8 @@
-// app/master-berita/tambah/page.tsx (atau lokasi file Anda)
+// app/master-berita/edit/[id]/page.tsx
 'use client';
 
-import React, { useState, useEffect } from 'react'; // <-- Tambahkan React di sini
-import { useRouter } from 'next/router';
+import React, { useState, useEffect } from 'react';
+import { useRouter, useParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -20,25 +20,21 @@ import {
     FormLabel,
     FormMessage,
 } from '@/components/ui/form';
-import dynamic from 'next/dynamic'; // <-- Import dynamic dari next/dynamic
 
-const TiptapEditor = dynamic(() => import('@/components/Editor'), {
-    ssr: false,
-    loading: () => <div className="text-sm text-gray-500">Loading editor...</div>,
-});
+import TiptapEditor from '@/components/Editor';
 
-
-// Skema Zod tidak berubah
 const formSchema = z.object({
     judul: z.string().min(10, { message: 'Judul berita minimal 10 karakter.' }),
     deskripsi: z.string().min(50, { message: 'Konten berita minimal 50 karakter.' }),
 });
 
-function TambahBeritaPage() {
+function EditBeritaPage() {
     const router = useRouter();
-    // 2. Tambahkan kembali state 'editorLoaded'
-    const [editorLoaded, setEditorLoaded] = useState(false);
-    const [content, setContent] = useState('')
+    const params = useParams();
+    const id = params?.id as string;
+
+    const [content, setContent] = useState('');
+    const [loading, setLoading] = useState(true);
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -49,18 +45,35 @@ function TambahBeritaPage() {
     });
 
     useEffect(() => {
+        const fetchBerita = async () => {
+            try {
+                const res = await fetch(`/api/master/berita/${id}`, {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    },
+                });
+                if (!res.ok) throw new Error('Gagal mengambil data berita');
+                const data = await res.json();
+                form.setValue('judul', data.data.judul);
+                form.setValue('deskripsi', data.data.deskripsi);
+                setContent(data.data.deskripsi);
+                setLoading(false);
+            } catch (error) {
+                toast.error((error as Error).message);
+                router.push('/master-berita');
+            }
+        };
+
+        fetchBerita();
+    }, [id, form, router]);
+
+    useEffect(() => {
         form.setValue('deskripsi', content, { shouldValidate: true, shouldDirty: true });
     }, [content, form]);
 
-    // 3. Gunakan useEffect untuk memastikan komponen hanya dimuat di client
-    useEffect(() => {
-        setEditorLoaded(true);
-    }, []);
-
-
     const handleSubmit = async (values: z.infer<typeof formSchema>) => {
-        const promise = fetch('/api/master/berita', {
-            method: 'POST',
+        const promise = fetch(`/api/master/berita/${id}`, {
+            method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -69,28 +82,34 @@ function TambahBeritaPage() {
         }).then(async (res) => {
             if (!res.ok) {
                 const errorData = await res.json();
-                throw new Error(errorData.message || 'Gagal menambahkan berita');
+                throw new Error(errorData.message || 'Gagal memperbarui berita');
             }
             return res.json();
         });
 
         toast.promise(promise, {
-            loading: 'Menyimpan berita...',
+            loading: 'Menyimpan perubahan...',
             success: () => {
                 router.push('/master-berita');
-                return 'Berita berhasil ditambahkan!';
+                return 'Berita berhasil diperbarui!';
             },
             error: (err) => err.message,
         });
     };
 
-    const deskripsiPreview = form.watch('deskripsi');
+    if (loading) {
+        return (
+            <main className="p-6">
+                <p>Memuat data berita...</p>
+            </main>
+        );
+    }
 
     return (
         <main className="flex-1 p-6 overflow-auto bg-gray-100">
             <Card className="bg-white rounded-lg shadow-md p-6 border border-gray-300 min-h-[calc(110vh-7rem)]">
                 <CardHeader>
-                    <CardTitle>Tambah Berita Baru</CardTitle>
+                    <CardTitle>Edit Berita</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <Form {...form}>
@@ -102,7 +121,7 @@ function TambahBeritaPage() {
                                     <FormItem>
                                         <FormLabel className="text-lg">Judul Berita</FormLabel>
                                         <FormControl>
-                                            <Input placeholder="Masukkan judul berita yang menarik..." {...field} />
+                                            <Input {...field} placeholder="Edit judul berita..." />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -126,24 +145,14 @@ function TambahBeritaPage() {
                             />
 
                             <Button type="submit" disabled={form.formState.isSubmitting}>
-                                {form.formState.isSubmitting ? 'Menyimpan...' : 'Simpan Berita'}
+                                {form.formState.isSubmitting ? 'Menyimpan...' : 'Update Berita'}
                             </Button>
                         </form>
                     </Form>
-
-                    {/* {deskripsiPreview && (
-                        <div className="mt-10 border-t pt-6">
-                            <h2 className="text-xl font-semibold mb-4">Preview Konten</h2>
-                            <div
-                                className="prose max-w-none"
-                                dangerouslySetInnerHTML={{ __html: deskripsiPreview }}
-                            />
-                        </div>
-                    )} */}
                 </CardContent>
             </Card>
         </main>
     );
 }
 
-export default withAuth(TambahBeritaPage);
+export default withAuth(EditBeritaPage);

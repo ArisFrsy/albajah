@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { OtpModal } from './OtpModal'
+import { Toaster } from 'sonner'
 // Hapus 'Label' dari 'ui/label', karena kita akan pakai dari 'ui/form'
 // import { Label } from '@/components/ui/label'
 
@@ -259,6 +260,7 @@ export default function LoginPage() {
                     onVerify={handleVerifyOtp}
                     onResend={handleResendOtp}
                 />
+                <Toaster position="top-right" richColors />
                 {loading && <Spinner />}
             </div>
         </>
