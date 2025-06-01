@@ -1,6 +1,8 @@
 'use client'
 
 import React, { useMemo } from 'react'
+import { File } from 'lucide-react'
+
 
 export type Header<T> = {
     column: keyof T | string
@@ -113,22 +115,34 @@ function DataTable<T extends Record<string, any>>({
                 </thead>
 
                 <tbody className="divide-y divide-gray-100">
-                    {paginatedData.map((row, idx) => (
-                        <tr
-                            key={idx}
-                            className={`${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-indigo-50 transition-colors`}
-                        >
-                            {headers.map(({ column, render, align = 'left' }) => (
-                                <td
-                                    key={String(column)}
-                                    className={`px-4 py-2 text-${align} text-gray-800`}
-                                >
-                                    {render ? render(row) : String(getNestedValue(row, String(column)) ?? '')}
-                                </td>
-                            ))}
+                    {paginatedData.length > 0 ? (
+                        paginatedData.map((row, idx) => (
+                            <tr
+                                key={idx}
+                                className={`${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-indigo-50 transition-colors`}
+                            >
+                                {headers.map(({ column, render, align = 'left' }) => (
+                                    <td
+                                        key={String(column)}
+                                        className={`px-4 py-2 text-${align} text-gray-800`}
+                                    >
+                                        {render ? render(row) : String(getNestedValue(row, String(column)) ?? '')}
+                                    </td>
+                                ))}
+                            </tr>
+                        ))
+                    ) : (
+                        <tr>
+                            <td colSpan={headers.length}>
+                                <div className="h-[250px] flex flex-col items-center justify-center text-gray-500 text-sm">
+                                    <File className="w-10 h-10 mb-2" />
+                                    There is no data
+                                </div>
+                            </td>
                         </tr>
-                    ))}
+                    )}
                 </tbody>
+
             </table>
 
             <div className="mt-4 flex justify-between items-center text-sm">

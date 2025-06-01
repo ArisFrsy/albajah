@@ -40,7 +40,7 @@ function MasterPaketPage() {
         { column: 'nama', label: 'Nama Paket', orderable: true, align: 'left' },
         { column: 'deskripsi', label: 'Deskripsi', orderable: false, align: 'left' },
         {
-            column: 'actions', label: 'Foto', orderable: false, align: 'left', render: (row: Paket) => (
+            column: 'foto', label: 'Foto', orderable: false, align: 'left', render: (row: Paket) => (
                 <img src={row.pathFoto || '/images/no-image.png'} alt={row.nama} className="w-16 h-16 object-cover rounded" />
             )
         },

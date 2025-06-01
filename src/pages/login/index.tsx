@@ -1,117 +1,264 @@
-'use client';
+'use client'
 
-import { useState, useRef } from 'react'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+import ReCAPTCHA from 'react-google-recaptcha'
+import { useRef, useState } from 'react'
+import { useRouter } from 'next/router'
+import Swal from 'sweetalert2'
 import Head from 'next/head'
-// import ReCAPTCHA from 'react-google-recaptcha'
-import DummyReCaptcha from '../../components/DummyReCaptcha';
-import { useRouter } from 'next/router';
-import Spinner from '@/components/Spinner';
+import Spinner from '@/components/Spinner'
+import { Button } from '@/components/ui/button'
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { OtpModal } from './OtpModal'
+// Hapus 'Label' dari 'ui/label', karena kita akan pakai dari 'ui/form'
+// import { Label } from '@/components/ui/label'
 
+// Impor komponen Form dari shadcn/ui
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from '@/components/ui/form'
+import { set } from 'date-fns'
+
+// Skema form tidak berubah, sudah benar
+const formSchema = z.object({
+    email: z.string().email({ message: 'Format email tidak valid.' }),
+    password: z
+        .string()
+        .min(1, 'Password harus memiliki minimal 1 karakter.'),
+})
 
 export default function LoginPage() {
-    const router = useRouter();
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
-    const [message, setMessage] = useState('')
-    const [captchaToken, setCaptchaToken] = useState('');
-    const [loading, setLoading] = useState(false);
+    const router = useRouter()
+    const [loading, setLoading] = useState(false)
+    const recaptchaRef = useRef<ReCAPTCHA>(null)
+    const [isModalOpen, setIsModalOpen] = useState(false)
+    const [loginEmail, setLoginEmail] = useState('')
 
-    async function handleSubmit(e: React.FormEvent) {
-        e.preventDefault()
+    // 1. Inisialisasi form menggunakan `useForm` dari react-hook-form
+    // Ini adalah pola yang direkomendasikan shadcn
+    const form = useForm<z.infer<typeof formSchema>>({
+        resolver: zodResolver(formSchema),
+        defaultValues: {
+            email: '',
+            password: '',
+        },
+    })
 
-        if (!captchaToken) {
-            alert('Captcha belum terverifikasi');
-            return;
-        }
+    // 2. Fungsi onSubmit sekarang menerima `values` dari form
+    async function onSubmit(values: z.infer<typeof formSchema>) {
+        console.log('Form data:', values)
+        const captcha = recaptchaRef.current?.getValue()
 
-        setLoading(true);
+        // if (!captcha) {
+        //     // Swal.fire({
+        //     //     icon: 'warning',
+        //     //     title: 'Captcha belum terverifikasi',
+        //     //     text: 'Silakan verifikasi captcha sebelum melanjutkan.',
+        //     // })
+        //     return
+        // }
 
-        const res = await fetch('/api/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password }),
-        })
+        setLoading(true)
 
-        const data = await res.json()
-        setMessage(data.message)
+        try {
+            const res = await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                // Kirim `values` langsung
+                body: JSON.stringify(values),
+            })
 
-        setLoading(false);
+            const resData = await res.json()
 
-        if (data.success) {
-            localStorage.setItem('token', data.token)
-            localStorage.setItem('user', JSON.stringify(data.user))
-            // Redirect or navigate...
-            router.push('/verify-code'); // Ganti dengan rute yang sesuai
+            if (res.ok && resData.success) {
+                localStorage.setItem('token', resData.token)
+                localStorage.setItem('user', JSON.stringify(resData.user))
+                setLoginEmail(values.email)
+                // Swal.fire({
+                //     icon: 'success',
+                //     title: 'Login berhasil!',
+                //     text: 'Anda akan diarahkan...',
+                // })
+                // router.push('/verify-code')
+
+                setIsModalOpen(true) // Buka modal OTP jika login sukses
+            } else {
+                throw new Error(resData.message || 'Login gagal')
+            }
+        } catch (error: any) {
+            // Swal.fire({
+            //     icon: 'error',
+            //     title: 'Login Gagal',
+            //     text: error.message || 'Terjadi kesalahan saat login.',
+            // })
+        } finally {
+            setLoading(false)
         }
     }
 
-    function onRecaptchaChange(value: string | null) {
-        console.log("Captcha value:", value);
+    const handleVerifyOtp = async (otp: string) => {
+        setLoading(true)
+        try {
+            const res = await fetch('/api/login/verify-code', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: loginEmail, // Kirim email yang sudah disimpan
+                    code: otp          // Gunakan key 'code' sesuai permintaan
+                })
+            })
+
+            const resData = await res.json()
+
+            if (res.ok && resData.success) {
+                localStorage.setItem('token', resData.token)
+                localStorage.setItem('user', JSON.stringify(resData.user))
+                // Swal.fire({
+                //     icon: 'success',
+                //     title: 'Verifikasi Berhasil',
+                //     text: 'Anda akan diarahkan...',
+                // })
+                router.push('/dashboard')
+            } else {
+                throw new Error(resData.message || 'Verifikasi gagal')
+            }
+        } catch (error: any) {
+            // Swal.fire({
+            //     icon: 'error',
+            //     title: 'Verifikasi Gagal',
+            //     text: error.message || 'Terjadi kesalahan saat verifikasi.',
+            // })
+        } finally {
+            setLoading(false)
+        }
     }
 
+    const handleResendOtp = async () => {
+        setLoading(true)
+        try {
+            const res = await fetch('/api/login/verify-code', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+            });
+
+            const resData = await res.json()
+
+            if (res.ok && resData.success) {
+                // Swal.fire({
+                //     icon: 'success',
+                //     title: 'Kode OTP baru telah dikirim.',
+                // })
+            } else {
+                throw new Error(resData.message || 'Gagal mengirim ulang OTP')
+            }
+        } catch (error: any) {
+            // Swal.fire({
+            //     icon: 'error',
+            //     title: 'Gagal Mengirim Ulang OTP',
+            //     text: error.message || 'Terjadi kesalahan saat mengirim ulang OTP.',
+            // })
+        } finally {
+            setLoading(false)
+        }
+    }
 
     return (
         <>
             <Head>
                 <title>Login | My App</title>
             </Head>
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-tr from-white to-indigo-100">
-                <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 border border-gray-300">
-                    <h2 className="text-3xl font-extrabold text-center text-gray-900 mb-6">Welcome</h2>
 
-                    <form onSubmit={handleSubmit} className="space-y-5">
-                        <div>
-                            <label className="block mb-1 text-sm font-semibold text-gray-700">Email</label>
-                            <input
-                                type="email"
-                                className="w-full px-4 py-2 border border-gray-300 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-600"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                required
-                            />
-                        </div>
+            <div className="min-h-screen flex items-center justify-center bg-muted px-4">
+                <Card className="w-full max-w-md">
+                    <CardHeader>
+                        <CardTitle>Login</CardTitle>
+                        <CardDescription>
+                            Masukkan email dan password untuk masuk ke akun Anda.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        {/* 3. Bungkus form dengan komponen <Form> dari shadcn */}
+                        <Form {...form}>
+                            <form
+                                onSubmit={form.handleSubmit(onSubmit)}
+                                className="space-y-6"
+                            >
+                                {/* 4. Gunakan <FormField> untuk setiap input */}
+                                <FormField
+                                    control={form.control}
+                                    name="email"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Email</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    type="email"
+                                                    // placeholder="contoh@email.com"
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
 
-                        <div>
-                            <label className="block mb-1 text-sm font-semibold text-gray-700">Password</label>
-                            <input
-                                type="password"
-                                className="w-full px-4 py-2 border border-gray-300 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-600"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                            />
-                        </div>
-                        <div>
-                            {/* <ReCAPTCHA
-                                ref={recaptchaRef}
-                                sitekey={SITE_KEY}
-                                onChange={onRecaptchaChange}
-                            /> */}
-                            <DummyReCaptcha onChange={(token) => setCaptchaToken(token)} />
-                        </div>
+                                <FormField
+                                    control={form.control}
+                                    name="password"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Password</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    type="password"
+                                                    // placeholder="******"
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
 
-                        <button
-                            type="submit"
-                            className="w-full bg-indigo-600 text-white font-semibold py-2 rounded-xl hover:bg-indigo-700 transition duration-200"
-                        >
-                            Sign In
-                        </button>
-                    </form>
+                                <ReCAPTCHA
+                                    ref={recaptchaRef}
+                                    sitekey={
+                                        '6LeNi04rAAAAAASa2iwBAbTXjRLNIT3dsIXMZ05s'
+                                    }
+                                    className="mx-auto"
+                                />
 
-                    {message && (
-                        <div className="mt-4 text-sm text-center text-red-600 font-medium">{message}</div>
-                    )}
-
-                    <p className="mt-6 text-center text-sm text-gray-600">
-                        Don't have an account?{' '}
-                        <a
-                            href="#"
-                            className="text-indigo-600 font-semibold hover:text-indigo-800 hover:underline"
-                        >
-                            Register
-                        </a>
-                    </p>
-                </div>
+                                <Button
+                                    type="submit"
+                                    className="w-full"
+                                    disabled={loading}
+                                >
+                                    {loading ? 'Memproses...' : 'Login'}
+                                </Button>
+                            </form>
+                        </Form>
+                    </CardContent>
+                </Card>
+                <OtpModal
+                    isOpen={isModalOpen}
+                    setIsOpen={setIsModalOpen}
+                    onVerify={handleVerifyOtp}
+                    onResend={handleResendOtp}
+                />
                 {loading && <Spinner />}
             </div>
         </>

@@ -1,6 +1,16 @@
 'use client'
 
 import { useState } from 'react'
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
 
 interface InsertPaketModalProps {
     isOpen: boolean
@@ -29,58 +39,52 @@ export default function InsertPaketModal({ isOpen, onClose, onSubmit }: InsertPa
         onClose()
     }
 
-    if (!isOpen) return null
-
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-opacity-20">
-            <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md">
-                <h2 className="text-xl font-semibold mb-4 text-gray-800">Tambah Paket</h2>
+        <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+            <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                    <DialogTitle>Tambah Paket</DialogTitle>
+                </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Nama Paket</label>
-                        <input
-                            type="text"
+                    <div className="space-y-2">
+                        <Label htmlFor="nama">Nama Paket</Label>
+                        <Input
+                            id="nama"
                             value={nama}
                             onChange={(e) => setNama(e.target.value)}
                             required
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-gray-800 text-sm p-2"
+                            placeholder="Masukkan nama paket"
                         />
                     </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Deskripsi</label>
-                        <textarea
+                    <div className="space-y-2">
+                        <Label htmlFor="deskripsi">Deskripsi</Label>
+                        <Textarea
+                            id="deskripsi"
                             value={deskripsi}
                             onChange={(e) => setDeskripsi(e.target.value)}
                             rows={3}
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-gray-800 text-sm p-2"
+                            placeholder="Opsional"
                         />
                     </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Upload Gambar</label>
-                        <input
+                    <div className="space-y-2">
+                        <Label htmlFor="file">Upload Gambar</Label>
+                        <Input
+                            id="file"
                             type="file"
                             accept="image/*"
                             onChange={handleFileChange}
-                            className="mt-1 block w-full text-sm text-gray-800 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
                         />
                     </div>
                     <div className="flex justify-end gap-2">
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className="px-4 py-2 text-sm rounded bg-gray-200 hover:bg-gray-300 text-gray-800"
-                        >
+                        <Button type="button" variant="outline" onClick={onClose}>
                             Batal
-                        </button>
-                        <button
-                            type="submit"
-                            className="px-4 py-2 text-sm rounded bg-indigo-600 text-white hover:bg-indigo-700"
-                        >
+                        </Button>
+                        <Button type="submit">
                             Simpan
-                        </button>
+                        </Button>
                     </div>
                 </form>
-            </div>
-        </div>
+            </DialogContent>
+        </Dialog>
     )
 }

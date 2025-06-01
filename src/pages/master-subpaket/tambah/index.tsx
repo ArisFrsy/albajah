@@ -1,20 +1,30 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Select from 'react-select';
 import { SubPaket } from '@/models/SubPaket';
 import { Paket } from '@/models/Paket';
 import { usePaketPagination } from '../../master-paket/UsePaketPagination';
 import withAuth from '@/components/withAuth';
 import Loading from '@/components/Spinner';
-import { Input, Textarea } from '@/components/common/Input';
 import Swal from 'sweetalert2';
 import { useRouter } from 'next/router';
+import {
+    Card,
+    CardHeader,
+    CardTitle,
+    CardContent,
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
+import { Select as ShadSelect, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Combobox } from '@/components/ui/combobox';
 
 function InsertSubPaketPage() {
     const router = useRouter();
     const [namaSubPaket, setNamaSubPaket] = useState('');
-    const [idPaket, setIdPaket] = useState(0);
+    const [idPaket, setIdPaket] = useState('');
     const [hargaIDR, setHargaIDR] = useState(0);
     const [hargaUSD, setHargaUSD] = useState(0);
     const [keberangkatan, setKeberangkatan] = useState('');
@@ -26,8 +36,9 @@ function InsertSubPaketPage() {
     const [perlengkapan, setPerlengkapan] = useState('');
 
     const [paketList, setPaketList] = useState<Paket[]>([]);
-    // Track if rendering on client side
     const [isClient, setIsClient] = useState(false);
+    const [options, setOptions] = useState<{ value: number; label: string }[]>([]);
+
     useEffect(() => {
         setIsClient(true);
     }, []);
@@ -37,6 +48,13 @@ function InsertSubPaketPage() {
     useEffect(() => {
         if (paket.length > 0) {
             setPaketList(paket);
+            const paketOptions = paket.map((p) => ({
+                value: p.idPaket,
+                label: p.nama,
+            }));
+
+            setOptions(paketOptions);
+
         }
     }, [paket]);
 
@@ -45,7 +63,7 @@ function InsertSubPaketPage() {
 
         const newSubPaket: SubPaket = {
             idSubpaket: '',
-            idPaket,
+            idPaket: parseInt(idPaket),
             namaSubPaket,
             hargaIDR,
             hargaUSD,
@@ -68,21 +86,12 @@ function InsertSubPaketPage() {
                 body: JSON.stringify(newSubPaket),
             });
 
-            if (!response.ok) {
-                throw new Error('Failed to insert sub paket');
-            }
-
             const result = await response.json();
 
-            if (!result.success) {
-                Swal.fire({
-                    title: 'Error',
-                    text: 'Failed to insert sub paket',
-                    icon: 'error',
-                });
-
+            if (!response.ok || !result.success) {
                 throw new Error(result.message || 'Failed to insert sub paket');
             }
+
             Swal.fire({
                 title: 'Success',
                 text: 'Sub Paket berhasil ditambahkan',
@@ -90,25 +99,18 @@ function InsertSubPaketPage() {
             });
 
             router.push('/master-subpaket');
-
         } catch (err) {
             Swal.fire({
                 title: 'Error',
-                text: "Terjadi kesalahan saat menambahkan sub paket. Silakan coba lagi.",
+                text: 'Terjadi kesalahan saat menambahkan sub paket. Silakan coba lagi.',
                 icon: 'error',
             });
         }
     };
 
-    if (!isClient) {
-        // Render loading atau null dulu sampai client ready supaya SSR dan CSR sama
-        return <Loading />;
-    }
-
-
     const resetForm = () => {
         setNamaSubPaket('');
-        setIdPaket(0);
+        setIdPaket('');
         setHargaIDR(0);
         setHargaUSD(0);
         setKeberangkatan('');
@@ -120,60 +122,99 @@ function InsertSubPaketPage() {
         setPerlengkapan('');
     };
 
-    const paketOptions = paketList.map((p) => ({
-        value: p.idPaket,
-        label: p.nama,
-    }));
+    if (!isClient) return <Loading />;
 
     return (
-        <main className="flex-1 p-4 bg-gray-50">
-            <div className="max-w-2xl mx-auto bg-white rounded-xl border border-gray-200 p-6">
-                <h1 className="text-xl font-semibold mb-5 text-gray-900">Tambah Sub Paket</h1>
-                <form onSubmit={handleSubmit} className="space-y-4 text-sm">
-                    <Input label="Nama Sub Paket" value={namaSubPaket} onChange={setNamaSubPaket} required />
-                    <div>
-                        <label className="block mb-1 text-gray-700">Pilih Paket</label>
-                        <Select
-                            options={paketOptions}
-                            value={paketOptions.find((opt) => opt.value === idPaket)}
-                            onChange={(e) => {
-                                setIdPaket(e?.value || 0);
-                            }}
-                            placeholder="Cari paket..."
-                            className="text-sm text-gray-900"
-                        />
-                    </div>
-                    <Input label="Harga IDR" type="number" value={hargaIDR} onChange={setHargaIDR} required />
-                    <Input label="Harga USD" type="number" value={hargaUSD} onChange={setHargaUSD} required />
-                    <Input label="Keberangkatan" type="date" value={keberangkatan} onChange={setKeberangkatan} required />
-                    <Input label="Durasi Hari" type="number" value={durasiHari} onChange={setDurasiHari} required />
-                    <Input label="Penerbangan" value={penerbangan} onChange={setPenerbangan} required />
-                    <Input label="Hotel Mekkah" value={hotelMekkah} onChange={setHotelMekkah} required />
-                    <Input label="Hotel Madinah" value={hotelMadinah} onChange={setHotelMadinah} required />
-                    <Textarea label="Fasilitas" value={fasilitas} onChange={setFasilitas} />
-                    <Textarea label="Perlengkapan" value={perlengkapan} onChange={setPerlengkapan} />
+        <main className="flex-1 p-6 overflow-auto bg-gray-100">
+            <Card className="bg-white rounded-lg shadow-md p-6 border border-gray-300 min-h-[calc(110vh-7rem)]">
+                <CardHeader>
+                    <CardTitle className="text-lg font-semibold text-gray-800">Tambah Sub Paket</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <form onSubmit={handleSubmit} className="space-y-4 text-sm">
+                        <div className='grid grid-cols-2 gap-4'>
+                            <div className="space-y-2">
+                                <Label>Nama Sub Paket</Label>
+                                <Input value={namaSubPaket} onChange={(e) => setNamaSubPaket(e.target.value)} required />
+                            </div>
 
-                    <div className="flex justify-end gap-2 pt-4">
-                        <button
-                            type="button"
-                            onClick={resetForm}
-                            className="px-3 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100"
-                        >
-                            Reset
-                        </button>
-                        <button
-                            type="submit"
-                            className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
-                        >
-                            Simpan
-                        </button>
-                    </div>
-                </form>
-            </div>
+                            <div className="space-y-2">
+                                <Label>Pilih Paket</Label>
+                                <Combobox
+                                    items={options}
+                                    value={idPaket}
+                                    onChange={(item) => setIdPaket(item.value.toString())}
+                                    placeholder="Cari paket..."
+                                />
+
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-4">
+                            <div className="space-y-2">
+                                <Label>Harga IDR</Label>
+                                <Input type="number" value={hargaIDR} onChange={(e) => setHargaIDR(Number(e.target.value))} required />
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Harga USD</Label>
+                                <Input type="number" value={hargaUSD} onChange={(e) => setHargaUSD(Number(e.target.value))} required />
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Durasi Hari</Label>
+                                <Input type="number" value={durasiHari} onChange={(e) => setDurasiHari(Number(e.target.value))} required />
+                            </div>
+                        </div>
+
+                        <div className='grid grid-cols-2 gap-4'>
+                            <div className="space-y-2">
+                                <Label>Keberangkatan</Label>
+                                <Input type="date" value={keberangkatan} onChange={(e) => setKeberangkatan(e.target.value)} required />
+                            </div>
+
+
+                            <div className="space-y-2">
+                                <Label>Penerbangan</Label>
+                                <Input value={penerbangan} onChange={(e) => setPenerbangan(e.target.value)} required />
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label>Hotel Mekkah</Label>
+                                <Input value={hotelMekkah} onChange={(e) => setHotelMekkah(e.target.value)} required />
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label>Hotel Madinah</Label>
+                                <Input value={hotelMadinah} onChange={(e) => setHotelMadinah(e.target.value)} required />
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label>Fasilitas</Label>
+                            <Textarea value={fasilitas} onChange={(e) => setFasilitas(e.target.value)} />
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label>Perlengkapan</Label>
+                            <Textarea value={perlengkapan} onChange={(e) => setPerlengkapan(e.target.value)} />
+                        </div>
+
+                        <div className="flex justify-end gap-2 pt-4">
+                            <Button variant="outline" type="button" onClick={resetForm}>
+                                Reset
+                            </Button>
+                            <Button type="submit" className="bg-green-600 hover:bg-green-700">
+                                Simpan
+                            </Button>
+                        </div>
+                    </form>
+                </CardContent>
+            </Card>
+
             {loading && <Loading />}
         </main>
     );
 }
 
 export default withAuth(InsertSubPaketPage);
-

@@ -59,8 +59,9 @@ model Subpaket {
 model Berita {
   idBerita  Int     @id @default(autoincrement())
   judul     String
-  deskripsi String?
+  deskripsi String? @db.Text
 }
+
 
 model Region {
   idProvinsi   Int
