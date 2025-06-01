@@ -47,7 +47,7 @@ export async function getSubPaketService({
       take: perPage,
       orderBy,
       include: {
-        paket: true, // Include related Paket data
+        Paket: true, // Include related Paket data
       },
     });
 
@@ -72,7 +72,7 @@ export async function getSubPaketByIdService(idSubpaket: string) {
   try {
     const subPaket = await prisma.subpaket.findUnique({
       where: { idSubpaket },
-      include: { paket: true }, // Include related Paket data
+      include: { Paket: true }, // Include related Paket data
     });
 
     if (!subPaket) {
@@ -99,7 +99,7 @@ export async function getSubPaketByIdService(idSubpaket: string) {
 export async function createSubPaketService(requestData: SubPaket) {
   try {
     const data: Prisma.SubpaketCreateInput = {
-      paket: {
+      Paket: {
         connect: {
           idPaket: requestData.idPaket, // pastikan ID ini ada di tabel Paket
         },
@@ -144,7 +144,7 @@ export async function updateSubPaketService(
 ) {
   try {
     const data: Prisma.SubpaketUpdateInput = {
-      paket: {
+      Paket: {
         connect: {
           idPaket: requestData.idPaket, // pastikan ID ini ada di tabel Paket
         },

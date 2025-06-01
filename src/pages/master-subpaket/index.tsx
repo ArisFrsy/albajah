@@ -52,7 +52,7 @@ function MasterSubPaket() {
 
     const headers: Header<SubPaket>[] = [
         { column: "namaSubPaket", label: "Sub Paket", orderable: true, align: "left" },
-        { column: "paket.nama", label: "Paket", orderable: true, align: "left" },
+        { column: "Paket.nama", label: "Paket", orderable: true, align: "left" },
         { column: "hargaIDR", label: "IDR", orderable: true, align: "right" },
         { column: "hargaUSD", label: "USD", orderable: true, align: "right" },
         { column: "keberangkatan", label: "Keberangkatan", orderable: true, align: "left" },
@@ -60,8 +60,8 @@ function MasterSubPaket() {
         { column: "penerbangan", label: "Penerbangan", orderable: true, align: "left" },
         { column: "hotelMekkah", label: "Hotel Mekkah", orderable: true, align: "left" },
         { column: "hotelMadinah", label: "Hotel Madinah", orderable: true, align: "left" },
-        { column: "fasilitas", label: "Fasilitas", orderable: false, align: "left" },
-        { column: "perlengkapan", label: "Perlengkapan", orderable: false, align: "left" },
+        // { column: "fasilitas", label: "Fasilitas", orderable: false, align: "left" },
+        // { column: "perlengkapan", label: "Perlengkapan", orderable: false, align: "left" },
         {
             column: 'actions', // this is allowed because we define 'actions' in Header<T>
             label: 'Actions',

@@ -8,16 +8,25 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model user {
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String   @unique
-  password  String
-  createdAt DateTime @default(now())
+model Berita {
+  idBerita  Int     @id @default(autoincrement())
+  judul     String
+  deskripsi String?
+}
+
+model Cabang {
+  idCabang        Int       @unique(map: "cabang_unique") @default(autoincrement())
+  idProvinsi      String    @db.VarChar
+  idKabupaten     String    @db.VarChar
+  penanggungjawab String
+  email           String
+  noTelepon       String
+  provinces       provinces @relation(fields: [idProvinsi], references: [id], map: "cabang_provinces_fk")
+  regencies       regencies @relation(fields: [idKabupaten], references: [id], map: "cabang_regencies_fk")
 }
 
 model LoginCode {
-  id        String   @id @default(uuid())
+  id        String   @id
   email     String
   code      String
   createdAt DateTime @default(now())
@@ -29,7 +38,16 @@ model Paket {
   nama      String
   deskripsi String?
   pathFoto  String?
-  subpakets Subpaket[]
+  Subpaket  Subpaket[]
+}
+
+model Region {
+  idProvinsi    Int
+  idKabupaten   Int
+  namaProvinsi  String
+  namaKabupaten String
+
+  @@id([idProvinsi, idKabupaten])
 }
 
 model Subpaket {
@@ -45,33 +63,7 @@ model Subpaket {
   hotelMadinah  String
   fasilitas     String?
   perlengkapan  String?
-  paket         Paket    @relation(fields: [idPaket], references: [idPaket])
-}
-
-model Berita {
-  idBerita  Int     @id @default(autoincrement())
-  judul     String
-  deskripsi String?
-}
-
-model Region {
-  idProvinsi    Int
-  idKabupaten   Int
-  namaProvinsi  String
-  namaKabupaten String
-  cabangs       Cabang[]
-
-  @@id([idProvinsi, idKabupaten])
-}
-
-model Cabang {
-  idCabang        Int    @id @default(autoincrement())
-  idProvinsi      Int
-  idKabupaten     Int
-  penanggungjawab String
-  email           String
-  noTelepon       String
-  region          Region @relation(fields: [idProvinsi, idKabupaten], references: [idProvinsi, idKabupaten])
+  Paket         Paket    @relation(fields: [idPaket], references: [idPaket])
 }
 
 model districts {
@@ -91,6 +83,7 @@ model migrations {
 model provinces {
   id        String      @id @db.Char(2)
   name      String      @db.VarChar(255)
+  Cabang    Cabang[]
   regencies regencies[]
 }
 
@@ -98,8 +91,17 @@ model regencies {
   id          String      @id @db.Char(4)
   province_id String      @db.Char(2)
   name        String      @db.VarChar(50)
+  Cabang      Cabang[]
   districts   districts[]
   provinces   provinces   @relation(fields: [province_id], references: [id], map: "regencies_province_id_foreign")
+}
+
+model user {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
 }
 
 model villages {

@@ -42,11 +42,6 @@ export const Sidebar = () => {
             icon: Newspaper
         },
         {
-            name: 'Master Region',
-            path: '/master-region',
-            icon: MapPin
-        },
-        {
             name: 'Master Cabang',
             path: '/master-cabang',
             icon: Building2
