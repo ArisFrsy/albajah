@@ -30,6 +30,7 @@ import { SubPaket } from '@/models/SubPaket';
 import { decrypt } from '@/lib/Encrypt';
 import { Plus, Minus } from 'lucide-react';
 import { formatCurrency, unformatCurrency } from '@/utils/formatCurrency';
+import { confirmDialog } from '@/lib/confirm-dialog';
 
 
 // Skema validasi Zod (sama persis dengan halaman tambah)
@@ -129,16 +130,13 @@ function EditSubPaketPage() {
     }, []);
 
     const handleSubmit = async (values: z.infer<typeof formSchema>) => {
-        const confirmUpdate = await Swal.fire({
+        const confirmed = await confirmDialog({
             title: 'Konfirmasi Perubahan',
-            text: 'Apakah Anda yakin ingin menyimpan perubahan ini?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Ya, Simpan',
-            cancelButtonText: 'Batal',
+            description: 'Apakah Anda yakin ingin menyimpan perubahan ini?',
+            confirmText: 'Simpan',
+            cancelText: 'Batal',
         });
-
-        if (!confirmUpdate.isConfirmed) return;
+        if (!confirmed.confirmed) return;
 
         const updatedSubPaket = {
             idSubpaket: id as string,
@@ -161,7 +159,7 @@ function EditSubPaketPage() {
         }).then(async (res) => {
             if (!res.ok) {
                 const errorData = await res.json();
-                throw new Error(errorData.message || 'Gagal memperbarui data');
+                toast.error(errorData.message || 'Gagal memperbarui sub paket');
             }
             return res.json();
         });

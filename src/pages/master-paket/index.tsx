@@ -12,8 +12,13 @@ import InsertPaketModal from "./InsertPaketModal";
 import Loading from "@/components/Spinner";
 import DetailPaketModal from "./DetailPaketModal";
 import EditPaketModal from "./EditPaketModal";
-import { Eye, Edit, Delete, Plus, Search } from "lucide-react";
+import { Eye, Edit, Delete, Plus, Search, Trash2 } from "lucide-react";
 import Swal from "sweetalert2";
+import { confirmDialog } from "@/lib/confirm-dialog";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+
+
 
 function MasterPaketPage() {
     const router = useRouter();
@@ -50,24 +55,35 @@ function MasterPaketPage() {
             align: 'left',
             render: (row: Paket) => (
                 <>
-                    <button
-                        className="bg-blue-500 text-blue-700 font-semibold text-white py-1 px-2 border border-blue-500 border-transparent rounded mr-2 "
-                        onClick={() => handleDetail(row)}
-                    >
-                        <Eye size={16} className="inline" />
-                    </button>
-                    <button
-                        className="bg-green-500 text-green-700 font-semibold text-white py-1 px-2 border border-green-500 border-transparent rounded mr-2"
-                        onClick={() => handleEdit(row)}
-                    >
-                        <Edit size={16} className="inline" />
-                    </button>
-                    <button
-                        className="bg-red-500 text-red-700 font-semibold text-white py-1 px-2 border border-red-500 border-transparent rounded mr-2"
-                        onClick={() => handleDelete(row)}
-                    >
-                        <Delete size={16} className="inline" />
-                    </button>
+                    <div className="flex gap-2">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="bg-blue-500 text-white hover:bg-blue-600"
+                            onClick={() => handleDetail(row)}
+                        >
+                            <Eye size={16} className="inline" />
+                        </Button>
+
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="bg-green-500 text-white hover:bg-green-600"
+                            onClick={() => handleEdit(row)}
+                        >
+                            <Edit size={16} className="inline" />
+                        </Button>
+
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="bg-red-500 text-white hover:bg-red-600"
+                            onClick={() => handleDelete(row)}
+                        >
+                            <Trash2 size={16} className="inline" />
+                        </Button>
+                    </div>
+
                 </>
             ),
         },
@@ -77,18 +93,16 @@ function MasterPaketPage() {
     const handleInsert = async (data: { nama: string; deskripsi?: string, fileFoto?: File | null }) => {
         try {
             // Show confirmation dialog
-            const result = await Swal.fire({
+            const result = await confirmDialog({
                 title: 'Konfirmasi',
-                text: 'Apakah Anda yakin ingin menambahkan paket ini?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Ya',
-                cancelButtonText: 'Tidak',
+                description: 'Apakah Anda yakin ingin menambahkan paket ini?',
+                confirmText: 'Ya',
+                cancelText: 'Batal',
             });
-
-            if (!result.isConfirmed) {
+            if (!result.confirmed) {
                 return; // User canceled, do not proceed
             }
+
 
             setLoading(true);
             // new form data
@@ -111,20 +125,10 @@ function MasterPaketPage() {
             setLoading(false);
 
             if (!res.ok) {
-                Swal.fire({
-                    title: 'Gagal',
-                    text: 'Gagal menambahkan paket. Silakan coba lagi.',
-                    icon: 'error',
-                });
-
-                throw new Error('Failed to insert');
+                toast.error('Gagal menambahkan paket. Silakan coba lagi.');
             }
 
-            Swal.fire({
-                title: 'Berhasil',
-                text: 'Paket berhasil ditambahkan.',
-                icon: 'success',
-            });
+            toast.success('Paket berhasil ditambahkan.');
 
             fetchPaket();
             // Optionally refresh list here
@@ -132,11 +136,7 @@ function MasterPaketPage() {
             console.error('Error inserting:', err)
             setLoading(false);
 
-            Swal.fire({
-                title: 'Error',
-                text: 'Terjadi kesalahan saat menambahkan paket.',
-                icon: 'error',
-            });
+            toast.error('Terjadi kesalahan saat menambahkan paket.');
 
         }
     }
@@ -145,15 +145,13 @@ function MasterPaketPage() {
     const handleUpdate = async (data: { idPaket: number; nama: string; deskripsi?: string; fileFoto?: File | null }) => {
         try {
             // Show confirmation dialog
-            const result = await Swal.fire({
+            const result = await confirmDialog({
                 title: 'Konfirmasi',
-                text: 'Apakah Anda yakin ingin memperbarui paket ini?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Ya',
-                cancelButtonText: 'Tidak',
+                description: 'Apakah Anda yakin ingin memperbarui paket ini?',
+                confirmText: 'Ya',
+                cancelText: 'Batal',
             });
-            if (!result.isConfirmed) {
+            if (!result.confirmed) {
                 return; // User canceled, do not proceed
             }
 
@@ -178,42 +176,27 @@ function MasterPaketPage() {
             })
             setLoading(false);
             if (!res.ok) {
-                Swal.fire({
-                    title: 'Gagal',
-                    text: 'Gagal memperbarui paket. Silakan coba lagi.',
-                    icon: 'error',
-                });
-                throw new Error('Failed to update');
+                toast.error('Gagal memperbarui paket. Silakan coba lagi.');
             }
-            Swal.fire({
-                title: 'Berhasil',
-                text: 'Paket berhasil diperbarui.',
-                icon: 'success',
-            });
+            toast.success('Paket berhasil diperbarui.');
             fetchPaket();
         } catch (err) {
             console.error('Error updating:', err)
             setLoading(false);
-            Swal.fire({
-                title: 'Error',
-                text: 'Terjadi kesalahan saat memperbarui paket.',
-                icon: 'error',
-            });
+            toast.error('Terjadi kesalahan saat memperbarui paket.');
         }
     }
 
     const handleDelete = async (data: { idPaket: number }) => {
         try {
             // Show confirmation dialog
-            const result = await Swal.fire({
+            const result = await confirmDialog({
                 title: 'Konfirmasi',
-                text: 'Apakah Anda yakin ingin menghapus paket ini?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Ya, Hapus',
-                cancelButtonText: 'Tidak',
+                description: 'Apakah Anda yakin ingin menghapus paket ini?',
+                confirmText: 'Ya',
+                cancelText: 'Batal',
             });
-            if (!result.isConfirmed) {
+            if (!result.confirmed) {
                 return; // User canceled, do not proceed
             }
             setLoading(true);
@@ -227,30 +210,16 @@ function MasterPaketPage() {
             })
             setLoading(false);
             if (!res.ok) {
-                Swal.fire({
-                    title: 'Gagal',
-                    text: 'Gagal menghapus paket. Silakan coba lagi.',
-                    icon: 'error',
-                });
-                throw new Error('Failed to delete');
+                toast.error('Gagal menghapus paket. Silakan coba lagi.');
             }
 
-            Swal.fire({
-                title: 'Berhasil',
-                text: 'Paket berhasil dihapus.',
-                icon: 'success',
-            });
+            toast.success('Paket berhasil dihapus.');
 
             fetchPaket();
         } catch (err) {
-            console.error('Error deleting:', err)
             setLoading(false);
 
-            Swal.fire({
-                title: 'Error',
-                text: 'Terjadi kesalahan saat menghapus paket.',
-                icon: 'error',
-            });
+            toast.error('Terjadi kesalahan saat menghapus paket.');
         }
     }
 

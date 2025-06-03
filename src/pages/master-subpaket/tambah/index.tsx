@@ -22,6 +22,8 @@ import { Select as ShadSelect, SelectContent, SelectItem, SelectTrigger, SelectV
 import { Combobox } from '@/components/ui/combobox';
 import { formatCurrency, unformatCurrency } from '@/utils/formatCurrency';
 import { Minus, Plus } from 'lucide-react';
+import { confirmDialog } from '@/lib/confirm-dialog';
+import { toast } from 'sonner';
 
 
 function InsertSubPaketPage() {
@@ -69,6 +71,14 @@ function InsertSubPaketPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
+        const confirmed = await confirmDialog({
+            title: 'Konfirmasi',
+            description: 'Apakah Anda yakin ingin menambahkan sub paket ini?',
+            confirmText: 'Ya, Tambah',
+            cancelText: 'Batal',
+        });
+        if (!confirmed.confirmed) return;
+
         const newSubPaket: SubPaket = {
             idSubpaket: '',
             idPaket: parseInt(idPaket),
@@ -97,22 +107,14 @@ function InsertSubPaketPage() {
             const result = await response.json();
 
             if (!response.ok || !result.success) {
-                throw new Error(result.message || 'Failed to insert sub paket');
+                toast.error(result.message || 'Gagal menambahkan sub paket');
             }
 
-            Swal.fire({
-                title: 'Success',
-                text: 'Sub Paket berhasil ditambahkan',
-                icon: 'success',
-            });
+            toast.success('Sub paket berhasil ditambahkan');
 
             router.push('/master-subpaket');
         } catch (err) {
-            Swal.fire({
-                title: 'Error',
-                text: 'Terjadi kesalahan saat menambahkan sub paket. Silakan coba lagi.',
-                icon: 'error',
-            });
+            toast.error('Terjadi kesalahan saat menambahkan sub paket');
         }
     };
 

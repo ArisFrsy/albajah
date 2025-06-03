@@ -8,10 +8,13 @@ import { useBeritaPagination } from "./UseBeritaPagination";
 import { Berita } from "@/models/Berita";
 import { Header } from "@/components/Header";
 import Loading from "@/components/Spinner";
-import { Eye, Edit, Delete, Plus, Search } from "lucide-react";
+import { Eye, Edit, Delete, Plus, Search, Trash2 } from "lucide-react";
 import Swal from "sweetalert2";
 import Link from "next/link";
 import { encrypt } from "@/lib/Encrypt";
+import { confirmDialog } from "@/lib/confirm-dialog";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 
 function MasterBerita() {
     const router = useRouter();
@@ -22,33 +25,33 @@ function MasterBerita() {
 
     const [selectedBerita, setSelectedBerita] = useState<Berita | null>(null);
 
-    const handleDelete = (berita: Berita) => {
-        Swal.fire({
-            title: 'Hapus Berita',
-            text: `Apakah Anda yakin ingin menghapus berita "${berita.judul}"?`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Ya, Hapus',
-            cancelButtonText: 'Batal',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                fetch(`/api/master/berita/${berita.idBerita}`, {
+    const handleDelete = async (berita: Berita) => {
+        const confirmed = await confirmDialog({
+            title: "Konfirmasi Hapus",
+            description: `Apakah Anda yakin ingin menghapus berita "${berita.judul}"?`,
+            confirmText: "Hapus",
+            cancelText: "Batal",
+        });
+        if (confirmed.confirmed) {
+            try {
+                const response = await fetch(`/api/master/berita/${berita.idBerita}`, {
                     method: 'DELETE',
                     headers: {
+                        'Content-Type': 'application/json',
                         Authorization: `Bearer ${localStorage.getItem('token')}`,
                     },
-                })
-                    .then((res) => res.json())
-                    .then(() => {
-                        Swal.fire('Berhasil', 'Berita berhasil dihapus.', 'success');
-                        router.reload();
-                    })
-                    .catch((error) => {
-                        console.error("Error deleting berita:", error);
-                        Swal.fire('Gagal', 'Terjadi kesalahan saat menghapus berita.', 'error');
-                    });
+                });
+
+                if (!response.ok) {
+                    toast.error("Gagal menghapus berita. Pastikan tidak ada data terkait yang masih digunakan.");
+                } else {
+                    toast.success("Berita berhasil dihapus.");
+                    router.reload();
+                }
+            } catch (error) {
+                toast.error("Terjadi kesalahan saat menghapus berita.");
             }
-        });
+        }
     }
 
     const headers: Header<Berita>[] = [
@@ -59,26 +62,35 @@ function MasterBerita() {
             align: 'left',
             render: (row: Berita) => (
                 <>
-                    <Link href={`/master-berita/view/${encrypt(row.idBerita ? row.idBerita.toString() : '-')}`} passHref>
-                        <button
-                            className="bg-blue-500 text-blue-700 font-semibold text-white py-1 px-2 border border-blue-500 border-transparent rounded mr-2"
+                    <div className="flex gap-2">
+
+                        <Link href={`/master-berita/view/${encrypt(row.idBerita ? row.idBerita.toString() : '-')}`} passHref>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="bg-blue-500 text-white hover:bg-blue-600"
+                            >
+                                <Eye size={16} className="inline" />
+                            </Button>
+                        </Link>
+                        <Link href={`/master-berita/edit/${encrypt(row.idBerita ? row.idBerita.toString() : '-')}`} passHref>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="bg-green-500 text-white hover:bg-green-600"
+                            >
+                                <Edit size={16} className="inline" />
+                            </Button>
+                        </Link>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="bg-red-500 text-white hover:bg-red-600"
+                            onClick={() => handleDelete(row)}
                         >
-                            <Eye size={16} className="inline" />
-                        </button>
-                    </Link>
-                    <Link href={`/master-berita/edit/${encrypt(row.idBerita ? row.idBerita.toString() : '-')}`} passHref>
-                        <button
-                            className="bg-yellow-500 text-yellow-700 font-semibold text-white py-1 px-2 border border-yellow-500 border-transparent rounded mr-2"
-                        >
-                            <Edit size={16} className="inline" />
-                        </button>
-                    </Link>
-                    <button
-                        className="bg-red-500 text-red-700 font-semibold text-white py-1 px-2 border border-red-500 border-transparent rounded mr-2"
-                        onClick={() => handleDelete(row)}
-                    >
-                        <Delete size={16} className="inline" />
-                    </button>
+                            <Trash2 size={16} className="inline" />
+                        </Button>
+                    </div>
                 </>
             ),
         },

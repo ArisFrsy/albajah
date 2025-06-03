@@ -8,11 +8,14 @@ import { useCabangPagination } from "./UseCabangPagination";
 import { Cabang } from "@/models/Cabang";
 import { Header } from "@/components/Header";
 import Loading from "@/components/Spinner";
-import { Eye, Edit, Delete, Plus, Search } from "lucide-react";
+import { Eye, Edit, Delete, Plus, Search, Trash2 } from "lucide-react";
 import Swal from "sweetalert2";
 import InsertCabangModal from "./InsertCabangModal";
 import EditCabangModal from "./EditCabangModal";
 import DetailCabangModal from "./DetailCabangModal";
+import { confirmDialog } from "@/lib/confirm-dialog";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 
 function MasterCabang() {
     const router = useRouter();
@@ -65,30 +68,51 @@ function MasterCabang() {
             align: 'left',
             render: (row: Cabang) => (
                 <>
-                    <button
-                        className="bg-blue-500 text-blue-700 font-semibold text-white py-1 px-2 border border-blue-500 border-transparent rounded mr-2 "
-                        onClick={() => handleDetail(row)}
-                    >
-                        <Eye size={16} className="inline" />
-                    </button>
-                    <button
-                        className="bg-green-500 text-green-700 font-semibold text-white py-1 px-2 border border-green-500 border-transparent rounded mr-2"
-                        onClick={() => handleEdit(row)}
-                    >
-                        <Edit size={16} className="inline" />
-                    </button>
-                    <button
-                        className="bg-red-500 text-red-700 font-semibold text-white py-1 px-2 border border-red-500 border-transparent rounded mr-2"
-                        onClick={() => handleDelete(row)}
-                    >
-                        <Delete size={16} className="inline" />
-                    </button>
+                    <div className="flex gap-2">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="bg-blue-500 text-white hover:bg-blue-600"
+                            onClick={() => handleDetail(row)}
+                        >
+                            <Eye size={16} className="inline" />
+                        </Button>
+
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="bg-green-500 text-white hover:bg-green-600"
+                            onClick={() => handleEdit(row)}
+                        >
+                            <Edit size={16} className="inline" />
+                        </Button>
+
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="bg-red-500 text-white hover:bg-red-600"
+                            onClick={() => handleDelete(row)}
+                        >
+                            <Trash2 size={16} className="inline" />
+                        </Button>
+                    </div>
                 </>
             ),
         },
     ]
 
     const handleInsert = async (data: { cabang: Cabang }) => {
+        const confirm = await confirmDialog({
+            title: 'Konfirmasi',
+            description: 'Apakah Anda yakin ingin menambahkan data cabang ini?',
+            confirmText: 'Ya, Tambah',
+            cancelText: 'Batal',
+        });
+
+        if (!confirm.confirmed) {
+            return; // User cancelled the operation
+        }
+
         try {
             const response = await fetch('/api/master/cabang', {
                 method: 'POST',
@@ -108,26 +132,27 @@ function MasterCabang() {
                 }
             }
 
-            Swal.fire({
-                title: 'Success',
-                text: 'Data berhasil ditambahkan',
-                icon: 'success',
-                confirmButtonText: 'OK',
-            });
+            toast.success('Data cabang berhasil ditambahkan');
 
             setShowModal(false);
             fetchCabang(); // Refresh the data after insertion
         } catch (error) {
-            Swal.fire({
-                title: 'Error',
-                text: 'Terjadi kesalahan saat menambahkan data. Silakan coba lagi.',
-                icon: 'error',
-                confirmButtonText: 'OK',
-            });
+            toast.error('Terjadi kesalahan saat menambahkan data cabang. Silakan coba lagi.');
         }
     }
 
     const handleUpdate = async (data: { cabang: Cabang }) => {
+        const confirm = await confirmDialog({
+            title: 'Konfirmasi',
+            description: 'Apakah Anda yakin ingin memperbarui data cabang ini?',
+            confirmText: 'Ya, Perbarui',
+            cancelText: 'Batal',
+        });
+
+        if (!confirm.confirmed) {
+            return; // User cancelled the operation
+        }
+
         if (!selectedCabang) return;
         try {
             const response = await fetch(`/api/master/cabang/${selectedCabang.idCabang}`, {
@@ -148,72 +173,51 @@ function MasterCabang() {
                 }
             }
 
-            Swal.fire({
-                title: 'Success',
-                text: 'Data berhasil diperbarui',
-                icon: 'success',
-                confirmButtonText: 'OK',
-            });
+            toast.success('Data cabang berhasil diperbarui');
 
             setShowModal(false);
             fetchCabang(); // Refresh the data after update
         } catch (error) {
-            Swal.fire({
-                title: 'Error',
-                text: 'Terjadi kesalahan saat memperbarui data. Silakan coba lagi.',
-                icon: 'error',
-                confirmButtonText: 'OK',
-            });
+            toast.error('Terjadi kesalahan saat memperbarui data cabang. Silakan coba lagi.');
         }
         setSelectedCabang(null); // Clear selected cabang after update
     }
 
-    const handleDelete = (cabang: Cabang) => {
-        Swal.fire({
+    const handleDelete = async (cabang: Cabang) => {
+        const confirm = await confirmDialog({
             title: 'Konfirmasi Hapus',
-            text: `Apakah Anda yakin ingin menghapus cabang ${cabang.penanggungjawab}?`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Hapus',
-            cancelButtonText: 'Batal',
-        }).then(async (result) => {
-            if (result.isConfirmed) {
-                try {
-                    const response = await fetch(`/api/master/cabang/${cabang.idCabang}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            Authorization: `Bearer ${localStorage.getItem('token')}`,
-                        },
-                    });
+            description: `Apakah Anda yakin ingin menghapus cabang ?`,
+            confirmText: 'Hapus',
+            cancelText: 'Batal',
+        });
 
-                    if (!response.ok) {
-                        // if unauthorized, clear token and redirect to login
-                        if (response.status === 401) {
-                            localStorage.removeItem("token");
-                            window.location.href = "/login"; // redirect to login page
-                            return;
-                        }
-                    }
+        if (!confirm.confirmed) {
+            return; // User cancelled the operation
+        }
 
-                    Swal.fire({
-                        title: 'Berhasil',
-                        text: 'Data berhasil dihapus',
-                        icon: 'success',
-                        confirmButtonText: 'OK',
-                    });
+        try {
+            const response = await fetch(`/api/master/cabang/${cabang.idCabang}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            });
 
-                    fetchCabang(); // Refresh the data after deletion
-                } catch (error) {
-                    Swal.fire({
-                        title: 'Error',
-                        text: 'Terjadi kesalahan saat menghapus data. Silakan coba lagi.',
-                        icon: 'error',
-                        confirmButtonText: 'OK',
-                    });
+            if (!response.ok) {
+                // if unauthorized, clear token and redirect to login
+                if (response.status === 401) {
+                    localStorage.removeItem("token");
+                    window.location.href = "/login"; // redirect to login page
+                    return;
                 }
             }
-        });
+
+            toast.success('Data cabang berhasil dihapus');
+            fetchCabang(); // Refresh the data after deletion
+        } catch (error) {
+            toast.error('Terjadi kesalahan saat menghapus data cabang. Silakan coba lagi.');
+        }
     }
 
     return (
@@ -257,7 +261,7 @@ function MasterCabang() {
                     <div className="flex items-center gap-2">
                         <input
                             type="text"
-                            placeholder="Cari Paket..."
+                            placeholder="Cari Cabang..."
                             className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-600 text-gray-800 text-sm"
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter') {

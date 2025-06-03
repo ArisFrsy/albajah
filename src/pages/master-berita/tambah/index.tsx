@@ -21,6 +21,7 @@ import {
     FormMessage,
 } from '@/components/ui/form';
 import dynamic from 'next/dynamic'; // <-- Import dynamic dari next/dynamic
+import { confirmDialog } from '@/lib/confirm-dialog';
 
 const TiptapEditor = dynamic(() => import('@/components/Editor'), {
     ssr: false,
@@ -71,6 +72,16 @@ function TambahBeritaPage() {
 
     const handleSubmit = async (values: z.infer<typeof formSchema>) => {
 
+        const confirmed = await confirmDialog({
+            title: 'Konfirmasi Tambah Berita',
+            description: `Apakah Anda yakin ingin menambahkan berita dengan judul "${values.judul}"?`,
+            confirmText: 'Tambah',
+            cancelText: 'Batal',
+        });
+        if (!confirmed.confirmed) {
+            return;
+        }
+
         // new formData
         const formData = new FormData();
         formData.append('judul', values.judul);
@@ -88,7 +99,7 @@ function TambahBeritaPage() {
         }).then(async (res) => {
             if (!res.ok) {
                 const errorData = await res.json();
-                throw new Error(errorData.message || 'Gagal menambahkan berita');
+                toast.error(errorData.message || 'Gagal menambahkan berita');
             }
             return res.json();
         });

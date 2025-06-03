@@ -25,6 +25,7 @@ import { decrypt } from '@/lib/Encrypt';
 import TiptapEditor from '@/components/Editor';
 import Image from 'next/image';
 import { set } from 'date-fns';
+import { confirmDialog } from '@/lib/confirm-dialog';
 
 const formSchema = z.object({
     judul: z.string().min(10, { message: 'Judul berita minimal 10 karakter.' }),
@@ -81,6 +82,16 @@ function EditBeritaPage() {
     }, [content, form]);
 
     const handleSubmit = async (values: z.infer<typeof formSchema>) => {
+        const confirmed = await confirmDialog({
+            title: 'Konfirmasi Perubahan',
+            description: `Apakah Anda yakin ingin memperbarui berita dengan judul "${values.judul}"?`,
+            confirmText: 'Perbarui',
+            cancelText: 'Batal',
+        });
+        if (!confirmed.confirmed) {
+            return;
+        }
+
         const formData = new FormData();
         formData.append('judul', values.judul);
         formData.append('deskripsi', content);
@@ -99,7 +110,7 @@ function EditBeritaPage() {
         }).then(async (res) => {
             if (!res.ok) {
                 const errorData = await res.json();
-                throw new Error(errorData.message || 'Gagal memperbarui berita');
+                toast.error(errorData.message || 'Gagal memperbarui berita');
             }
             return res.json();
         });

@@ -8,10 +8,13 @@ import { useSubPaketPagination } from "./UseSubPaketPagination";
 import { SubPaket } from "@/models/SubPaket";
 import { Header } from "@/components/Header";
 import Loading from "@/components/Spinner";
-import { Eye, Edit, Delete, Plus, Search } from "lucide-react";
+import { Eye, Edit, Delete, Plus, Search, Trash2 } from "lucide-react";
 import Swal from "sweetalert2";
 import Link from "next/link";
 import { encrypt } from "@/lib/Encrypt";
+import { confirmDialog } from "@/lib/confirm-dialog";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 
 function MasterSubPaket() {
     const router = useRouter();
@@ -22,33 +25,36 @@ function MasterSubPaket() {
 
     const [selectedSubPaket, setSelectedSubPaket] = useState<SubPaket | null>(null);
 
-    const handleDelete = (subPaket: SubPaket) => {
-        Swal.fire({
-            title: 'Hapus Sub Paket',
-            text: `Apakah Anda yakin ingin menghapus sub paket "${subPaket.namaSubPaket}"?`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Ya, Hapus',
-            cancelButtonText: 'Batal',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                fetch(`/api/master/sub-paket/${subPaket.idSubpaket}`, {
+    const handleDelete = async (subPaket: SubPaket) => {
+        const confirmed = await confirmDialog({
+            title: "Konfirmasi Hapus",
+            description: `Apakah Anda yakin ingin menghapus sub paket "${subPaket.namaSubPaket}"?`,
+            confirmText: "Hapus",
+            cancelText: "Batal",
+        });
+
+        if (confirmed.confirmed) {
+            try {
+                const response = await fetch(`/api/master/subpaket/${subPaket.idSubpaket}`, {
                     method: 'DELETE',
                     headers: {
+                        'Content-Type': 'application/json',
                         Authorization: `Bearer ${localStorage.getItem('token')}`,
                     },
-                })
-                    .then((res) => res.json())
-                    .then(() => {
-                        Swal.fire('Berhasil', 'Sub paket berhasil dihapus.', 'success');
-                        router.reload();
-                    })
-                    .catch((error) => {
-                        console.error("Error deleting sub paket:", error);
-                        Swal.fire('Gagal', 'Terjadi kesalahan saat menghapus sub paket.', 'error');
-                    });
+                });
+
+                if (!response.ok) {
+                    toast.error("Gagal menghapus sub paket. Pastikan tidak ada data terkait yang masih digunakan.");
+                }
+
+                toast.success("Sub paket berhasil dihapus.");
+
+                // Refresh data after deletion
+                router.reload();
+            } catch (error) {
+                toast.error("Terjadi kesalahan saat menghapus sub paket.");
             }
-        });
+        }
     }
 
     const headers: Header<SubPaket>[] = [
@@ -69,26 +75,35 @@ function MasterSubPaket() {
             align: 'left',
             render: (row: SubPaket) => (
                 <>
-                    <Link href={`/master-subpaket/view/${encrypt(row.idSubpaket)}`} passHref>
-                        <button
-                            className="bg-blue-500 text-blue-700 font-semibold text-white py-1 px-2 border border-blue-500 border-transparent rounded mr-2"
+                    <div className="flex gap-2">
+
+                        <Link href={`/master-subpaket/view/${encrypt(row.idSubpaket)}`} passHref>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="bg-blue-500 text-white hover:bg-blue-600"
+                            >
+                                <Eye size={16} className="inline" />
+                            </Button>
+                        </Link>
+                        <Link href={`/master-subpaket/edit/${encrypt(row.idSubpaket)}`} passHref>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="bg-green-500 text-white hover:bg-green-600"
+                            >
+                                <Edit size={16} className="inline" />
+                            </Button>
+                        </Link>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="bg-red-500 text-white hover:bg-red-600"
+                            onClick={() => handleDelete(row)}
                         >
-                            <Eye size={16} className="inline" />
-                        </button>
-                    </Link>
-                    <Link href={`/master-subpaket/edit/${encrypt(row.idSubpaket)}`} passHref>
-                        <button
-                            className="bg-yellow-500 text-yellow-700 font-semibold text-white py-1 px-2 border border-yellow-500 border-transparent rounded mr-2"
-                        >
-                            <Edit size={16} className="inline" />
-                        </button>
-                    </Link>
-                    <button
-                        className="bg-red-500 text-red-700 font-semibold text-white py-1 px-2 border border-red-500 border-transparent rounded mr-2"
-                        onClick={() => handleDelete(row)}
-                    >
-                        <Delete size={16} className="inline" />
-                    </button>
+                            <Trash2 size={16} className="inline" />
+                        </Button>
+                    </div>
                 </>
             ),
         },
