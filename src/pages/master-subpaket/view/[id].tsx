@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
+import { useParams } from 'next/navigation';
 import { SubPaket } from '@/models/SubPaket';
 import withAuth from '@/components/withAuth';
 import Loading from '@/components/Spinner';
@@ -22,11 +23,15 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import { cn } from '@/lib/utils';
+import { decrypt } from '@/lib/Encrypt';
+import { formatCurrency } from '@/utils/formatCurrency';
 
 
 function ViewSubPaketPage() {
     const router = useRouter();
-    const { id } = router.query;
+    const params = useParams();
+    const decryptId = params?.id as string;
+    const id = decryptId ? decrypt(decryptId) : '';
     const [subPaket, setSubPaket] = useState<SubPaket | null>(null);
     const [loading, setLoading] = useState(true);
 
@@ -102,8 +107,8 @@ function ViewSubPaketPage() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                                 <DetailItem icon={<Package />} label="Nama Paket Utama" value={subPaket.paket?.nama || '-'} />
                                 <DetailItem icon={<Clock />} label="Durasi" value={`${subPaket.durasiHari} hari`} />
-                                <DetailItem icon={<Tag />} label="Harga IDR" value={`Rp ${subPaket.hargaIDR?.toLocaleString('id-ID') || '0'}`} />
-                                <DetailItem icon={<DollarSign />} label="Harga USD" value={`$ ${subPaket.hargaUSD?.toLocaleString('en-US') || '0'}`} />
+                                <DetailItem icon={<Tag />} label="Harga IDR" value={formatCurrency(subPaket.hargaIDR, 'id-ID', 'IDR')} />
+                                <DetailItem icon={<DollarSign />} label="Harga USD" value={formatCurrency(subPaket.hargaUSD, 'en-US', 'USD')} />
                             </div>
                         </section>
 
@@ -122,10 +127,31 @@ function ViewSubPaketPage() {
                         <section>
                             <h3 className="text-lg font-semibold text-foreground mb-4">Fasilitas & Perlengkapan</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                                <DetailItem icon={<CheckSquare />} label="Fasilitas" value={subPaket.fasilitas || '-'} />
-                                <DetailItem icon={<List />} label="Perlengkapan" value={subPaket.perlengkapan || '-'} />
+                                <DetailItem
+                                    icon={<CheckSquare />}
+                                    label="Fasilitas"
+                                    value={
+                                        subPaket.fasilitas
+                                            ? subPaket.fasilitas.split(',').map((item, index) => (
+                                                <li key={index} className="ml-4 list-disc">{item.trim()}</li>
+                                            ))
+                                            : '-'
+                                    }
+                                />
+                                <DetailItem
+                                    icon={<List />}
+                                    label="Perlengkapan"
+                                    value={
+                                        subPaket.perlengkapan
+                                            ? subPaket.perlengkapan.split(',').map((item, index) => (
+                                                <li key={index} className="ml-4 list-disc">{item.trim()}</li>
+                                            ))
+                                            : '-'
+                                    }
+                                />
                             </div>
                         </section>
+
                     </CardContent>
                     <CardFooter className="flex justify-end bg-muted/50 p-6">
                         <Button onClick={() => router.push('/master-subpaket')}>
@@ -139,7 +165,7 @@ function ViewSubPaketPage() {
 }
 
 // Komponen DetailItem disempurnakan dengan styling shadcn
-const DetailItem = ({ icon, label, value }: { icon: React.ReactNode; label: string; value: string | number }) => (
+const DetailItem = ({ icon, label, value }: { icon: React.ReactNode; label: string; value: string | number | React.ReactNode }) => (
     <div className="flex items-start gap-4">
         <div className="flex-shrink-0 text-muted-foreground mt-1">
             {icon && (

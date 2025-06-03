@@ -20,27 +20,35 @@ import {
     FormLabel,
     FormMessage,
 } from '@/components/ui/form';
+import { decrypt } from '@/lib/Encrypt';
 
 import TiptapEditor from '@/components/Editor';
+import Image from 'next/image';
+import { set } from 'date-fns';
 
 const formSchema = z.object({
     judul: z.string().min(10, { message: 'Judul berita minimal 10 karakter.' }),
     deskripsi: z.string().min(50, { message: 'Konten berita minimal 50 karakter.' }),
+    image: z.string().optional(),
 });
 
 function EditBeritaPage() {
     const router = useRouter();
     const params = useParams();
-    const id = params?.id as string;
+    const decryptId = params?.id as string;
+    const id = decryptId ? decrypt(decryptId) : '';
 
     const [content, setContent] = useState('');
     const [loading, setLoading] = useState(true);
+    const [imagePath, setImagePath] = useState('');
+    const [file, setFile] = useState<File | null>(null)
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             judul: '',
             deskripsi: '',
+            image: '',
         },
     });
 
@@ -57,6 +65,7 @@ function EditBeritaPage() {
                 form.setValue('judul', data.data.judul);
                 form.setValue('deskripsi', data.data.deskripsi);
                 setContent(data.data.deskripsi);
+                setImagePath(data.data.imagePath || '');
                 setLoading(false);
             } catch (error) {
                 toast.error((error as Error).message);
@@ -72,13 +81,21 @@ function EditBeritaPage() {
     }, [content, form]);
 
     const handleSubmit = async (values: z.infer<typeof formSchema>) => {
+        const formData = new FormData();
+        formData.append('judul', values.judul);
+        formData.append('deskripsi', content);
+        if (file) {
+            formData.append('image', file);
+        } else {
+            formData.append('image', values.image || '');
+        }
+
         const promise = fetch(`/api/master/berita/${id}`, {
             method: 'PUT',
             headers: {
-                'Content-Type': 'application/json',
                 Authorization: `Bearer ${localStorage.getItem('token')}`,
             },
-            body: JSON.stringify(values),
+            body: formData,
         }).then(async (res) => {
             if (!res.ok) {
                 const errorData = await res.json();
@@ -96,6 +113,14 @@ function EditBeritaPage() {
             error: (err) => err.message,
         });
     };
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files.length > 0) {
+            setFile(e.target.files[0])
+        } else {
+            setFile(null)
+        }
+    }
 
     if (loading) {
         return (
@@ -127,6 +152,38 @@ function EditBeritaPage() {
                                     </FormItem>
                                 )}
                             />
+
+                            <FormField
+                                control={form.control}
+                                name="image"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="text-lg">Upload Gambar</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                id="file"
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={handleFileChange}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            {imagePath && (
+                                <div className="mt-2">
+                                    <p className="text-xs text-gray-500">Gambar saat ini:</p>
+                                    <Image
+                                        src={imagePath}
+                                        alt="Foto Berita"
+                                        width={100}
+                                        height={100}
+                                        className="rounded-md border border-gray-300 mt-1"
+                                    />
+                                </div>
+                            )}
 
                             <FormField
                                 control={form.control}

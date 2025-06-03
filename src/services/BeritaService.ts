@@ -1,6 +1,10 @@
 import { Prisma } from "@/generated/prisma";
 import prisma from "@/lib/prisma"; // your prisma client instance, make sure it uses the same generated client
 import { Berita } from "@/models/Berita";
+import { saveFileToLocal } from "./UploadService";
+import fs from "fs";
+import path from "path";
+import { get } from "http";
 
 export async function getAllBeritaService({
   page = 1,
@@ -94,9 +98,16 @@ export async function getBeritaByIdService(id: number) {
 
 export async function createBeritaService(requestData: Berita) {
   try {
+    let imagePath: string | null = null;
+    if (requestData.image != null) {
+      const getPath = await saveFileToLocal(requestData.image);
+      getPath ? (imagePath = getPath) : (imagePath = "");
+    }
+
     const data: Prisma.BeritaCreateInput = {
       judul: requestData.judul,
       deskripsi: requestData.deskripsi,
+      imagePath: imagePath,
     };
 
     const newBerita = await prisma.berita.create({
@@ -120,9 +131,36 @@ export async function createBeritaService(requestData: Berita) {
 
 export async function updateBeritaService(id: number, requestData: Berita) {
   try {
+    const existingBerita = await prisma.berita.findUnique({
+      where: { idBerita: id },
+    });
+
+    let imagePath = existingBerita?.imagePath || null;
+
+    if (requestData.image != null) {
+      // If a new image is provided, save it and update the path
+      const getPath = await saveFileToLocal(requestData.image);
+      if (getPath) {
+        // If a new path is returned, delete the old image file if it exists
+        if (existingBerita?.imagePath) {
+          const oldImagePath = path.join(
+            process.cwd(),
+            existingBerita.imagePath
+          );
+          if (fs.existsSync(oldImagePath)) {
+            fs.unlinkSync(oldImagePath);
+          }
+        }
+        imagePath = getPath;
+      } else {
+        imagePath = null; // If saving failed, set to null
+      }
+    }
+
     const data: Prisma.BeritaUpdateInput = {
       judul: requestData.judul,
       deskripsi: requestData.deskripsi,
+      imagePath: imagePath, // Use the updated image path
     };
 
     const updatedBerita = await prisma.berita.update({

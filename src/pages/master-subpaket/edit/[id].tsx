@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
+import { useParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -26,6 +27,10 @@ import {
     FormMessage,
 } from '@/components/ui/form';
 import { SubPaket } from '@/models/SubPaket';
+import { decrypt } from '@/lib/Encrypt';
+import { Plus, Minus } from 'lucide-react';
+import { formatCurrency, unformatCurrency } from '@/utils/formatCurrency';
+
 
 // Skema validasi Zod (sama persis dengan halaman tambah)
 const formSchema = z.object({
@@ -44,9 +49,17 @@ const formSchema = z.object({
 
 function EditSubPaketPage() {
     const router = useRouter();
-    const { id } = router.query;
+    const params = useParams();
+    const decryptId = params?.id as string;
+    const id = decryptId ? decrypt(decryptId) : '';
     const [isClient, setIsClient] = useState(false);
     const [options, setOptions] = useState<{ value: number; label: string }[]>([]);
+    const [fasilitasList, setFasilitasList] = useState<string[]>([]);
+    const [perlengkapanList, setPerlengkapanList] = useState<string[]>([]);
+    const [hargaIDR, setHargaIDR] = useState(0);
+    const [hargaUSD, setHargaUSD] = useState(0);
+    const [hargaIDRDisplay, setHargaIDRDisplay] = useState('');
+    const [hargaUSDDisplay, setHargaUSDDisplay] = useState('');
 
     // State loading untuk proses fetch data awal
     const [initialLoading, setInitialLoading] = useState(true);
@@ -98,6 +111,11 @@ function EditSubPaketPage() {
                         fasilitas: p.fasilitas || '',
                         perlengkapan: p.perlengkapan || '',
                     });
+                    setHargaIDRDisplay(formatCurrency(p.hargaIDR, 'id-ID', 'IDR'));
+                    setHargaUSDDisplay(formatCurrency(p.hargaUSD, 'en-US', 'USD'));
+                    setFasilitasList(p.fasilitas ? p.fasilitas.split(',') : []);
+                    setPerlengkapanList(p.perlengkapan ? p.perlengkapan.split(',') : []);
+
                 })
                 .catch(() => {
                     toast.error('Gagal memuat data sub paket.');
@@ -127,6 +145,10 @@ function EditSubPaketPage() {
             ...values,
             idPaket: parseInt(values.idPaket),
             keberangkatan: new Date(values.keberangkatan).toISOString(),
+            hargaIDR: unformatCurrency(hargaIDR.toString()),
+            hargaUSD: unformatCurrency(hargaUSD.toString()),
+            fasilitas: fasilitasList.filter(f => f.trim() !== '').join(','),
+            perlengkapan: perlengkapanList.filter(p => p.trim() !== '').join(','),
         };
 
         const promise = fetch(`/api/master/sub-paket`, {
@@ -197,14 +219,36 @@ function EditSubPaketPage() {
                                 <FormField control={form.control} name="hargaIDR" render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Harga IDR</FormLabel>
-                                        <FormControl><Input type="number" {...field} /></FormControl>
+                                        <FormControl>
+                                            <Input
+                                                value={hargaIDRDisplay}
+                                                onChange={(e) => {
+                                                    const value = e.target.value;
+                                                    const numeric = unformatCurrency(value);
+                                                    setHargaIDR(numeric);
+                                                    setHargaIDRDisplay(formatCurrency(numeric, 'id-ID', 'IDR'));
+                                                }}
+                                                required
+                                            />
+                                        </FormControl>
                                         <FormMessage />
                                     </FormItem>
                                 )} />
                                 <FormField control={form.control} name="hargaUSD" render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Harga USD</FormLabel>
-                                        <FormControl><Input type="number" {...field} /></FormControl>
+                                        <FormControl>
+                                            <Input
+                                                value={hargaUSDDisplay}
+                                                onChange={(e) => {
+                                                    const value = e.target.value;
+                                                    const numeric = unformatCurrency(value);
+                                                    setHargaUSD(numeric);
+                                                    setHargaUSDDisplay(formatCurrency(numeric, 'en-US', 'USD'));
+                                                }}
+                                                required
+                                            />
+                                        </FormControl>
                                         <FormMessage />
                                     </FormItem>
                                 )} />
@@ -248,22 +292,54 @@ function EditSubPaketPage() {
                                 )} />
                             </div>
 
-                            <div className="space-y-2">
-                                <FormField control={form.control} name="fasilitas" render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Fasilitas</FormLabel>
-                                        <FormControl><Textarea {...field} rows={3} /></FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )} />
-                                <FormField control={form.control} name="perlengkapan" render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Perlengkapan</FormLabel>
-                                        <FormControl><Textarea {...field} rows={3} /></FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )} />
-                            </div>
+                            <FormItem>
+                                <FormLabel>Fasilitas</FormLabel>
+                                {fasilitasList.map((item, index) => (
+                                    <div key={index} className="flex items-center gap-2 mb-2">
+                                        <Input
+                                            value={item}
+                                            onChange={(e) => {
+                                                const updated = [...fasilitasList];
+                                                updated[index] = e.target.value;
+                                                setFasilitasList(updated);
+                                            }}
+                                        />
+                                        <Button type="button" variant="ghost" onClick={() => {
+                                            setFasilitasList(fasilitasList.filter((_, i) => i !== index));
+                                        }}>
+                                            <Minus className="w-4 h-4" />
+                                        </Button>
+                                    </div>
+                                ))}
+                                <Button type="button" variant="outline" onClick={() => setFasilitasList([...fasilitasList, ''])}>
+                                    <Plus className="w-4 h-4 mr-1" /> Tambah Fasilitas
+                                </Button>
+                            </FormItem>
+
+                            <FormItem>
+                                <FormLabel>Perlengkapan</FormLabel>
+                                {perlengkapanList.map((item, index) => (
+                                    <div key={index} className="flex items-center gap-2 mb-2">
+                                        <Input
+                                            value={item}
+                                            onChange={(e) => {
+                                                const updated = [...perlengkapanList];
+                                                updated[index] = e.target.value;
+                                                setPerlengkapanList(updated);
+                                            }}
+                                        />
+                                        <Button type="button" variant="ghost" onClick={() => {
+                                            setPerlengkapanList(perlengkapanList.filter((_, i) => i !== index));
+                                        }}>
+                                            <Minus className="w-4 h-4" />
+                                        </Button>
+                                    </div>
+                                ))}
+                                <Button type="button" variant="outline" onClick={() => setPerlengkapanList([...perlengkapanList, ''])}>
+                                    <Plus className="w-4 h-4 mr-1" /> Tambah Perlengkapan
+                                </Button>
+                            </FormItem>
+
 
                             <div className="flex justify-end gap-4 pt-4">
                                 <Button variant="outline" type="button" onClick={() => router.back()}>

@@ -3,7 +3,7 @@ import { getProvincesController } from "@/controllers/IndoRegionController";
 import { checkAuth } from "@/utils/auth";
 
 export async function GET(request: Request) {
-  const unauthorizedResponse = checkAuth(request);
+  const unauthorizedResponse = await checkAuth(request);
   if (unauthorizedResponse) return unauthorizedResponse;
 
   try {

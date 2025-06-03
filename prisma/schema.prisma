@@ -12,6 +12,7 @@ model Berita {
   idBerita  Int     @id @default(autoincrement())
   judul     String
   deskripsi String?
+  imagePath String? @db.VarChar
 }
 
 model Cabang {
@@ -26,7 +27,7 @@ model Cabang {
 }
 
 model LoginCode {
-  id        String   @id
+  id        String   @id @default(uuid())
   email     String
   code      String
   createdAt DateTime @default(now())

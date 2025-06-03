@@ -4,12 +4,12 @@ import { checkAuth } from "@/utils/auth";
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
-  const unauthorizedResponse = checkAuth(request);
+  const unauthorizedResponse = await checkAuth(request);
   if (unauthorizedResponse) return unauthorizedResponse;
 
-  const idDistrict = params.id;
+  const idDistrict = (await context.params).id;
 
   try {
     const result = await getVillagesController(idDistrict);

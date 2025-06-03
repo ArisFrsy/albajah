@@ -7,7 +7,7 @@ import {
 
 import { checkAuth } from "@/utils/auth";
 export async function GET(request: Request) {
-  const unauthorizedResponse = checkAuth(request);
+  const unauthorizedResponse = await checkAuth(request);
   if (unauthorizedResponse) return unauthorizedResponse;
 
   const url = new URL(request.url);
@@ -37,14 +37,17 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const unauthorizedResponse = checkAuth(request);
+  const unauthorizedResponse = await checkAuth(request);
   if (unauthorizedResponse) return unauthorizedResponse;
 
   try {
-    // get from json body
-
-    const { judul, deskripsi } = await request.json();
-    const result = await createBeritaController(judul, deskripsi);
+    // get form data from request body
+    const url = new URL(request.url);
+    const formData = await request.formData();
+    const judul = formData.get("judul") as string;
+    const deskripsi = formData.get("deskripsi") as string | undefined;
+    const image = formData.get("image") as File | null;
+    const result = await createBeritaController(judul, deskripsi, image);
 
     return NextResponse.json(result, { status: 201 });
   } catch (error) {

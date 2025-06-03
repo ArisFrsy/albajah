@@ -11,6 +11,7 @@ import Loading from "@/components/Spinner";
 import { Eye, Edit, Delete, Plus, Search } from "lucide-react";
 import Swal from "sweetalert2";
 import Link from "next/link";
+import { encrypt } from "@/lib/Encrypt";
 
 function MasterBerita() {
     const router = useRouter();
@@ -58,14 +59,14 @@ function MasterBerita() {
             align: 'left',
             render: (row: Berita) => (
                 <>
-                    <Link href={`/master-berita/view/${row.idBerita}`} passHref>
+                    <Link href={`/master-berita/view/${encrypt(row.idBerita ? row.idBerita.toString() : '-')}`} passHref>
                         <button
                             className="bg-blue-500 text-blue-700 font-semibold text-white py-1 px-2 border border-blue-500 border-transparent rounded mr-2"
                         >
                             <Eye size={16} className="inline" />
                         </button>
                     </Link>
-                    <Link href={`/master-berita/edit/${row.idBerita}`} passHref>
+                    <Link href={`/master-berita/edit/${encrypt(row.idBerita ? row.idBerita.toString() : '-')}`} passHref>
                         <button
                             className="bg-yellow-500 text-yellow-700 font-semibold text-white py-1 px-2 border border-yellow-500 border-transparent rounded mr-2"
                         >

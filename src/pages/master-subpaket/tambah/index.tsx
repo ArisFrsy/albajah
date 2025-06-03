@@ -20,6 +20,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Select as ShadSelect, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Combobox } from '@/components/ui/combobox';
+import { formatCurrency, unformatCurrency } from '@/utils/formatCurrency';
+import { Minus, Plus } from 'lucide-react';
+
 
 function InsertSubPaketPage() {
     const router = useRouter();
@@ -34,6 +37,11 @@ function InsertSubPaketPage() {
     const [hotelMadinah, setHotelMadinah] = useState('');
     const [fasilitas, setFasilitas] = useState('');
     const [perlengkapan, setPerlengkapan] = useState('');
+    const [hargaIDRDisplay, setHargaIDRDisplay] = useState('');
+    const [hargaUSDDisplay, setHargaUSDDisplay] = useState('');
+    const [fasilitasList, setFasilitasList] = useState<string[]>(['']);
+    const [perlengkapanList, setPerlengkapanList] = useState<string[]>(['']);
+
 
     const [paketList, setPaketList] = useState<Paket[]>([]);
     const [isClient, setIsClient] = useState(false);
@@ -72,8 +80,8 @@ function InsertSubPaketPage() {
             penerbangan,
             hotelMekkah,
             hotelMadinah,
-            fasilitas,
-            perlengkapan,
+            fasilitas: fasilitasList.filter(f => f.trim() !== '').join(', '),
+            perlengkapan: perlengkapanList.filter(p => p.trim() !== '').join(', '),
         };
 
         try {
@@ -120,9 +128,13 @@ function InsertSubPaketPage() {
         setHotelMadinah('');
         setFasilitas('');
         setPerlengkapan('');
+        setFasilitasList(['']);
+        setPerlengkapanList(['']);
+
     };
 
     if (!isClient) return <Loading />;
+
 
     return (
         <main className="flex-1 p-6 overflow-auto bg-gray-100">
@@ -153,11 +165,29 @@ function InsertSubPaketPage() {
                         <div className="grid grid-cols-3 gap-4">
                             <div className="space-y-2">
                                 <Label>Harga IDR</Label>
-                                <Input type="number" value={hargaIDR} onChange={(e) => setHargaIDR(Number(e.target.value))} required />
+                                <Input
+                                    value={hargaIDRDisplay}
+                                    onChange={(e) => {
+                                        const value = e.target.value;
+                                        const numeric = unformatCurrency(value);
+                                        setHargaIDR(numeric);
+                                        setHargaIDRDisplay(formatCurrency(numeric, 'id-ID', 'IDR'));
+                                    }}
+                                    required
+                                />
                             </div>
                             <div className="space-y-2">
                                 <Label>Harga USD</Label>
-                                <Input type="number" value={hargaUSD} onChange={(e) => setHargaUSD(Number(e.target.value))} required />
+                                <Input
+                                    value={hargaUSDDisplay}
+                                    onChange={(e) => {
+                                        const value = e.target.value;
+                                        const numeric = unformatCurrency(value);
+                                        setHargaUSD(numeric);
+                                        setHargaUSDDisplay(formatCurrency(numeric, 'en-US', 'USD'));
+                                    }}
+                                    required
+                                />
                             </div>
                             <div className="space-y-2">
                                 <Label>Durasi Hari</Label>
@@ -192,13 +222,81 @@ function InsertSubPaketPage() {
 
                         <div className="space-y-2">
                             <Label>Fasilitas</Label>
-                            <Textarea value={fasilitas} onChange={(e) => setFasilitas(e.target.value)} />
+                            {fasilitasList.map((item, index) => (
+                                <div key={index} className="flex items-center gap-2">
+                                    <Input
+                                        value={item}
+                                        onChange={(e) => {
+                                            const updated = [...fasilitasList];
+                                            updated[index] = e.target.value;
+                                            setFasilitasList(updated);
+                                        }}
+                                        placeholder={`Fasilitas ${index + 1}`}
+                                    />
+                                    <Button
+                                        type="button"
+                                        size="icon"
+                                        variant="ghost"
+                                        onClick={() => {
+                                            const updated = fasilitasList.filter((_, i) => i !== index);
+                                            setFasilitasList(updated.length ? updated : ['']);
+                                        }}
+                                    >
+                                        <Minus className="w-4 h-4" />
+                                    </Button>
+                                    {index === fasilitasList.length - 1 && (
+                                        <Button
+                                            type="button"
+                                            size="icon"
+                                            variant="ghost"
+                                            onClick={() => setFasilitasList([...fasilitasList, ''])}
+                                        >
+                                            <Plus className="w-4 h-4" />
+                                        </Button>
+                                    )}
+                                </div>
+                            ))}
                         </div>
+
 
                         <div className="space-y-2">
                             <Label>Perlengkapan</Label>
-                            <Textarea value={perlengkapan} onChange={(e) => setPerlengkapan(e.target.value)} />
+                            {perlengkapanList.map((item, index) => (
+                                <div key={index} className="flex items-center gap-2">
+                                    <Input
+                                        value={item}
+                                        onChange={(e) => {
+                                            const updated = [...perlengkapanList];
+                                            updated[index] = e.target.value;
+                                            setPerlengkapanList(updated);
+                                        }}
+                                        placeholder={`Perlengkapan ${index + 1}`}
+                                    />
+                                    <Button
+                                        type="button"
+                                        size="icon"
+                                        variant="ghost"
+                                        onClick={() => {
+                                            const updated = perlengkapanList.filter((_, i) => i !== index);
+                                            setPerlengkapanList(updated.length ? updated : ['']);
+                                        }}
+                                    >
+                                        <Minus className="w-4 h-4" />
+                                    </Button>
+                                    {index === perlengkapanList.length - 1 && (
+                                        <Button
+                                            type="button"
+                                            size="icon"
+                                            variant="ghost"
+                                            onClick={() => setPerlengkapanList([...perlengkapanList, ''])}
+                                        >
+                                            <Plus className="w-4 h-4" />
+                                        </Button>
+                                    )}
+                                </div>
+                            ))}
                         </div>
+
 
                         <div className="flex justify-end gap-2 pt-4">
                             <Button variant="outline" type="button" onClick={resetForm}>

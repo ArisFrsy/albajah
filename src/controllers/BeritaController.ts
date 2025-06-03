@@ -32,25 +32,27 @@ export async function getBeritaByIdController(id: number) {
 
 export async function createBeritaController(
   judul: string,
-  deskripsi?: string
+  deskripsi?: string,
+  image?: File | null
 ) {
   if (!judul) {
     throw new Error("Judul is required to create a berita");
   }
 
-  return await createBeritaService({ judul, deskripsi });
+  return await createBeritaService({ judul, deskripsi, image });
 }
 
 export async function updateBeritaController(
   id: number,
   judul: string,
-  deskripsi?: string
+  deskripsi?: string,
+  image?: File | null
 ) {
   if (!id) {
     throw new Error("ID is required to update a berita");
   }
 
-  return await updateBeritaService(id, { judul, deskripsi });
+  return await updateBeritaService(id, { judul, deskripsi, image });
 }
 
 export async function deleteBeritaController(id: number) {

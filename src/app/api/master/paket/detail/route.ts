@@ -6,7 +6,7 @@ export async function GET(
   request: Request,
   { params }: { params: { id: string } }
 ) {
-  const unauthorizedResponse = checkAuth(request);
+  const unauthorizedResponse = await checkAuth(request);
   if (unauthorizedResponse) return unauthorizedResponse;
 
   const id = parseInt(params.id, 10);

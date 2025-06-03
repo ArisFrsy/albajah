@@ -100,7 +100,12 @@ function MasterCabang() {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to insert data');
+                // if unauthorized, clear token and redirect to login
+                if (response.status === 401) {
+                    localStorage.removeItem("token");
+                    window.location.href = "/login"; // redirect to login page
+                    return;
+                }
             }
 
             Swal.fire({
@@ -135,7 +140,12 @@ function MasterCabang() {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to update data');
+                // if unauthorized, clear token and redirect to login
+                if (response.status === 401) {
+                    localStorage.removeItem("token");
+                    window.location.href = "/login"; // redirect to login page
+                    return;
+                }
             }
 
             Swal.fire({
@@ -178,7 +188,12 @@ function MasterCabang() {
                     });
 
                     if (!response.ok) {
-                        throw new Error('Failed to delete data');
+                        // if unauthorized, clear token and redirect to login
+                        if (response.status === 401) {
+                            localStorage.removeItem("token");
+                            window.location.href = "/login"; // redirect to login page
+                            return;
+                        }
                     }
 
                     Swal.fire({

@@ -1,4 +1,8 @@
-import { loginService, verifyCodeService } from "../services/AuthService";
+import {
+  loginService,
+  verifyCodeService,
+  resendCodeService,
+} from "../services/AuthService";
 import { LoginRequest } from "@/requests/LoginRequest";
 
 export async function loginController(body: LoginRequest) {
@@ -14,4 +18,12 @@ export async function verifyCodeController(email: string, code: string) {
     throw new Error("Email and code are required");
   }
   return await verifyCodeService(email, code);
+}
+
+export async function resendCodeController(email: string) {
+  if (!email) {
+    throw new Error("Email is required");
+  }
+
+  return await resendCodeService(email);
 }

@@ -8,12 +8,12 @@ import { checkAuth } from "@/utils/auth";
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
-  const unauthorizedResponse = checkAuth(request);
+  const unauthorizedResponse = await checkAuth(request);
   if (unauthorizedResponse) return unauthorizedResponse;
 
-  const idCabang = parseInt(params.id, 10);
+  const idCabang = parseInt((await context.params).id, 10);
   if (isNaN(idCabang)) {
     return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
   }
@@ -31,12 +31,12 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
-  const unauthorizedResponse = checkAuth(request);
+  const unauthorizedResponse = await checkAuth(request);
   if (unauthorizedResponse) return unauthorizedResponse;
 
-  const idCabang = parseInt(params.id, 10);
+  const idCabang = parseInt((await context.params).id, 10);
   if (isNaN(idCabang)) {
     return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
   }
@@ -55,12 +55,12 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
-  const unauthorizedResponse = checkAuth(request);
+  const unauthorizedResponse = await checkAuth(request);
   if (unauthorizedResponse) return unauthorizedResponse;
 
-  const idCabang = parseInt(params.id, 10);
+  const idCabang = parseInt((await context.params).id, 10);
   if (isNaN(idCabang)) {
     return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
   }

@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { verifyJwt } from "./jtw"; // pastikan ini verify JWT-mu
 import { jwtDecode } from "jwt-decode";
 
-export function checkAuth(request: Request) {
+export async function checkAuth(request: Request) {
   const authHeader = request.headers.get("Authorization");
   const token = authHeader?.split(" ")[1];
 
@@ -15,13 +15,21 @@ export function checkAuth(request: Request) {
     userId: string;
     email: string;
     verified: boolean;
+    expiresAt: string;
   };
 
   if (!data.verified) {
     return NextResponse.json(
       { message: "Email not verified" },
-      { status: 403 }
+      { status: 401 }
     );
+  }
+
+  // check expiresAt
+  const expiresAt = new Date(data.expiresAt);
+
+  if (expiresAt < new Date()) {
+    return NextResponse.json({ message: "Token expired" }, { status: 401 });
   }
 
   return null; // artinya valid dan lanjut

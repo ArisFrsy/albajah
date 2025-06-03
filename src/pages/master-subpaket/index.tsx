@@ -11,6 +11,7 @@ import Loading from "@/components/Spinner";
 import { Eye, Edit, Delete, Plus, Search } from "lucide-react";
 import Swal from "sweetalert2";
 import Link from "next/link";
+import { encrypt } from "@/lib/Encrypt";
 
 function MasterSubPaket() {
     const router = useRouter();
@@ -68,14 +69,14 @@ function MasterSubPaket() {
             align: 'left',
             render: (row: SubPaket) => (
                 <>
-                    <Link href={`/master-subpaket/view/${row.idSubpaket}`} passHref>
+                    <Link href={`/master-subpaket/view/${encrypt(row.idSubpaket)}`} passHref>
                         <button
                             className="bg-blue-500 text-blue-700 font-semibold text-white py-1 px-2 border border-blue-500 border-transparent rounded mr-2"
                         >
                             <Eye size={16} className="inline" />
                         </button>
                     </Link>
-                    <Link href={`/master-subpaket/edit/${row.idSubpaket}`} passHref>
+                    <Link href={`/master-subpaket/edit/${encrypt(row.idSubpaket)}`} passHref>
                         <button
                             className="bg-yellow-500 text-yellow-700 font-semibold text-white py-1 px-2 border border-yellow-500 border-transparent rounded mr-2"
                         >

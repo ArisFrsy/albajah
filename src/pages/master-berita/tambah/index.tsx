@@ -32,6 +32,7 @@ const TiptapEditor = dynamic(() => import('@/components/Editor'), {
 const formSchema = z.object({
     judul: z.string().min(10, { message: 'Judul berita minimal 10 karakter.' }),
     deskripsi: z.string().min(50, { message: 'Konten berita minimal 50 karakter.' }),
+    gambar: z.string().optional(), // Gambar bisa berupa string URL atau base64
 });
 
 function TambahBeritaPage() {
@@ -39,12 +40,22 @@ function TambahBeritaPage() {
     // 2. Tambahkan kembali state 'editorLoaded'
     const [editorLoaded, setEditorLoaded] = useState(false);
     const [content, setContent] = useState('')
+    const [file, setFile] = useState<File | null>(null)
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files.length > 0) {
+            setFile(e.target.files[0])
+        } else {
+            setFile(null)
+        }
+    }
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             judul: '',
             deskripsi: '',
+            gambar: '', // Gambar bisa berupa string URL atau base64
         },
     });
 
@@ -59,13 +70,21 @@ function TambahBeritaPage() {
 
 
     const handleSubmit = async (values: z.infer<typeof formSchema>) => {
+
+        // new formData
+        const formData = new FormData();
+        formData.append('judul', values.judul);
+        formData.append('deskripsi', values.deskripsi);
+        if (file) {
+            formData.append('image', file);
+        }
+
         const promise = fetch('/api/master/berita', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
                 Authorization: `Bearer ${localStorage.getItem('token')}`,
             },
-            body: JSON.stringify(values),
+            body: formData,
         }).then(async (res) => {
             if (!res.ok) {
                 const errorData = await res.json();
@@ -103,6 +122,25 @@ function TambahBeritaPage() {
                                         <FormLabel className="text-lg">Judul Berita</FormLabel>
                                         <FormControl>
                                             <Input placeholder="Masukkan judul berita yang menarik..." {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="gambar"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="text-lg">Upload Gambar</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                id="file"
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={handleFileChange}
+                                            />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>

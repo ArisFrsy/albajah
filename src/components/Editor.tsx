@@ -161,11 +161,11 @@ const TiptapEditor: React.FC<Props> = ({ value, onChange }) => {
                     ))}
                 </select>
 
-                <button
+                {/* <button
                     type="button"
                     onClick={addImage} title="Insert Image">
                     <ImageIcon className={buttonClass()} />
-                </button>
+                </button> */}
             </div>
 
             <div className="border rounded-md p-2 min-h-[400px]">

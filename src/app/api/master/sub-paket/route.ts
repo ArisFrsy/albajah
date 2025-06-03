@@ -10,7 +10,7 @@ import { checkAuth } from "@/utils/auth";
 import { SubPaket } from "@/models/SubPaket";
 
 export async function GET(request: Request) {
-  const unauthorizedResponse = checkAuth(request);
+  const unauthorizedResponse = await checkAuth(request);
   if (unauthorizedResponse) return unauthorizedResponse;
 
   const url = new URL(request.url);
@@ -42,7 +42,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const unauthorizedResponse = checkAuth(request);
+  const unauthorizedResponse = await checkAuth(request);
   if (unauthorizedResponse) return unauthorizedResponse;
 
   try {
@@ -60,7 +60,7 @@ export async function POST(request: Request) {
 }
 
 export async function PUT(request: Request) {
-  const unauthorizedResponse = checkAuth(request);
+  const unauthorizedResponse = await checkAuth(request);
   if (unauthorizedResponse) return unauthorizedResponse;
 
   try {

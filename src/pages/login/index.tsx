@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import ReCAPTCHA from 'react-google-recaptcha'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/router'
 import Swal from 'sweetalert2'
 import Head from 'next/head'
@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { OtpModal } from './OtpModal'
-import { Toaster } from 'sonner'
+import { toast, Toaster } from 'sonner'
 // Hapus 'Label' dari 'ui/label', karena kita akan pakai dari 'ui/form'
 // import { Label } from '@/components/ui/label'
 
@@ -48,6 +48,7 @@ export default function LoginPage() {
     const recaptchaRef = useRef<ReCAPTCHA>(null)
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [loginEmail, setLoginEmail] = useState('')
+    const [counter, setCounter] = useState(0)
 
     // 1. Inisialisasi form menggunakan `useForm` dari react-hook-form
     // Ini adalah pola yang direkomendasikan shadcn
@@ -97,6 +98,7 @@ export default function LoginPage() {
                 // router.push('/verify-code')
 
                 setIsModalOpen(true) // Buka modal OTP jika login sukses
+                setCounter(0) // Reset counter untuk pengiriman ulang OTP
             } else {
                 throw new Error(resData.message || 'Login gagal')
             }
@@ -113,6 +115,8 @@ export default function LoginPage() {
 
     const handleVerifyOtp = async (otp: string) => {
         setLoading(true)
+
+        setCounter((prev) => prev + 1)
         try {
             const res = await fetch('/api/login/verify-code', {
                 method: 'POST',
@@ -135,7 +139,7 @@ export default function LoginPage() {
                 // })
                 router.push('/dashboard')
             } else {
-                throw new Error(resData.message || 'Verifikasi gagal')
+                toast.error(resData.message || 'Verifikasi gagal')
             }
         } catch (error: any) {
             // Swal.fire({
@@ -148,12 +152,21 @@ export default function LoginPage() {
         }
     }
 
+    useEffect(() => {
+        if (counter > 3) {
+            setIsModalOpen(false)
+        }
+    }, [counter])
+
     const handleResendOtp = async () => {
         setLoading(true)
         try {
-            const res = await fetch('/api/login/verify-code', {
+            const res = await fetch('/api/login/resend-code', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: loginEmail, // Gunakan email yang sudah disimpan
+                }),
             });
 
             const resData = await res.json()
@@ -163,6 +176,8 @@ export default function LoginPage() {
                 //     icon: 'success',
                 //     title: 'Kode OTP baru telah dikirim.',
                 // })
+
+                setCounter(0)
             } else {
                 throw new Error(resData.message || 'Gagal mengirim ulang OTP')
             }
@@ -176,6 +191,7 @@ export default function LoginPage() {
             setLoading(false)
         }
     }
+
 
     return (
         <>

@@ -30,10 +30,14 @@ export async function loginService({ email, password }: LoginRequest) {
     userId: user.id,
     email: user.email,
     verified: false,
+    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // token expires in 24 hours
   });
 
   const code = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit code
   const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // expires in 5 minutes
+
+  // Hapus kode lama jika ada
+  await prisma.loginCode.deleteMany({ where: { email } });
 
   await prisma.loginCode.create({ data: { email, code, expiresAt } });
 
@@ -63,7 +67,6 @@ export async function verifyCodeService(email: string, code: string) {
   });
 
   if (!loginCode) {
-    localStorage.removeItem("token");
     return { success: false, message: "Invalid or expired code" };
   }
 
@@ -81,4 +84,24 @@ export async function verifyCodeService(email: string, code: string) {
     message: "Code verified successfully",
     token,
   };
+}
+
+export async function resendCodeService(email: string) {
+  const user = await prisma.user.findUnique({ where: { email } });
+
+  if (!user) {
+    return { success: false, message: "User not found" };
+  }
+
+  const code = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit code
+  const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // expires in 5 minutes
+
+  // Hapus kode lama jika ada
+  await prisma.loginCode.deleteMany({ where: { email } });
+
+  await prisma.loginCode.create({ data: { email, code, expiresAt } });
+
+  await sendLoginCode(email, user.name, code); // kirim email
+
+  return { success: true, message: "Code resent successfully" };
 }

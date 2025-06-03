@@ -30,7 +30,12 @@ export function useBeritaPagination(initialPage = 1, initialLimit = 10) {
       );
 
       if (!response.ok) {
-        throw new Error("Failed to fetch data");
+        // if unauthorized, clear token and redirect to login
+        if (response.status === 401) {
+          localStorage.removeItem("token");
+          window.location.href = "/login"; // redirect to login page
+          return;
+        }
       }
 
       const data = await response.json();

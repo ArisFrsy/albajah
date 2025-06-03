@@ -7,6 +7,8 @@ import { dummyAdvertise } from './dummyAdvertise';
 import { dummyGallery } from './dummyGallery';
 import { paketHajiUmrah } from './dummyProduct';
 import { izinAlBahjah } from './izin-albahjah'; // Sesuaikan path jika perlu
+
+import { redirect } from 'next/navigation';
 // Import ikon dari lucide-react
 import {
   ExternalLink,
@@ -102,6 +104,8 @@ const getSubPaketImageSrc = (gambarArray: (ImportedImage | string)[]): string =>
 
 
 const CompanyProfileDashboardGreenPage = () => {
+  redirect('/dashboard'); // Redirect ke halaman dashboard
+
   return (
     <div className="bg-slate-50 min-h-screen font-sans">
       {/* Header Utama */}

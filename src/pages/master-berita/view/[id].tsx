@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import { useParams } from 'next/navigation';
 import withAuth from '@/components/withAuth';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,9 +9,14 @@ import { Button } from '@/components/ui/button';
 import { Berita } from '@/models/Berita';
 import Loading from '@/components/Spinner';
 
+import { decrypt } from '@/lib/Encrypt';
+import Image from 'next/image';
+
 function ViewBeritaPage() {
     const router = useRouter();
-    const { id } = router.query;
+    const params = useParams();
+    const decryptId = params?.id as string;
+    const id = decryptId ? decrypt(decryptId) : '';
 
     const [berita, setBerita] = useState<Berita | null>(null);
     const [loading, setLoading] = useState(true);
@@ -64,6 +70,18 @@ function ViewBeritaPage() {
                             <CardTitle className="text-3xl font-bold">{berita.judul}</CardTitle>
                         </CardHeader>
                         <CardContent className=''>
+                            {berita.imagePath && (
+                                <div className="mb-4">
+                                    <Image
+                                        src={berita.imagePath}
+                                        alt={berita.judul}
+                                        width={100}
+                                        height={100}
+                                        className="w-auto h-auto rounded-lg object-cover text-center mx-auto border border-gray-200 shadow-sm"
+                                        style={{ maxWidth: 'auto', maxHeight: '400px' }}
+                                    />
+                                </div>
+                            )}
                             <article className="border border-gray-200 px-4 mx-4 prose max-w-none mb-8" dangerouslySetInnerHTML={{ __html: berita.deskripsi || "" }} />
                             <div className="flex justify-end">
                                 <Button variant="outline" onClick={() => router.push('/master-berita')}>

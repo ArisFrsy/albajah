@@ -7,12 +7,12 @@ import { checkAuth } from "@/utils/auth";
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
-  const unauthorizedResponse = checkAuth(request);
+  const unauthorizedResponse = await checkAuth(request);
   if (unauthorizedResponse) return unauthorizedResponse;
 
-  const idSubpaket = params.id;
+  const idSubpaket = (await context.params).id;
 
   try {
     const result = await getSubPaketByIdController(idSubpaket);
@@ -33,12 +33,12 @@ export async function GET(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
-  const unauthorizedResponse = checkAuth(request);
+  const unauthorizedResponse = await checkAuth(request);
   if (unauthorizedResponse) return unauthorizedResponse;
 
-  const idSubpaket = params.id;
+  const idSubpaket = (await context.params).id;
 
   try {
     const result = await deleteSubPaketController(idSubpaket);
