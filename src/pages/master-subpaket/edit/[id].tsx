@@ -112,6 +112,8 @@ function EditSubPaketPage() {
                         fasilitas: p.fasilitas || '',
                         perlengkapan: p.perlengkapan || '',
                     });
+                    setHargaIDR(p.hargaIDR || 0);
+                    setHargaUSD(p.hargaUSD || 0);
                     setHargaIDRDisplay(formatCurrency(p.hargaIDR, 'id-ID', 'IDR'));
                     setHargaUSDDisplay(formatCurrency(p.hargaUSD, 'en-US', 'USD'));
                     setFasilitasList(p.fasilitas ? p.fasilitas.split(',') : []);
