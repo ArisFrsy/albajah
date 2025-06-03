@@ -13,22 +13,24 @@ export function useSubPaketPagination(initialPage = 1, initialLimit = 10) {
   );
   const [loading, setLoading] = useState<boolean>(true);
   const [search, setSearch] = useState<string>("");
+  const [idPaketFilter, setIdPaketFilter] = useState("");
 
   const fetchSubPaket = async () => {
     try {
       setLoading(true);
-      const response = await fetch(
-        `/api/master/sub-paket?page=${page}&perPage=${limit}&orderBy=${orderByField}&orderDir=${orderByDirection}&search=${encodeURIComponent(
-          search
-        )}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      let url = `/api/master/sub-paket?page=${page}&perPage=${limit}&orderBy=${orderByField}&orderDir=${orderByDirection}&search=${encodeURIComponent(
+        search
+      )}`;
+      if (idPaketFilter) {
+        url += `&idPaket=${idPaketFilter}`;
+      }
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
 
       if (!response.ok) {
         // if unauthorized, clear token and redirect to login
@@ -51,7 +53,7 @@ export function useSubPaketPagination(initialPage = 1, initialLimit = 10) {
 
   useEffect(() => {
     fetchSubPaket();
-  }, [page, limit, orderByField, orderByDirection, search]);
+  }, [page, limit, orderByField, orderByDirection, search, idPaketFilter]);
 
   return {
     subPaket,
@@ -67,5 +69,7 @@ export function useSubPaketPagination(initialPage = 1, initialLimit = 10) {
     loading,
     search,
     setSearch,
+    idPaketFilter,
+    setIdPaketFilter,
   };
 }

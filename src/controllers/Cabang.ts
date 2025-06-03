@@ -13,7 +13,9 @@ export async function getAllCabangController(
   search?: string,
   filter?: string,
   orderByField?: string,
-  orderByDirection?: "asc" | "desc"
+  orderByDirection?: "asc" | "desc",
+  idProvinsi?: string,
+  idKabupaten?: string
 ) {
   return await getAllCabangService({
     page,
@@ -22,6 +24,8 @@ export async function getAllCabangController(
     filter,
     orderByField,
     orderByDirection,
+    idProvinsi,
+    idKabupaten,
   });
 }
 

@@ -8,22 +8,46 @@ import { useSubPaketPagination } from "./UseSubPaketPagination";
 import { SubPaket } from "@/models/SubPaket";
 import { Header } from "@/components/Header";
 import Loading from "@/components/Spinner";
-import { Eye, Edit, Delete, Plus, Search, Trash2 } from "lucide-react";
+import { Eye, Edit, Delete, Plus, Search, Trash2, ListFilter } from "lucide-react";
 import Swal from "sweetalert2";
 import Link from "next/link";
 import { encrypt } from "@/lib/Encrypt";
 import { confirmDialog } from "@/lib/confirm-dialog";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter,
+} from "@/components/ui/dialog";
+import { usePaketPagination } from "../master-paket/UsePaketPagination";
+import { Combobox } from "@/components/ui/combobox";
+import { Label } from "@/components/ui/label";
+import { set } from "date-fns";
 
 function MasterSubPaket() {
     const router = useRouter();
     const [order, setOrder] = useState<"asc" | "desc">("desc");
-    const [showModal, setShowModal] = useState(false);
-    const [showDetailModal, setShowDetailModal] = useState(false);
-    const [showEditModal, setShowEditModal] = useState(false);
+    const [showFilterModal, setShowFilterModal] = useState(false);
+    const [options, setOptions] = useState<{ value: number; label: string }[]>([]);
+    const [idPaket, setIdPaket] = useState('');
 
-    const [selectedSubPaket, setSelectedSubPaket] = useState<SubPaket | null>(null);
+    const { paket } = usePaketPagination(1, 1000);
+
+    useEffect(() => {
+        if (paket.length > 0) {
+            const paketOptions = paket.map((p) => ({
+                value: p.idPaket,
+                label: p.nama,
+            }));
+
+            setOptions(paketOptions);
+
+        }
+    }, [paket]);
 
     const handleDelete = async (subPaket: SubPaket) => {
         const confirmed = await confirmDialog({
@@ -123,6 +147,8 @@ function MasterSubPaket() {
         loading,
         search,
         setSearch,
+        setIdPaketFilter,
+        idPaketFilter,
     } = useSubPaketPagination();
 
 
@@ -164,6 +190,14 @@ function MasterSubPaket() {
                     Filter
                 </a> */}
                 <div className="flex items-center gap-2">
+                    <Button
+                        variant="outline"
+                        className="text-green-600 border-green-600 hover:bg-green-600 hover:text-white"
+                        onClick={() => setShowFilterModal(true)}
+                    >
+                        <ListFilter size={16} className="mr-1" />
+                        Filter
+                    </Button>
                     <input
                         type="text"
                         placeholder="Cari Sub Paket..."
@@ -174,7 +208,10 @@ function MasterSubPaket() {
                             }
                         }}
                     />
+
+                    {/* ✅ Tombol Filter */}
                 </div>
+
 
                 <Link href="/master-subpaket/tambah" passHref>
                     <div className="inline-block rounded-sm border border-green-600 px-6 py-2 text-sm font-medium text-green-600 hover:bg-green-600 hover:text-white focus:ring-3 focus:outline-hidden">
@@ -218,6 +255,49 @@ function MasterSubPaket() {
         {loading && (
             <Loading />
         )}
+
+        {/* ✅ Modal Filter */}
+        <Dialog open={showFilterModal} onOpenChange={setShowFilterModal}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Filter Sub Paket</DialogTitle>
+                </DialogHeader>
+
+                {/* ✅ Isi Filter (contoh input tahun keberangkatan) */}
+                <div className="space-y-4 py-2">
+                    <div className="space-y-2">
+                        <Label>Pilih Paket</Label>
+                        <Combobox
+                            items={options}
+                            value={idPaket}
+                            onChange={(item) => setIdPaket(item.value.toString())}
+                            placeholder="Cari paket..."
+                        />
+
+                    </div>
+
+                    {/* Tambahkan filter lain di sini */}
+                </div>
+                <DialogFooter>
+                    <Button variant="outline" onClick={() => {
+                        setShowFilterModal(false);
+                        setIdPaket(''); // Reset filter when modal is closed
+                        setIdPaketFilter(''); // Reset filter state
+                    }}>
+                        Batal
+                    </Button>
+                    <Button
+                        className="bg-green-600 text-white hover:bg-green-700"
+                        onClick={() => {
+                            setShowFilterModal(false); // Set the filter state
+                            setIdPaketFilter(idPaket); // Apply the selected filter
+                        }}
+                    >
+                        Terapkan Filter
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     </main>);
 }
 

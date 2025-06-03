@@ -9,6 +9,8 @@ export async function getAllCabangService({
   filter = "",
   orderByField = "idCabang",
   orderByDirection = "desc",
+  idProvinsi,
+  idKabupaten,
 }: {
   page?: number;
   perPage?: number;
@@ -16,6 +18,8 @@ export async function getAllCabangService({
   filter?: string;
   orderByField?: string;
   orderByDirection?: "asc" | "desc";
+  idProvinsi?: string;
+  idKabupaten?: string;
 }) {
   try {
     const where: Prisma.CabangWhereInput = {
@@ -55,7 +59,16 @@ export async function getAllCabangService({
           },
         },
       ],
-      ...(filter && {}),
+      ...(idProvinsi && {
+        provinces: {
+          id: idProvinsi,
+        },
+      }),
+      ...(idKabupaten && {
+        regencies: {
+          id: idKabupaten,
+        },
+      }),
     };
 
     // Build orderBy object dynamically

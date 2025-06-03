@@ -3,12 +3,12 @@
 import withAuth from "@/components/withAuth";
 import DataTable from "@/components/DataTable";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCabangPagination } from "./UseCabangPagination";
 import { Cabang } from "@/models/Cabang";
 import { Header } from "@/components/Header";
 import Loading from "@/components/Spinner";
-import { Eye, Edit, Delete, Plus, Search, Trash2 } from "lucide-react";
+import { Eye, Edit, Delete, Plus, Search, Trash2, ListFilter } from "lucide-react";
 import Swal from "sweetalert2";
 import InsertCabangModal from "./InsertCabangModal";
 import EditCabangModal from "./EditCabangModal";
@@ -16,6 +16,18 @@ import DetailCabangModal from "./DetailCabangModal";
 import { confirmDialog } from "@/lib/confirm-dialog";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Combobox } from "@/components/ui/combobox";
+import { Label } from "@/components/ui/label";
+import { useIndoRegion } from "./UseIndoRegion";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter,
+} from "@/components/ui/dialog";
+import { set } from "date-fns";
 
 function MasterCabang() {
     const router = useRouter();
@@ -24,6 +36,21 @@ function MasterCabang() {
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDetailModal, setShowDetailModal] = useState(false);
     const [selectedCabang, setSelectedCabang] = useState<Cabang | null>(null);
+    const [listProvinsi, setListProvinsi] = useState<{ value: number; label: string }[]>([]);
+    const [listKabupaten, setListKabupaten] = useState<{ value: number; label: string }[]>([]);
+    const [showFilterModal, setShowFilterModal] = useState(false);
+
+    const { provinces, regencies, selectedProvince, setSelectedProvince, selectedRegency, setSelectedRegency } = useIndoRegion();
+
+    useEffect(() => {
+        if (provinces.length > 0) {
+            const provinceOptions = provinces.map((province) => ({
+                value: parseInt(province.id),
+                label: province.name,
+            }));
+            setListProvinsi(provinceOptions)
+        }
+    }, [provinces]);
 
     const handleEdit = (cabang: Cabang) => {
         setSelectedCabang(cabang);
@@ -34,6 +61,19 @@ function MasterCabang() {
         setSelectedCabang(cabang);
         setShowDetailModal(true);
     }
+
+    useEffect(() => {
+        if (selectedProvince) {
+            const regencyOptions = regencies.map((regency) => ({
+                value: parseInt(regency.id),
+                label: regency.name,
+            }));
+            setListKabupaten(regencyOptions);
+        } else {
+            setListKabupaten([]);
+        }
+    }, [selectedProvince, regencies]);
+
     const {
         cabang,
         totalPage,
@@ -49,6 +89,8 @@ function MasterCabang() {
         search,
         setSearch,
         fetchCabang,
+        setIdKabupatenFilter,
+        setIdProvinsiFilter
     } = useCabangPagination();
 
     const headers: Header<Cabang>[] = [
@@ -252,13 +294,15 @@ function MasterCabang() {
                 <hr className="my-4 border-gray-300" />
                 <br />
                 <div className="flex justify-between items-center mb-4">
-                    {/* <a
-                        className="inline-block rounded-sm border border-green-600 px-6 py-2 text-sm font-medium text-green-600 hover:bg-green-600 hover:text-white focus:ring-3 focus:outline-hidden"
-                        href="#"
-                    >
-                        Filter
-                    </a> */}
                     <div className="flex items-center gap-2">
+                        <Button
+                            variant="outline"
+                            className="text-green-600 border-green-600 hover:bg-green-600 hover:text-white"
+                            onClick={() => setShowFilterModal(true)}
+                        >
+                            <ListFilter size={16} className="mr-1" />
+                            Filter
+                        </Button>
                         <input
                             type="text"
                             placeholder="Cari Cabang..."
@@ -314,6 +358,59 @@ function MasterCabang() {
             {loading && (
                 <Loading />
             )}
+
+            <Dialog open={showFilterModal} onOpenChange={setShowFilterModal}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Filter Cabang</DialogTitle>
+                    </DialogHeader>
+
+                    {/* ✅ Isi Filter (contoh input tahun keberangkatan) */}
+                    <div className="space-y-4 py-2">
+                        <div className="space-y-2">
+                            <Label htmlFor="idProvinsi">Provinsi</Label>
+                            <Combobox
+                                items={listProvinsi}
+                                value={selectedProvince}
+                                onChange={(item) => (
+                                    setSelectedProvince(item.value.toString())
+                                )}
+                                placeholder="Cari Provinsi..."
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="idKabupaten">Kabupaten/Kota</Label>
+                            <Combobox
+                                items={listKabupaten}
+                                value={selectedRegency}
+                                onChange={(Item) => setSelectedRegency(Item.value.toString())}
+                                placeholder="Pilih Kabupaten/Kota"
+                            />
+                        </div>
+
+                        {/* Tambahkan filter lain di sini */}
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => {
+                            setShowFilterModal(false);
+                            setSelectedProvince(''); // Reset filter state
+                            setSelectedRegency(''); // Reset filter state
+                        }}>
+                            Batal
+                        </Button>
+                        <Button
+                            className="bg-green-600 text-white hover:bg-green-700"
+                            onClick={() => {
+                                setShowFilterModal(false); // Set the filter state
+                                setIdProvinsiFilter(selectedProvince)
+                                setIdKabupatenFilter(selectedRegency)
+                            }}
+                        >
+                            Terapkan Filter
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </main>
     )
 }

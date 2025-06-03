@@ -53,7 +53,7 @@ function InsertSubPaketPage() {
         setIsClient(true);
     }, []);
 
-    const { paket, setSearch, loading } = usePaketPagination();
+    const { paket, setSearch, loading } = usePaketPagination(1, 1000);
 
     useEffect(() => {
         if (paket.length > 0) {

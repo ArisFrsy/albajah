@@ -12,22 +12,28 @@ export function useCabangPagination(initialPage = 1, initialLimit = 10) {
   );
   const [loading, setLoading] = useState<boolean>(true);
   const [search, setSearch] = useState<string>("");
+  const [idProvinsiFilter, setIdProvinsiFilter] = useState<string>("");
+  const [idKabupatenFilter, setIdKabupatenFilter] = useState<string>("");
 
   const fetchCabang = async () => {
     try {
       setLoading(true);
-      const response = await fetch(
-        `/api/master/cabang?page=${page}&perPage=${limit}&orderBy=${orderByField}&orderDir=${orderByDirection}&search=${encodeURIComponent(
-          search
-        )}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      let url = `/api/master/cabang?page=${page}&perPage=${limit}&orderBy=${orderByField}&orderDir=${orderByDirection}&search=${encodeURIComponent(
+        search
+      )}`;
+      if (idProvinsiFilter) {
+        url += `&idProvinsi=${idProvinsiFilter}`;
+      }
+      if (idKabupatenFilter) {
+        url += `&idKabupaten=${idKabupatenFilter}`;
+      }
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
 
       if (!response.ok) {
         // if unauthorized, clear token and redirect to login
@@ -50,7 +56,15 @@ export function useCabangPagination(initialPage = 1, initialLimit = 10) {
 
   useEffect(() => {
     fetchCabang();
-  }, [page, limit, orderByField, orderByDirection, search]);
+  }, [
+    page,
+    limit,
+    orderByField,
+    orderByDirection,
+    search,
+    idProvinsiFilter,
+    idKabupatenFilter,
+  ]);
 
   return {
     cabang,
@@ -67,5 +81,9 @@ export function useCabangPagination(initialPage = 1, initialLimit = 10) {
     search,
     setSearch,
     fetchCabang,
+    setIdProvinsiFilter,
+    idProvinsiFilter,
+    setIdKabupatenFilter,
+    idKabupatenFilter,
   };
 }

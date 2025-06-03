@@ -18,6 +18,8 @@ export async function GET(request: Request) {
   const rawOrderDir = url.searchParams.get("orderDir") || "desc";
   const orderByDirection =
     rawOrderDir === "asc" || rawOrderDir === "desc" ? rawOrderDir : "desc";
+  const idProvinsi = url.searchParams.get("idProvinsi") || "";
+  const idKabupaten = url.searchParams.get("idKabupaten") || "";
 
   try {
     const result = await getAllCabangController(
@@ -26,7 +28,9 @@ export async function GET(request: Request) {
       search,
       filter,
       orderByField,
-      orderByDirection
+      orderByDirection,
+      idProvinsi,
+      idKabupaten
     );
     return NextResponse.json(result, { status: 200 });
   } catch (error) {
