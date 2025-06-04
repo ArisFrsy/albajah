@@ -22,13 +22,11 @@ export async function getAllRegionsService({
         {
           namaProvinsi: {
             contains: search,
-            mode: "insensitive",
           },
         },
         {
           namaKabupaten: {
             contains: search,
-            mode: "insensitive",
           },
         },
       ],

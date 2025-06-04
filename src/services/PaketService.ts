@@ -27,20 +27,17 @@ export async function getAllPaketService({
         {
           nama: {
             contains: search,
-            mode: "insensitive",
           },
         },
         {
           deskripsi: {
             contains: search,
-            mode: "insensitive",
           },
         },
       ],
       ...(filter && {
         deskripsi: {
           contains: filter,
-          mode: "insensitive",
         },
       }),
     };

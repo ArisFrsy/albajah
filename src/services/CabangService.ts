@@ -28,7 +28,6 @@ export async function getAllCabangService({
           provinces: {
             name: {
               contains: search,
-              mode: "insensitive",
             },
           },
         },
@@ -36,26 +35,22 @@ export async function getAllCabangService({
           regencies: {
             name: {
               contains: search,
-              mode: "insensitive",
             },
           },
         },
         {
           penanggungjawab: {
             contains: search,
-            mode: "insensitive",
           },
         },
         {
           email: {
             contains: search,
-            mode: "insensitive",
           },
         },
         {
           noTelepon: {
             contains: search,
-            mode: "insensitive",
           },
         },
       ],

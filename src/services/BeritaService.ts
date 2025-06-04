@@ -25,13 +25,11 @@ export async function getAllBeritaService({
         {
           judul: {
             contains: search,
-            mode: "insensitive",
           },
         },
         {
           deskripsi: {
             contains: search,
-            mode: "insensitive",
           },
         },
       ],

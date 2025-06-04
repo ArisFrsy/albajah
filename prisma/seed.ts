@@ -9,13 +9,17 @@ async function main() {
   // Hash password dengan salt rounds 10
   const hashedPassword = await bcrypt.hash(passwordPlain, 10);
 
-  await prisma.user.create({
-    data: {
-      name: "admin",
-      email: "aris.it.dev@gmail.com",
-      password: hashedPassword,
-      createdAt: new Date(),
-    },
+  // cerate multi user
+  await prisma.user.createMany({
+    data: [
+      {
+        name: "admin",
+        email: "aris.it.dev@gmail.com",
+        password: hashedPassword,
+        createdAt: new Date(),
+      },
+    ],
+    skipDuplicates: true,
   });
 
   console.log("User admin created with hashed password");

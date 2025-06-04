@@ -23,13 +23,11 @@ export async function getSubPaketService({
         {
           namaSubPaket: {
             contains: search,
-            mode: "insensitive",
           },
         },
         {
           penerbangan: {
             contains: search,
-            mode: "insensitive",
           },
         },
       ],

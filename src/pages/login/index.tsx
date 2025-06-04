@@ -131,7 +131,6 @@ export default function LoginPage() {
 
             if (res.ok && resData.success) {
                 localStorage.setItem('token', resData.token)
-                localStorage.setItem('user', JSON.stringify(resData.user))
                 // Swal.fire({
                 //     icon: 'success',
                 //     title: 'Verifikasi Berhasil',
