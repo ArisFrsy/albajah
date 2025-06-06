@@ -5,7 +5,7 @@ export interface SubPaket {
   namaSubPaket: string;
   hargaIDR: number;
   hargaUSD: number;
-  keberangkatan: String;
+  keberangkatan: string;
   durasiHari: number;
   penerbangan: string;
   hotelMekkah: string;

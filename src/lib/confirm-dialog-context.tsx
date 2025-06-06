@@ -22,7 +22,7 @@ export type ConfirmDialogOptions = {
 };
 
 type ConfirmDialogContextType = {
-    show: (options: ConfirmDialogOptions) => Promise<{ confirmed: boolean }>;
+    show: (_options: ConfirmDialogOptions) => Promise<{ confirmed: boolean }>;
 };
 
 // Context setup
@@ -50,7 +50,7 @@ export const ConfirmDialogProvider = ({ children }: { children: ReactNode }) => 
         confirmText: "Yes",
         cancelText: "Cancel",
     });
-    const [resolver, setResolver] = useState<(value: { confirmed: boolean }) => void>();
+    const [resolver, setResolver] = useState<(_value: { confirmed: boolean }) => void>();
 
     const show = (opts: ConfirmDialogOptions) => {
         setOptions({

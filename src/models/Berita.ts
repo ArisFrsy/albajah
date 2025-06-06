@@ -1,5 +1,5 @@
 export interface Berita {
-  idBerita?: Number;
+  idBerita?: number;
   judul: string;
   deskripsi?: string;
   imagePath?: string;

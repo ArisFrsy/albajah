@@ -3,7 +3,7 @@ type Header<T> = {
   label: string;
   orderable?: boolean;
   align?: "left" | "right" | "center";
-  render?: (row: T) => React.ReactNode;
+  render?: (_row: T) => React.ReactNode;
 };
 
 export type { Header };

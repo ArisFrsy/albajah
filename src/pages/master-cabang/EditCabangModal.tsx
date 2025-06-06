@@ -2,10 +2,9 @@
 import { useEffect, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { useIndoRegion } from './UseIndoRegion';
+import { useIndoRegion } from '../../hooks/UseIndoRegion';
 import { Combobox } from '@/components/ui/combobox';
 import { Cabang } from '@/models/Cabang';
 import Loading from '@/components/Spinner';
@@ -13,7 +12,7 @@ import Loading from '@/components/Spinner';
 interface EditCabangModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSubmit: (data: { cabang: Cabang }) => void;
+    onSubmit: (_data: { cabang: Cabang }) => void;
     initialData: Cabang | null;
 }
 
@@ -29,7 +28,7 @@ export default function EditCabangModal({
     const [listProvinsi, setListProvinsi] = useState<{ value: number; label: string }[]>([]);
     const [listKabupaten, setListKabupaten] = useState<{ value: number; label: string }[]>([]);
 
-    const { provinces, regencies, selectedProvince, loading, setLoading, setSelectedProvince, selectedRegency, setSelectedRegency } = useIndoRegion();
+    const { provinces, regencies, selectedProvince, loading, setSelectedProvince, selectedRegency, setSelectedRegency } = useIndoRegion();
 
     useEffect(() => {
         if (provinces.length > 0) {
@@ -55,7 +54,6 @@ export default function EditCabangModal({
 
     useEffect(() => {
         if (initialData) {
-            console.log('Initial Data:', initialData);
             setPenganggungJawab(initialData.penanggungjawab || '');
             setEmail(initialData.email || '');
             setNoTelepon(initialData.noTelepon || '');

@@ -2,11 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { SubPaket } from '@/models/SubPaket';
-import { Paket } from '@/models/Paket';
-import { usePaketPagination } from '../../master-paket/UsePaketPagination';
+import { usePaketPagination } from '../../../hooks/UsePaketPagination';
 import withAuth from '@/components/withAuth';
 import Loading from '@/components/Spinner';
-import Swal from 'sweetalert2';
 import { useRouter } from 'next/router';
 import {
     Card,
@@ -16,9 +14,7 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Select as ShadSelect, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Combobox } from '@/components/ui/combobox';
 import { formatCurrency, unformatCurrency } from '@/utils/formatCurrency';
 import { Minus, Plus } from 'lucide-react';
@@ -37,15 +33,12 @@ function InsertSubPaketPage() {
     const [penerbangan, setPenerbangan] = useState('');
     const [hotelMekkah, setHotelMekkah] = useState('');
     const [hotelMadinah, setHotelMadinah] = useState('');
-    const [fasilitas, setFasilitas] = useState('');
-    const [perlengkapan, setPerlengkapan] = useState('');
     const [hargaIDRDisplay, setHargaIDRDisplay] = useState('');
     const [hargaUSDDisplay, setHargaUSDDisplay] = useState('');
     const [fasilitasList, setFasilitasList] = useState<string[]>(['']);
     const [perlengkapanList, setPerlengkapanList] = useState<string[]>(['']);
 
 
-    const [paketList, setPaketList] = useState<Paket[]>([]);
     const [isClient, setIsClient] = useState(false);
     const [options, setOptions] = useState<{ value: number; label: string }[]>([]);
 
@@ -53,11 +46,10 @@ function InsertSubPaketPage() {
         setIsClient(true);
     }, []);
 
-    const { paket, setSearch, loading } = usePaketPagination(1, 1000);
+    const { paket, loading } = usePaketPagination(1, 1000);
 
     useEffect(() => {
         if (paket.length > 0) {
-            setPaketList(paket);
             const paketOptions = paket.map((p) => ({
                 value: p.idPaket,
                 label: p.nama,
@@ -113,7 +105,7 @@ function InsertSubPaketPage() {
             toast.success('Sub paket berhasil ditambahkan');
 
             router.push('/master-subpaket');
-        } catch (err) {
+        } catch {
             toast.error('Terjadi kesalahan saat menambahkan sub paket');
         }
     };
@@ -128,8 +120,6 @@ function InsertSubPaketPage() {
         setPenerbangan('');
         setHotelMekkah('');
         setHotelMadinah('');
-        setFasilitas('');
-        setPerlengkapan('');
         setFasilitasList(['']);
         setPerlengkapanList(['']);
 

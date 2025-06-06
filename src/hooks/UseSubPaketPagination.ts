@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { SubPaket } from "@/models/SubPaket";
-import { set } from "date-fns";
+import { toast } from "sonner";
 
 export function useSubPaketPagination(initialPage = 1, initialLimit = 10) {
   const [subPaket, setSubPaket] = useState<SubPaket[]>([]);
@@ -13,9 +13,9 @@ export function useSubPaketPagination(initialPage = 1, initialLimit = 10) {
   );
   const [loading, setLoading] = useState<boolean>(true);
   const [search, setSearch] = useState<string>("");
-  const [idPaketFilter, setIdPaketFilter] = useState("");
+  const [idPaketFilter, setIdPaketFilter] = useState<string>("");
 
-  const fetchSubPaket = async () => {
+  const fetchSubPaket = useCallback(async () => {
     try {
       setLoading(true);
       let url = `${
@@ -35,27 +35,27 @@ export function useSubPaketPagination(initialPage = 1, initialLimit = 10) {
       });
 
       if (!response.ok) {
-        // if unauthorized, clear token and redirect to login
         if (response.status === 401) {
           localStorage.removeItem("token");
-          window.location.href = "/login"; // redirect to login page
+          window.location.href = "/login";
           return;
         }
+        throw new Error("Network response was not ok");
       }
 
       const data = await response.json();
       setSubPaket(data.data || []);
       setTotalPage(Math.ceil((data.total || 0) / limit));
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching sub-paket:", error);
+    } catch {
+      toast.error("Gagal mengambil data sub-paket. Silakan coba lagi.");
+    } finally {
       setLoading(false);
     }
-  };
+  }, [page, limit, orderByField, orderByDirection, search, idPaketFilter]);
 
   useEffect(() => {
     fetchSubPaket();
-  }, [page, limit, orderByField, orderByDirection, search, idPaketFilter]);
+  }, [fetchSubPaket]);
 
   return {
     subPaket,

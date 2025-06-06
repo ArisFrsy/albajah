@@ -2,14 +2,12 @@
 
 import withAuth from "@/components/withAuth";
 import DataTable from "@/components/DataTable";
-import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
-import { useCabangPagination } from "./UseCabangPagination";
+import { useCabangPagination } from "../../hooks/UseCabangPagination";
 import { Cabang } from "@/models/Cabang";
 import { Header } from "@/components/Header";
 import Loading from "@/components/Spinner";
-import { Eye, Edit, Delete, Plus, Search, Trash2, ListFilter } from "lucide-react";
-import Swal from "sweetalert2";
+import { Eye, Edit, Plus, Trash2, ListFilter } from "lucide-react";
 import InsertCabangModal from "./InsertCabangModal";
 import EditCabangModal from "./EditCabangModal";
 import DetailCabangModal from "./DetailCabangModal";
@@ -18,19 +16,16 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Combobox } from "@/components/ui/combobox";
 import { Label } from "@/components/ui/label";
-import { useIndoRegion } from "./UseIndoRegion";
+import { useIndoRegion } from "../../hooks/UseIndoRegion";
 import {
     Dialog,
     DialogContent,
-    DialogDescription,
     DialogHeader,
     DialogTitle,
     DialogFooter,
 } from "@/components/ui/dialog";
-import { set } from "date-fns";
 
 function MasterCabang() {
-    const router = useRouter();
     const [order, setOrder] = useState<"asc" | "desc">("asc");
     const [showModal, setShowModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
@@ -76,17 +71,13 @@ function MasterCabang() {
 
     const {
         cabang,
-        totalPage,
         page,
         limit,
         setPage,
         setLimit,
         orderByField,
         setOrderByField,
-        orderByDirection,
-        setOrderByDirection,
         loading,
-        search,
         setSearch,
         fetchCabang,
         setIdKabupatenFilter,
@@ -178,7 +169,7 @@ function MasterCabang() {
 
             setShowModal(false);
             fetchCabang(); // Refresh the data after insertion
-        } catch (error) {
+        } catch {
             toast.error('Terjadi kesalahan saat menambahkan data cabang. Silakan coba lagi.');
         }
     }
@@ -219,7 +210,7 @@ function MasterCabang() {
 
             setShowModal(false);
             fetchCabang(); // Refresh the data after update
-        } catch (error) {
+        } catch {
             toast.error('Terjadi kesalahan saat memperbarui data cabang. Silakan coba lagi.');
         }
         setSelectedCabang(null); // Clear selected cabang after update
@@ -257,7 +248,7 @@ function MasterCabang() {
 
             toast.success('Data cabang berhasil dihapus');
             fetchCabang(); // Refresh the data after deletion
-        } catch (error) {
+        } catch {
             toast.error('Terjadi kesalahan saat menghapus data cabang. Silakan coba lagi.');
         }
     }

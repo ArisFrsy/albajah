@@ -3,13 +3,12 @@
 import withAuth from "@/components/withAuth";
 import DataTable from "@/components/DataTable";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import { useBeritaPagination } from "./UseBeritaPagination";
+import { useState } from "react";
+import { useBeritaPagination } from "@/hooks/UseBeritaPagination";
 import { Berita } from "@/models/Berita";
 import { Header } from "@/components/Header";
 import Loading from "@/components/Spinner";
-import { Eye, Edit, Delete, Plus, Search, Trash2 } from "lucide-react";
-import Swal from "sweetalert2";
+import { Eye, Edit, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { encrypt } from "@/lib/Encrypt";
 import { confirmDialog } from "@/lib/confirm-dialog";
@@ -19,11 +18,6 @@ import { Button } from "@/components/ui/button";
 function MasterBerita() {
     const router = useRouter();
     const [order, setOrder] = useState<"asc" | "desc">("desc");
-    const [showModal, setShowModal] = useState(false);
-    const [showDetailModal, setShowDetailModal] = useState(false);
-    const [showEditModal, setShowEditModal] = useState(false);
-
-    const [selectedBerita, setSelectedBerita] = useState<Berita | null>(null);
 
     const handleDelete = async (berita: Berita) => {
         const confirmed = await confirmDialog({
@@ -48,7 +42,7 @@ function MasterBerita() {
                     toast.success("Berita berhasil dihapus.");
                     router.reload();
                 }
-            } catch (error) {
+            } catch {
                 toast.error("Terjadi kesalahan saat menghapus berita.");
             }
         }

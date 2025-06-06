@@ -1,7 +1,6 @@
 import type { i18n } from "@/configs/i18n";
 import type { LucideIcon, icons } from "lucide-react";
 import type { ComponentType, SVGAttributes } from "react";
-import type { z } from "zod";
 import type { radii, themes } from "./configs/themes";
 
 export type LayoutType = "vertical" | "horizontal";

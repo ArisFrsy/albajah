@@ -44,15 +44,13 @@ function ViewBeritaPage() {
                 .then((data) => {
                     setBerita(data.data);
                 })
-                .catch((err: Error) => {
-                    console.error("Error fetching berita:", err);
-                    setError(err.message);
+                .catch(() => {
+                    setError('Gagal mengambil data berita. Pastikan ID berita valid.');
                 })
                 .finally(() => {
                     setLoading(false);
                 });
-        } catch (err) {
-            console.error("Unexpected error:", err);
+        } catch {
             setError('Terjadi kesalahan saat mengambil data berita.');
             setLoading(false);
         }

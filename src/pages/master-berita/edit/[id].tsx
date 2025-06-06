@@ -24,7 +24,6 @@ import { decrypt } from '@/lib/Encrypt';
 
 import TiptapEditor from '@/components/Editor';
 import Image from 'next/image';
-import { set } from 'date-fns';
 import { confirmDialog } from '@/lib/confirm-dialog';
 
 const formSchema = z.object({
@@ -77,7 +76,7 @@ function EditBeritaPage() {
         };
 
         fetchBerita();
-    }, [id, form, router]);
+    }, [id, form, router, baseUrl]);
 
     useEffect(() => {
         form.setValue('deskripsi', content, { shouldValidate: true, shouldDirty: true });
@@ -173,7 +172,7 @@ function EditBeritaPage() {
                             <FormField
                                 control={form.control}
                                 name="image"
-                                render={({ field }) => (
+                                render={() => (
                                     <FormItem>
                                         <FormLabel className="text-lg">Upload Gambar</FormLabel>
                                         <FormControl>

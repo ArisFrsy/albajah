@@ -3,8 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import clsx from 'clsx';
 import {
-    Package, PackageOpen, Newspaper, MapPin, Building2,
-    LogOut, Home, ChevronLeft, ChevronRight, Menu
+    Package, PackageOpen, Newspaper, Building2, Home, ChevronLeft, ChevronRight, Menu
 } from 'lucide-react';
 
 export const Sidebar = () => {
@@ -13,10 +12,10 @@ export const Sidebar = () => {
     const [collapsed, setCollapsed] = useState(false);
     const [isMobileOpen, setIsMobileOpen] = useState(false);
 
-    const handleLogout = () => {
-        localStorage.removeItem('token');
-        router.replace('/login');
-    };
+    // const handleLogout = () => {
+    //     localStorage.removeItem('token');
+    //     router.replace('/login');
+    // };
 
     const menus = [
         {

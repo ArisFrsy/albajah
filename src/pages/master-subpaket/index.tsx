@@ -4,12 +4,11 @@ import withAuth from "@/components/withAuth";
 import DataTable from "@/components/DataTable";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { useSubPaketPagination } from "./UseSubPaketPagination";
+import { useSubPaketPagination } from "../../hooks/UseSubPaketPagination";
 import { SubPaket } from "@/models/SubPaket";
 import { Header } from "@/components/Header";
 import Loading from "@/components/Spinner";
-import { Eye, Edit, Delete, Plus, Search, Trash2, ListFilter } from "lucide-react";
-import Swal from "sweetalert2";
+import { Eye, Edit, Plus, Trash2, ListFilter } from "lucide-react";
 import Link from "next/link";
 import { encrypt } from "@/lib/Encrypt";
 import { confirmDialog } from "@/lib/confirm-dialog";
@@ -18,15 +17,13 @@ import { Button } from "@/components/ui/button";
 import {
     Dialog,
     DialogContent,
-    DialogDescription,
     DialogHeader,
     DialogTitle,
     DialogFooter,
 } from "@/components/ui/dialog";
-import { usePaketPagination } from "../master-paket/UsePaketPagination";
+import { usePaketPagination } from "@/hooks/UsePaketPagination";
 import { Combobox } from "@/components/ui/combobox";
 import { Label } from "@/components/ui/label";
-import { set } from "date-fns";
 
 function MasterSubPaket() {
     const router = useRouter();
@@ -75,7 +72,7 @@ function MasterSubPaket() {
 
                 // Refresh data after deletion
                 router.reload();
-            } catch (error) {
+            } catch {
                 toast.error("Terjadi kesalahan saat menghapus sub paket.");
             }
         }
@@ -135,20 +132,15 @@ function MasterSubPaket() {
 
     const {
         subPaket,
-        totalPage,
         page,
         limit,
         setPage,
         setLimit,
         orderByField,
         setOrderByField,
-        orderByDirection,
-        setOrderByDirection,
         loading,
-        search,
         setSearch,
         setIdPaketFilter,
-        idPaketFilter,
     } = useSubPaketPagination();
 
 

@@ -7,7 +7,9 @@ import HeaderComponent from './HeaderComponent';
 import { Toaster } from 'sonner';
 
 export default function withAuth(Component: React.ComponentType) {
-    return function ProtectedComponent(props: any) {
+    return function ProtectedComponent(props: any // eslint-disable-line @typescript-eslint/no-explicit-any
+
+    ) {
         const router = useRouter();
 
         useEffect(() => {

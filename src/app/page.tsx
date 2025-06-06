@@ -1,94 +1,94 @@
 // Misalkan file ini disimpan sebagai: components/CompanyProfileDashboardGreen.tsx
 // atau pages/profil-perusahaan-hijau.tsx jika menggunakan Next.js Pages Router
 
-import React from 'react';
+// import React from 'react';
 
-import { dummyAdvertise } from './dummyAdvertise';
-import { dummyGallery } from './dummyGallery';
-import { paketHajiUmrah } from './dummyProduct';
-import { izinAlBahjah } from './izin-albahjah'; // Sesuaikan path jika perlu
+// import { dummyAdvertise } from './dummyAdvertise';
+// import { dummyGallery } from './dummyGallery';
+// import { paketHajiUmrah } from './dummyProduct';
+// import { izinAlBahjah } from './izin-albahjah'; // Sesuaikan path jika perlu
 
 import { redirect } from 'next/navigation';
-// Import ikon dari lucide-react
-import {
-  ExternalLink,
-  ImageIcon,
-  Package,
-  ShieldCheck,
-  Plane,
-  Landmark,
-  Briefcase,
-  Award,
-  FileText,
-  Clock,
-  MapPin,
-  CheckCircle,
-  Building,
-} from 'lucide-react';
+// // Import ikon dari lucide-react
+// import {
+//   ExternalLink,
+//   ImageIcon,
+//   Package,
+//   ShieldCheck,
+//   Plane,
+//   Landmark,
+//   Briefcase,
+//   Award,
+//   FileText,
+//   Clock,
+//   MapPin,
+//   CheckCircle,
+//   Building,
+// } from 'lucide-react';
 
-// Mendefinisikan tipe data untuk type safety (opsional namun direkomendasikan)
-interface Advertise {
-  id: number;
-  name: string;
-  image: string;
-  description: string;
-}
+// // Mendefinisikan tipe data untuk type safety (opsional namun direkomendasikan)
+// interface Advertise {
+//   id: number;
+//   name: string;
+//   image: string;
+//   description: string;
+// }
 
-interface GalleryImage {
-  id: number;
-  src: string;
-  alt: string;
-}
+// interface GalleryImage {
+//   id: number;
+//   src: string;
+//   alt: string;
+// }
 
-interface Harga {
-  idr: number | null;
-  usd: number | null;
-}
+// interface Harga {
+//   idr: number | null;
+//   usd: number | null;
+// }
 
 // Asumsi variabel gambar yang diimpor adalah objek dengan properti 'src' atau string path
-interface ImportedImage {
-  src: string;
-  height?: number;
-  width?: number;
-  blurDataURL?: string;
-}
+// interface ImportedImage {
+//   src: string;
+//   height?: number;
+//   width?: number;
+//   blurDataURL?: string;
+// }
 
-interface SubPaket {
-  id: number;
-  namaSubPaket: string;
-  slug: string;
-  deskripsi: string;
-  harga: Harga;
-  gambar: (ImportedImage | string)[];
-  durasi?: string;
-  hotel_makkah?: string;
-  hotel_madinah?: string;
-  penerbangan?: string;
-  keberangkatan_hijriah?: string;
-  keberangkatan_masehi?: string;
-  include?: string[];
-  perlengkapan?: string[];
-}
+// interface SubPaket {
+//   id: number;
+//   namaSubPaket: string;
+//   slug: string;
+//   deskripsi: string;
+//   harga: Harga;
+//   gambar: (ImportedImage | string)[];
+//   durasi?: string;
+//   hotel_makkah?: string;
+//   hotel_madinah?: string;
+//   penerbangan?: string;
+//   keberangkatan_hijriah?: string;
+//   keberangkatan_masehi?: string;
+//   include?: string[];
+//   perlengkapan?: string[];
+// }
 
-interface Paket {
-  id: number;
-  namaPaket: string;
-  deskripsi: string;
-  harga: Harga;
-  durasi: string | null;
-  destinasi?: string[];
-  gambar: string;
-  lokasi: string;
-  subPaket: SubPaket[];
-}
+// interface Paket {
+//   id: number;
+//   namaPaket: string;
+//   deskripsi: string;
+//   harga: Harga;
+//   durasi: string | null;
+//   destinasi?: string[];
+//   gambar: string;
+//   lokasi: string;
+//   subPaket: SubPaket[];
+// }
 
-interface Izin {
-  nama: string;
-  nomor: string;
-  berlaku_mulai?: string;
-  berlaku_mula?: string;
-  deskripsi: string;
-}
+// interface Izin {
+//   nama: string;
+//   nomor: string;
+//   berlaku_mulai?: string;
+//   berlaku_mula?: string;
+//   deskripsi: string;
+// }
 
 // Helper function untuk mendapatkan src gambar dari subPaket
 // const getSubPaketImageSrc = (gambarArray: (ImportedImage | string)[]): string => {

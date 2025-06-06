@@ -6,7 +6,9 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "build:trace": "cross-env NODE_OPTIONS=--trace-deprecation next build",
+    "export": "next export"
   },
   "dependencies": {
     "@ckeditor/ckeditor5-build-classic": "^35.4.0",

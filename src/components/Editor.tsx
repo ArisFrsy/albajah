@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback } from "react";
+import React from "react";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 // import Image from "@tiptap/extension-image"; // <-- 1. REMOVE THIS LINE
@@ -16,14 +16,12 @@ import {
     Underline as UnderlineIcon,
     AlignLeft,
     AlignCenter,
-    AlignRight,
-    Image as ImageIcon, // This is just the icon, not the Tiptap extension
+    AlignRight, // This is just the icon, not the Tiptap extension
 } from "lucide-react";
-import { toast } from "sonner"
 
 interface Props {
     value: string;
-    onChange: (value: string) => void;
+    onChange: (_value: string) => void;
 }
 
 const fonts = [
@@ -54,26 +52,6 @@ const TiptapEditor: React.FC<Props> = ({ value, onChange }) => {
         content: value, // ResizeImage will now handle parsing <img> tags from this HTML
         onUpdate: ({ editor }) => onChange(editor.getHTML()),
     });
-
-    const addImage = useCallback(async () => {
-        if (!editor) return;
-        const input = document.createElement("input");
-        input.type = "file";
-        input.accept = "image/*";
-        input.click();
-
-        input.onchange = async () => {
-            const file = input.files?.[0];
-            if (file) {
-                if (file.size <= 500 * 1024) {
-                    const base64 = await convertToBase64(file);
-                    editor.chain().focus().setImage({ src: base64 }).run();
-                } else {
-                    toast.error("File size exceeds 500KB. Please choose a smaller image.");
-                }
-            }
-        };
-    }, [editor]);
 
     if (!editor) return <div>Loading editor...</div>;
 
@@ -160,12 +138,6 @@ const TiptapEditor: React.FC<Props> = ({ value, onChange }) => {
                         </option>
                     ))}
                 </select>
-
-                {/* <button
-                    type="button"
-                    onClick={addImage} title="Insert Image">
-                    <ImageIcon className={buttonClass()} />
-                </button> */}
             </div>
 
             <div className="border rounded-md p-2 min-h-[400px]">
@@ -176,15 +148,6 @@ const TiptapEditor: React.FC<Props> = ({ value, onChange }) => {
 };
 
 export default TiptapEditor;
-
-function convertToBase64(file: File): Promise<string> {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-    });
-}
 
 function buttonClass(active = false): string {
     return `w-6 h-6 stroke-[1.5] ${active ? "text-blue-500" : "text-gray-700"

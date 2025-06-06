@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Cabang } from "@/models/Cabang";
+import { toast } from "sonner";
 
 export function useCabangPagination(initialPage = 1, initialLimit = 10) {
   const [cabang, setCabang] = useState<Cabang[]>([]);
@@ -15,7 +16,7 @@ export function useCabangPagination(initialPage = 1, initialLimit = 10) {
   const [idProvinsiFilter, setIdProvinsiFilter] = useState<string>("");
   const [idKabupatenFilter, setIdKabupatenFilter] = useState<string>("");
 
-  const fetchCabang = async () => {
+  const fetchCabang = useCallback(async () => {
     try {
       setLoading(true);
       let url = `${
@@ -38,26 +39,22 @@ export function useCabangPagination(initialPage = 1, initialLimit = 10) {
       });
 
       if (!response.ok) {
-        // if unauthorized, clear token and redirect to login
         if (response.status === 401) {
           localStorage.removeItem("token");
-          window.location.href = "/login"; // redirect to login page
+          window.location.href = "/login";
           return;
         }
+        throw new Error("Network response was not ok");
       }
 
       const data = await response.json();
       setCabang(data.data || []);
       setTotalPage(Math.ceil((data.total || 0) / limit));
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching cabang:", error);
+    } catch {
+      toast.error("Gagal mengambil data cabang. Silakan coba lagi.");
+    } finally {
       setLoading(false);
     }
-  };
-
-  useEffect(() => {
-    fetchCabang();
   }, [
     page,
     limit,
@@ -67,6 +64,10 @@ export function useCabangPagination(initialPage = 1, initialLimit = 10) {
     idProvinsiFilter,
     idKabupatenFilter,
   ]);
+
+  useEffect(() => {
+    fetchCabang();
+  }, [fetchCabang]);
 
   return {
     cabang,

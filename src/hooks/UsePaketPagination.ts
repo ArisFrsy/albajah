@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Paket } from "@/models/Paket";
-import { set } from "date-fns";
+import { toast } from "sonner";
 
 export function usePaketPagination(initialPage = 1, initialLimit = 10) {
   const [paket, setPaket] = useState<Paket[]>([]);
@@ -8,14 +8,13 @@ export function usePaketPagination(initialPage = 1, initialLimit = 10) {
   const [page, setPage] = useState<number>(initialPage);
   const [limit, setLimit] = useState<number>(initialLimit);
   const [orderByField, setOrderByField] = useState<string | null>("idPaket");
-
   const [orderByDirection, setOrderByDirection] = useState<"asc" | "desc">(
     "desc"
   );
   const [loading, setLoading] = useState<boolean>(true);
   const [search, setSearch] = useState<string>("");
 
-  const fetchPaket = async () => {
+  const fetchPaket = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch(
@@ -34,27 +33,27 @@ export function usePaketPagination(initialPage = 1, initialLimit = 10) {
       );
 
       if (!response.ok) {
-        // if unauthorized, clear token and redirect to login
         if (response.status === 401) {
           localStorage.removeItem("token");
           window.location.href = "/login"; // redirect to login page
           return;
         }
+        throw new Error("Network response was not ok");
       }
 
       const data = await response.json();
       setPaket(data.data || []);
       setTotalPage(Math.ceil((data.total || 0) / limit));
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching paket:", error);
+    } catch {
+      toast.error("Gagal mengambil data paket. Silakan coba lagi.");
+    } finally {
       setLoading(false);
     }
-  };
+  }, [page, limit, orderByField, orderByDirection, search]);
 
   useEffect(() => {
     fetchPaket();
-  }, [page, limit, orderByField, orderByDirection, search]);
+  }, [fetchPaket]);
 
   return {
     paket,
@@ -70,6 +69,7 @@ export function usePaketPagination(initialPage = 1, initialLimit = 10) {
     fetchPaket,
     loading,
     setLoading,
+    search,
     setSearch,
   };
 }

@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Berita } from "@/models/Berita";
-import { set } from "date-fns";
+import { toast } from "sonner";
+
 export function useBeritaPagination(initialPage = 1, initialLimit = 10) {
   const [berita, setBerita] = useState<Berita[]>([]);
   const [totalPage, setTotalPage] = useState<number>(0);
@@ -13,7 +14,8 @@ export function useBeritaPagination(initialPage = 1, initialLimit = 10) {
   const [loading, setLoading] = useState<boolean>(true);
   const [search, setSearch] = useState<string>("");
 
-  const fetchBerita = async () => {
+  // Bungkus fetchBerita dengan useCallback agar referensi fungsi stabil
+  const fetchBerita = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch(
@@ -32,27 +34,27 @@ export function useBeritaPagination(initialPage = 1, initialLimit = 10) {
       );
 
       if (!response.ok) {
-        // if unauthorized, clear token and redirect to login
         if (response.status === 401) {
           localStorage.removeItem("token");
-          window.location.href = "/login"; // redirect to login page
+          window.location.href = "/login";
           return;
         }
+        throw new Error("Network response was not ok");
       }
 
       const data = await response.json();
       setBerita(data.data || []);
       setTotalPage(Math.ceil((data.total || 0) / limit));
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching berita:", error);
+    } catch {
+      toast.error("Gagal mengambil data berita. Silakan coba lagi.");
+    } finally {
       setLoading(false);
     }
-  };
+  }, [page, limit, orderByField, orderByDirection, search]);
 
   useEffect(() => {
     fetchBerita();
-  }, [page, limit, orderByField, orderByDirection, search]);
+  }, [fetchBerita]);
 
   return {
     berita,

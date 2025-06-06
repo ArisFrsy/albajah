@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Province } from "@/models/Provinces";
 import { Regencies } from "@/models/Regencies";
-import { set } from "date-fns";
+import { toast } from "sonner";
 
 function getProvinceList() {
   try {
@@ -15,9 +15,9 @@ function getProvinceList() {
         },
       }
     ).then((res) => res.json());
-  } catch (error) {
-    console.error("Error fetching provinces:", error);
+  } catch {
     // throw error; // Rethrow the error to be handled by the caller
+    toast.error("Gagal mengambil daftar provinsi. Silakan coba lagi.");
   }
 }
 
@@ -33,8 +33,8 @@ function getRegencyList(provinceId: string) {
         },
       }
     ).then((res) => res.json());
-  } catch (error) {
-    console.error("Error fetching regencies:", error);
+  } catch {
+    toast.error("Gagal mengambil daftar kabupaten. Silakan coba lagi.");
     // throw error; // Rethrow the error to be handled by the caller
   }
 }
@@ -52,8 +52,8 @@ export function useIndoRegion() {
         setLoading(true);
         const data = await getProvinceList();
         setProvinces(data.data);
-      } catch (error) {
-        console.error("Error fetching provinces:", error);
+      } catch {
+        toast.error("Gagal mengambil daftar provinsi. Silakan coba lagi.");
       } finally {
         setLoading(false);
       }
@@ -68,8 +68,8 @@ export function useIndoRegion() {
           setLoading(true);
           const data = await getRegencyList(selectedProvince);
           setRegencies(data.data);
-        } catch (error) {
-          console.error("Error fetching regencies:", error);
+        } catch {
+          toast.error("Gagal mengambil daftar kabupaten. Silakan coba lagi.");
         } finally {
           setLoading(false);
         }

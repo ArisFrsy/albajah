@@ -26,7 +26,7 @@ interface ComboBoxItem {
 interface ComboboxProps {
     items: ComboBoxItem[];
     value: string | number | undefined; // Value bisa jadi undefined saat awal
-    onChange: (value: ComboBoxItem) => void;
+    onChange: (_value: ComboBoxItem) => void;
     placeholder?: string;
     selectPlaceholder?: string; // Placeholder untuk tombol
     searchPlaceholder?: string; // Placeholder untuk input pencarian

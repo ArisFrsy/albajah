@@ -16,7 +16,7 @@ import { Label } from '@/components/ui/label'
 interface EditPaketModalProps {
     isOpen: boolean
     onClose: () => void
-    onSubmit: (data: { idPaket: number; nama: string; deskripsi?: string; fileFoto?: File | null }) => void
+    onSubmit: (_data: { idPaket: number; nama: string; deskripsi?: string; fileFoto?: File | null }) => void
     data: {
         idPaket: number
         nama: string

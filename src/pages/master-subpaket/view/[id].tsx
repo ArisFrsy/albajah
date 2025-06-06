@@ -22,9 +22,9 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { cn } from '@/lib/utils';
 import { decrypt } from '@/lib/Encrypt';
 import { formatCurrency } from '@/utils/formatCurrency';
+import { toast } from 'sonner';
 
 
 function ViewSubPaketPage() {
@@ -51,15 +51,15 @@ function ViewSubPaketPage() {
                     .then(data => {
                         setSubPaket(data.data || null);
                     })
-                    .catch(error => {
-                        console.error("Fetch error:", error);
+                    .catch(() => {
+                        toast.error('Gagal mengambil data sub paket. Silakan coba lagi.');
                         setSubPaket(null);
                     })
                     .finally(() => {
                         setLoading(false);
                     });
-            } catch (error) {
-                console.error("Error fetching sub-paket:", error);
+            } catch {
+                toast.error('Terjadi kesalahan saat memproses data. Silakan coba lagi.');
                 setSubPaket(null);
                 setLoading(false);
             }
@@ -175,7 +175,7 @@ const DetailItem = ({ icon, label, value }: { icon: React.ReactNode; label: stri
     <div className="flex items-start gap-4">
         <div className="flex-shrink-0 text-muted-foreground mt-1">
             {icon && (
-                // @ts-ignore - Memberitahu TypeScript untuk mengabaikan error di baris berikutnya
+                // @ts-expect-error - Memberitahu TypeScript untuk mengabaikan error di baris berikutnya
                 React.cloneElement(icon as React.ReactElement, { size: 20 })
             )}
         </div>

@@ -15,7 +15,7 @@ import { Label } from '@/components/ui/label'
 interface InsertPaketModalProps {
     isOpen: boolean
     onClose: () => void
-    onSubmit: (data: { nama: string; deskripsi?: string; fileFoto: File | null }) => void
+    onSubmit: (_data: { nama: string; deskripsi?: string; fileFoto: File | null }) => void
 }
 
 export default function InsertPaketModal({ isOpen, onClose, onSubmit }: InsertPaketModalProps) {

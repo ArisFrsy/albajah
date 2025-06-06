@@ -39,7 +39,6 @@ const formSchema = z.object({
 function TambahBeritaPage() {
     const router = useRouter();
     // 2. Tambahkan kembali state 'editorLoaded'
-    const [editorLoaded, setEditorLoaded] = useState(false);
     const [content, setContent] = useState('')
     const [file, setFile] = useState<File | null>(null)
 
@@ -63,12 +62,6 @@ function TambahBeritaPage() {
     useEffect(() => {
         form.setValue('deskripsi', content, { shouldValidate: true, shouldDirty: true });
     }, [content, form]);
-
-    // 3. Gunakan useEffect untuk memastikan komponen hanya dimuat di client
-    useEffect(() => {
-        setEditorLoaded(true);
-    }, []);
-
 
     const handleSubmit = async (values: z.infer<typeof formSchema>) => {
 
@@ -118,8 +111,6 @@ function TambahBeritaPage() {
         }
     };
 
-    const deskripsiPreview = form.watch('deskripsi');
-
     return (
         <main className="flex-1 p-6 overflow-auto bg-gray-100">
             <Card className="bg-white rounded-lg shadow-md p-6 border border-gray-300 min-h-[calc(110vh-7rem)]">
@@ -146,7 +137,7 @@ function TambahBeritaPage() {
                             <FormField
                                 control={form.control}
                                 name="gambar"
-                                render={({ field }) => (
+                                render={() => (
                                     <FormItem>
                                         <FormLabel className="text-lg">Upload Gambar</FormLabel>
                                         <FormControl>

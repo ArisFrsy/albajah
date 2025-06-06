@@ -1,4 +1,3 @@
-// Reusable Input Component
 export function Input({
     label,
     type = 'text',
@@ -8,8 +7,8 @@ export function Input({
 }: {
     label: string;
     type?: string;
-    value: any;
-    onChange: (val: any) => void;
+    value: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+    onChange: (_val: any) => void; // eslint-disable-line @typescript-eslint/no-explicit-any
     required?: boolean;
 }) {
     return (
@@ -34,7 +33,7 @@ export function Textarea({
 }: {
     label: string;
     value: string;
-    onChange: (val: string) => void;
+    onChange: (_val: string) => void;
 }) {
     return (
         <div>

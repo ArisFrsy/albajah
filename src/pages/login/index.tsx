@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import ReCAPTCHA from 'react-google-recaptcha'
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/router'
-import Swal from 'sweetalert2'
+// import Swal from 'sweetalert2'
 import Head from 'next/head'
 import Spinner from '@/components/Spinner'
 import { Button } from '@/components/ui/button'
@@ -18,7 +18,7 @@ import {
     CardTitle,
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { OtpModal } from './OtpModal'
+import { OtpModal } from '@/hooks/OtpModal'
 import { toast, Toaster } from 'sonner'
 // Hapus 'Label' dari 'ui/label', karena kita akan pakai dari 'ui/form'
 // import { Label } from '@/components/ui/label'
@@ -32,7 +32,7 @@ import {
     FormLabel,
     FormMessage,
 } from '@/components/ui/form'
-import { set } from 'date-fns'
+// import { set } from 'date-fns'
 
 // Skema form tidak berubah, sudah benar
 const formSchema = z.object({
@@ -62,17 +62,16 @@ export default function LoginPage() {
 
     // 2. Fungsi onSubmit sekarang menerima `values` dari form
     async function onSubmit(values: z.infer<typeof formSchema>) {
-        console.log('Form data:', values)
+        // console.log('Form data:', values)
         const captcha = recaptchaRef.current?.getValue()
 
-        // if (!captcha) {
-        //     // Swal.fire({
-        //     //     icon: 'warning',
-        //     //     title: 'Captcha belum terverifikasi',
-        //     //     text: 'Silakan verifikasi captcha sebelum melanjutkan.',
-        //     // })
-        //     return
-        // }
+        if (!captcha) {
+            toast.error('Silakan selesaikan CAPTCHA terlebih dahulu.')
+            setLoading(false)
+            return null
+        } else {
+            toast.success('CAPTCHA berhasil diselesaikan.')
+        }
 
         setLoading(true)
 
@@ -102,14 +101,14 @@ export default function LoginPage() {
             } else {
                 throw new Error(resData.message || 'Login gagal')
             }
-        } catch (error: any) {
+        } catch {
             // Swal.fire({
             //     icon: 'error',
             //     title: 'Login Gagal',
             //     text: error.message || 'Terjadi kesalahan saat login.',
             // })
 
-            toast.error(error.message || 'Terjadi kesalahan saat login.')
+            toast.error('Terjadi kesalahan saat login.')
         } finally {
             setLoading(false)
         }
@@ -142,13 +141,13 @@ export default function LoginPage() {
             } else {
                 toast.error(resData.message || 'Verifikasi gagal')
             }
-        } catch (error: any) {
+        } catch {
             // Swal.fire({
             //     icon: 'error',
             //     title: 'Verifikasi Gagal',
             //     text: error.message || 'Terjadi kesalahan saat verifikasi.',
             // })
-            toast.error(error.message || 'Terjadi kesalahan saat verifikasi.')
+            toast.error('Terjadi kesalahan saat verifikasi.')
         } finally {
             setLoading(false)
         }
@@ -188,13 +187,13 @@ export default function LoginPage() {
                 //     text: resData.message || 'Terjadi kesalahan saat mengirim ulang OTP.',
                 // })
             }
-        } catch (error: any) {
+        } catch {
             // Swal.fire({
             //     icon: 'error',
             //     title: 'Gagal Mengirim Ulang OTP',
             //     text: error.message || 'Terjadi kesalahan saat mengirim ulang OTP.',
             // })
-            toast.error(error.message || 'Terjadi kesalahan saat mengirim ulang OTP')
+            toast.error('Terjadi kesalahan saat mengirim ulang OTP')
         } finally {
             setLoading(false)
         }

@@ -1,5 +1,5 @@
 "use client";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -7,19 +7,16 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { useIndoRegion } from "./UseIndoRegion";
+import { useIndoRegion } from "../../hooks/UseIndoRegion";
 import { Combobox } from "@/components/ui/combobox";
 import { Cabang } from "@/models/Cabang";
-import { Item } from "@radix-ui/react-dropdown-menu";
-import Loading from "@/components/Spinner";
 
 interface InsertCabangModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: { cabang: Cabang }) => void;
+  onSubmit: (_data: { cabang: Cabang }) => void;
 }
 
 export default function InsertCabangModal({
@@ -33,7 +30,7 @@ export default function InsertCabangModal({
   const [listProvinsi, setListProvinsi] = useState<{ value: number; label: string }[]>([]);
   const [listKabupaten, setListKabupaten] = useState<{ value: number; label: string }[]>([]);
 
-  const { provinces, regencies, selectedProvince, loading, setLoading, setSelectedProvince, selectedRegency, setSelectedRegency } = useIndoRegion();
+  const { provinces, regencies, selectedProvince, setSelectedProvince, selectedRegency, setSelectedRegency } = useIndoRegion();
 
 
   useEffect(() => {
@@ -58,15 +55,6 @@ export default function InsertCabangModal({
       setListKabupaten([]);
     }
   }, [selectedProvince, regencies]);
-
-  const handleProvinceChange = (value: string) => {
-    setSelectedProvince(value);
-    setSelectedRegency(""); // Reset kabupaten when province changes
-  };
-
-  const handleKabupatenChange = (value: string) => {
-    setSelectedRegency(value);
-  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

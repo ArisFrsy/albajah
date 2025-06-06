@@ -9,7 +9,7 @@ export type Header<T> = {
     label: string
     orderable?: boolean
     align?: 'left' | 'right' | 'center'
-    render?: (row: T) => React.ReactNode
+    render?: (_row: T) => React.ReactNode
 }
 
 type DataTableProps<T> = {
@@ -17,20 +17,23 @@ type DataTableProps<T> = {
     headers: Header<T>[]
     page: number
     perPage: number
-    setPage: (page: number) => void
-    setPerPage: (perPage: number) => void
+    setPage: (_page: number) => void
+    setPerPage: (_perPage: number) => void
     orderBy?: string | null
     order?: 'asc' | 'desc'
-    setOrderBy?: (column: string | null) => void
-    setOrder?: (order: 'asc' | 'desc') => void
+    setOrderBy?: (_column: string | null) => void
+    setOrder?: (_order: 'asc' | 'desc') => void
 }
 
 // Helper to access nested values like 'paket.nama'
-function getNestedValue(obj: any, path: string): any {
+function getNestedValue(obj: any // eslint-disable-line @typescript-eslint/no-explicit-any
+    , path: string): any // eslint-disable-line @typescript-eslint/no-explicit-any 
+{
     return path.split('.').reduce((acc, part) => acc?.[part], obj)
 }
 
-function DataTable<T extends Record<string, any>>({
+function DataTable<T extends Record<string, any // eslint-disable-line @typescript-eslint/no-explicit-any
+>>({
     data,
     headers,
     page,

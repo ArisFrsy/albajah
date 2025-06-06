@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -83,7 +83,7 @@ function SettingProfilePage() {
         };
 
         fetchProfile();
-    }, [form]);
+    }, [form, decryptId]);
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         try {

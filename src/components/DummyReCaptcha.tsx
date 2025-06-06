@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 
 type Props = {
-    onChange: (token: string) => void;
+    onChange: (_token: string) => void;
 };
 
 export default function DummyReCaptcha({ onChange }: Props) {

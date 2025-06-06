@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import {
     Bell,
-    Settings,
+    // Settings,
     LogOut,
 } from 'lucide-react';
 import { useState, useRef } from 'react';
@@ -15,16 +15,17 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+// import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { User2 } from 'lucide-react';
 import { User } from '@/models/User';
 import { encrypt } from '@/lib/Encrypt';
 import Link from 'next/link';
+import { toast } from 'sonner';
 
 export default function HeaderComponent() {
     const profileMenuRef = useRef<HTMLButtonElement>(null);
-    const [notifications] = useState(99);
+    // const [notifications] = useState(99);
 
     const fallbackUser: User = {
         id: 0,
@@ -43,8 +44,9 @@ export default function HeaderComponent() {
                 try {
                     const parsedUser = JSON.parse(userDetail);
                     setUserData(parsedUser);
-                } catch (error) {
-                    console.error('Failed to parse user data:', error);
+                } catch {
+                    toast.error('Failed to parse user data from localStorage. Please log in again.');
+
                 }
             }
         }
@@ -107,7 +109,6 @@ export default function HeaderComponent() {
 
                         <DropdownMenuItem
                             className="gap-2 text-red-600 focus:bg-red-50 focus:text-red-700"
-                            onClick={() => console.log('Sign out clicked')}
                         >
                             <Link href="/logout" className="flex items-center gap-2 w-full">
                                 <LogOut className="w-4 h-4 text-red-600" />

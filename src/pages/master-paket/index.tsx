@@ -1,19 +1,16 @@
 "use client";
 
 import withAuth from "@/components/withAuth";
-import { Sidebar } from "@/components/Sidebar";
 import DataTable from "@/components/DataTable";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { usePaketPagination } from "./UsePaketPagination";
+import { useState } from "react";
+import { usePaketPagination } from "../../hooks/UsePaketPagination";
 import { Paket } from "@/models/Paket";
 import { Header } from "@/components/Header";
 import InsertPaketModal from "./InsertPaketModal";
 import Loading from "@/components/Spinner";
 import DetailPaketModal from "./DetailPaketModal";
 import EditPaketModal from "./EditPaketModal";
-import { Eye, Edit, Delete, Plus, Search, Trash2 } from "lucide-react";
-import Swal from "sweetalert2";
+import { Eye, Edit, Plus, Trash2 } from "lucide-react";
 import { confirmDialog } from "@/lib/confirm-dialog";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -21,7 +18,6 @@ import { Button } from "@/components/ui/button";
 
 
 function MasterPaketPage() {
-    const router = useRouter();
     const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
     const [order, setOrder] = useState<'asc' | 'desc'>('asc');
     const [showModal, setShowModal] = useState(false)
@@ -133,8 +129,7 @@ function MasterPaketPage() {
 
             fetchPaket();
             // Optionally refresh list here
-        } catch (err) {
-            console.error('Error inserting:', err)
+        } catch {
             setLoading(false);
 
             toast.error('Terjadi kesalahan saat menambahkan paket.');
@@ -181,8 +176,7 @@ function MasterPaketPage() {
             }
             toast.success('Paket berhasil diperbarui.');
             fetchPaket();
-        } catch (err) {
-            console.error('Error updating:', err)
+        } catch {
             setLoading(false);
             toast.error('Terjadi kesalahan saat memperbarui paket.');
         }
@@ -217,7 +211,7 @@ function MasterPaketPage() {
             toast.success('Paket berhasil dihapus.');
 
             fetchPaket();
-        } catch (err) {
+        } catch {
             setLoading(false);
 
             toast.error('Terjadi kesalahan saat menghapus paket.');

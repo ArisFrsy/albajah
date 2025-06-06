@@ -33,8 +33,8 @@ import { Button } from '@/components/ui/button'
 // Definisikan tipe props untuk komponen ini
 interface OtpModalProps {
     isOpen: boolean
-    setIsOpen: (isOpen: boolean) => void
-    onVerify: (otp: string) => Promise<void> // Fungsi yang dipanggil saat verifikasi
+    setIsOpen: (_isOpen: boolean) => void
+    onVerify: (_otp: string) => Promise<void> // Fungsi yang dipanggil saat verifikasi
     onResend: () => Promise<void> // Fungsi untuk kirim ulang OTP
 }
 
@@ -80,10 +80,8 @@ export function OtpModal({ isOpen, setIsOpen, onVerify, onResend }: OtpModalProp
         try {
             await onVerify(data.pin)
             // Jika sukses, parent component akan menutup modal
-        } catch (error: any) {
-            toast.error('Verifikasi Gagal', {
-                description: error.message || 'Kode OTP yang Anda masukkan salah.',
-            })
+        } catch {
+            toast.error('Gagal Verifikasi');
         } finally {
             setLoading(false)
         }
@@ -96,10 +94,8 @@ export function OtpModal({ isOpen, setIsOpen, onVerify, onResend }: OtpModalProp
             toast.success('Kode OTP baru telah dikirim.')
             setCountdown(60) // Reset timer
             setIsTimerActive(true) // Aktifkan kembali timer
-        } catch (error: any) {
-            toast.error('Gagal Mengirim Ulang', {
-                description: error.message || 'Terjadi kesalahan, coba lagi nanti.',
-            })
+        } catch {
+            toast.error('Gagal Mengirim Ulang')
         }
     }
 

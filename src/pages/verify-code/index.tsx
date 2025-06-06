@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { jwtDecode } from 'jwt-decode';
 import Spinner from '@/components/Spinner';
+import { toast } from 'sonner';
 
 
 export default function VerifyCodePage() {
@@ -22,10 +23,10 @@ export default function VerifyCodePage() {
         }
 
         try {
-            const decoded: any = jwtDecode(token);
+            const decoded: any = jwtDecode(token); // eslint-disable-line @typescript-eslint/no-explicit-any
             setEmail(decoded.email);
-        } catch (err) {
-            console.error('Invalid token');
+        } catch {
+            toast.error('Invalid token. Please log in again.');
             localStorage.removeItem('token');
             router.replace('/login');
         }
