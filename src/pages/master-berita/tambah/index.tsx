@@ -83,35 +83,39 @@ function TambahBeritaPage() {
         }
 
         // new formData
-        const formData = new FormData();
-        formData.append('judul', values.judul);
-        formData.append('deskripsi', values.deskripsi);
-        if (file) {
-            formData.append('image', file);
-        }
-
-        const promise = fetch('/api/master/berita', {
-            method: 'POST',
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('token')}`,
-            },
-            body: formData,
-        }).then(async (res) => {
-            if (!res.ok) {
-                const errorData = await res.json();
-                toast.error(errorData.message || 'Gagal menambahkan berita');
+        try {
+            const formData = new FormData();
+            formData.append('judul', values.judul);
+            formData.append('deskripsi', values.deskripsi);
+            if (file) {
+                formData.append('image', file);
             }
-            return res.json();
-        });
 
-        toast.promise(promise, {
-            loading: 'Menyimpan berita...',
-            success: () => {
-                router.push('/master-berita');
-                return 'Berita berhasil ditambahkan!';
-            },
-            error: (err) => err.message,
-        });
+            const promise = fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/master/berita`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+                body: formData,
+            }).then(async (res) => {
+                if (!res.ok) {
+                    const errorData = await res.json();
+                    toast.error(errorData.message || 'Gagal menambahkan berita');
+                }
+                return res.json();
+            });
+
+            toast.promise(promise, {
+                loading: 'Menyimpan berita...',
+                success: () => {
+                    router.push('/master-berita');
+                    return 'Berita berhasil ditambahkan!';
+                },
+                error: (err) => err.message,
+            });
+        } catch (error) {
+            toast.error((error as Error).message || 'Terjadi kesalahan saat menambahkan berita');
+        }
     };
 
     const deskripsiPreview = form.watch('deskripsi');

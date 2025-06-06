@@ -37,26 +37,32 @@ function ViewSubPaketPage() {
 
     useEffect(() => {
         if (id) {
-            setLoading(true);
-            fetch(`/api/master/sub-paket/${id}`, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
-                }
-            })
-                .then(res => {
-                    if (!res.ok) throw new Error('Gagal mengambil data');
-                    return res.json();
+            try {
+                setLoading(true);
+                fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/master/sub-paket/${id}`, {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`
+                    }
                 })
-                .then(data => {
-                    setSubPaket(data.data || null);
-                })
-                .catch(error => {
-                    console.error("Fetch error:", error);
-                    setSubPaket(null);
-                })
-                .finally(() => {
-                    setLoading(false);
-                });
+                    .then(res => {
+                        if (!res.ok) throw new Error('Gagal mengambil data');
+                        return res.json();
+                    })
+                    .then(data => {
+                        setSubPaket(data.data || null);
+                    })
+                    .catch(error => {
+                        console.error("Fetch error:", error);
+                        setSubPaket(null);
+                    })
+                    .finally(() => {
+                        setLoading(false);
+                    });
+            } catch (error) {
+                console.error("Error fetching sub-paket:", error);
+                setSubPaket(null);
+                setLoading(false);
+            }
         }
     }, [id]);
 

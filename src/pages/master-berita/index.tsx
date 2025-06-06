@@ -34,7 +34,7 @@ function MasterBerita() {
         });
         if (confirmed.confirmed) {
             try {
-                const response = await fetch(`/api/master/berita/${berita.idBerita}`, {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/master/berita/${berita.idBerita}`, {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',

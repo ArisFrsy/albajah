@@ -18,7 +18,9 @@ export function useSubPaketPagination(initialPage = 1, initialLimit = 10) {
   const fetchSubPaket = async () => {
     try {
       setLoading(true);
-      let url = `/api/master/sub-paket?page=${page}&perPage=${limit}&orderBy=${orderByField}&orderDir=${orderByDirection}&search=${encodeURIComponent(
+      let url = `${
+        process.env.NEXT_PUBLIC_API_BASE_URL
+      }/api/master/sub-paket?page=${page}&perPage=${limit}&orderBy=${orderByField}&orderDir=${orderByDirection}&search=${encodeURIComponent(
         search
       )}`;
       if (idPaketFilter) {

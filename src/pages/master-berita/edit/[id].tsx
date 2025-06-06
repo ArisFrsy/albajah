@@ -39,6 +39,8 @@ function EditBeritaPage() {
     const decryptId = params?.id as string;
     const id = decryptId ? decrypt(decryptId) : '';
 
+    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
+
     const [content, setContent] = useState('');
     const [loading, setLoading] = useState(true);
     const [imagePath, setImagePath] = useState('');
@@ -56,7 +58,7 @@ function EditBeritaPage() {
     useEffect(() => {
         const fetchBerita = async () => {
             try {
-                const res = await fetch(`/api/master/berita/${id}`, {
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/master/berita/${id}`, {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem('token')}`,
                     },
@@ -66,7 +68,7 @@ function EditBeritaPage() {
                 form.setValue('judul', data.data.judul);
                 form.setValue('deskripsi', data.data.deskripsi);
                 setContent(data.data.deskripsi);
-                setImagePath(data.data.imagePath || '');
+                setImagePath(baseUrl + data.data.urlImage || '');
                 setLoading(false);
             } catch (error) {
                 toast.error((error as Error).message);
@@ -101,28 +103,32 @@ function EditBeritaPage() {
             formData.append('image', values.image || '');
         }
 
-        const promise = fetch(`/api/master/berita/${id}`, {
-            method: 'PUT',
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('token')}`,
-            },
-            body: formData,
-        }).then(async (res) => {
-            if (!res.ok) {
-                const errorData = await res.json();
-                toast.error(errorData.message || 'Gagal memperbarui berita');
-            }
-            return res.json();
-        });
+        try {
+            const promise = fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/master/berita/${id}`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+                body: formData,
+            }).then(async (res) => {
+                if (!res.ok) {
+                    const errorData = await res.json();
+                    toast.error(errorData.message || 'Gagal memperbarui berita');
+                }
+                return res.json();
+            });
 
-        toast.promise(promise, {
-            loading: 'Menyimpan perubahan...',
-            success: () => {
-                router.push('/master-berita');
-                return 'Berita berhasil diperbarui!';
-            },
-            error: (err) => err.message,
-        });
+            toast.promise(promise, {
+                loading: 'Menyimpan perubahan...',
+                success: () => {
+                    router.push('/master-berita');
+                    return 'Berita berhasil diperbarui!';
+                },
+                error: (err) => err.message,
+            });
+        } catch (error) {
+            toast.error((error as Error).message || 'Terjadi kesalahan saat memperbarui berita');
+        }
     };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {

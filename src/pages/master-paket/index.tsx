@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 
 function MasterPaketPage() {
     const router = useRouter();
+    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
     const [order, setOrder] = useState<'asc' | 'desc'>('asc');
     const [showModal, setShowModal] = useState(false)
     const [showDetailModal, setShowDetailModal] = useState(false);
@@ -46,7 +47,7 @@ function MasterPaketPage() {
         { column: 'deskripsi', label: 'Deskripsi', orderable: false, align: 'left' },
         {
             column: 'foto', label: 'Foto', orderable: false, align: 'left', render: (row: Paket) => (
-                <img src={row.pathFoto || '/images/no-image.png'} alt={row.nama} className="w-16 h-16 object-cover rounded" />
+                <img src={baseUrl + row.urlFoto || '/images/no-image.png'} alt={row.nama} className="w-16 h-16 object-cover rounded" />
             )
         },
         {
@@ -115,7 +116,7 @@ function MasterPaketPage() {
                 formData.append('fileFoto', data.fileFoto);
             }
 
-            const res = await fetch('/api/master/paket', {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/master/paket`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -167,8 +168,8 @@ function MasterPaketPage() {
                 formData.append('fileFoto', data.fileFoto);
             }
 
-            const res = await fetch(`/api/master/paket`, {
-                method: 'PUT',
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/master/paket/` + selectedPaket?.idPaket, {
+                method: 'POST',
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('token')}`,
                 },
@@ -200,7 +201,7 @@ function MasterPaketPage() {
                 return; // User canceled, do not proceed
             }
             setLoading(true);
-            const res = await fetch(`/api/master/paket`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/master/paket/` + data.idPaket, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',

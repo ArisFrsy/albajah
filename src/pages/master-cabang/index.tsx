@@ -94,8 +94,8 @@ function MasterCabang() {
     } = useCabangPagination();
 
     const headers: Header<Cabang>[] = [
-        { column: 'provinces.name', label: 'Provinsi', align: 'left' },
-        { column: 'regencies.name', label: 'Kabupaten', align: 'left' },
+        { column: 'provinsi.name', label: 'Provinsi', align: 'left' },
+        { column: 'kabupaten.name', label: 'Kabupaten', align: 'left' },
         { column: 'penanggungjawab', label: 'Penanggung Jawab', align: 'left' },
         {
             column: 'email',
@@ -156,7 +156,7 @@ function MasterCabang() {
         }
 
         try {
-            const response = await fetch('/api/master/cabang', {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/master/cabang`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -197,7 +197,7 @@ function MasterCabang() {
 
         if (!selectedCabang) return;
         try {
-            const response = await fetch(`/api/master/cabang/${selectedCabang.idCabang}`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/master/cabang/${selectedCabang.idCabang}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -238,7 +238,7 @@ function MasterCabang() {
         }
 
         try {
-            const response = await fetch(`/api/master/cabang/${cabang.idCabang}`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/master/cabang/${cabang.idCabang}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -395,6 +395,8 @@ function MasterCabang() {
                             setShowFilterModal(false);
                             setSelectedProvince(''); // Reset filter state
                             setSelectedRegency(''); // Reset filter state
+                            setIdProvinsiFilter(''); // Reset filter state
+                            setIdKabupatenFilter(''); // Reset filter state
                         }}>
                             Batal
                         </Button>

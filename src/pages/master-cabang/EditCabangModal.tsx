@@ -62,7 +62,7 @@ export default function EditCabangModal({
             if (initialData) {
                 setSelectedProvince(initialData.idProvinsi);
             }
-            if (initialData.regencies) {
+            if (initialData) {
                 setSelectedRegency(initialData.idKabupaten);
             }
         }

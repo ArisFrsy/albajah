@@ -19,7 +19,9 @@ export function usePaketPagination(initialPage = 1, initialLimit = 10) {
     try {
       setLoading(true);
       const response = await fetch(
-        `/api/master/paket?page=${page}&perPage=${limit}&orderBy=${orderByField}&orderDir=${orderByDirection}&search=${encodeURIComponent(
+        `${
+          process.env.NEXT_PUBLIC_API_BASE_URL
+        }/api/master/paket?page=${page}&perPage=${limit}&orderBy=${orderByField}&orderDir=${orderByDirection}&search=${encodeURIComponent(
           search
         )}`,
         {

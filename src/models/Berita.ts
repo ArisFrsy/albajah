@@ -4,4 +4,5 @@ export interface Berita {
   deskripsi?: string;
   imagePath?: string;
   image?: File | null;
+  urlImage?: string;
 }

@@ -19,6 +19,7 @@ interface DetailPaketModalProps {
         nama: string
         deskripsi?: string | null
         pathFoto?: string | null
+        urlFoto?: string | null
     } | null
 }
 
@@ -35,6 +36,8 @@ function DetailItem({ label, value }: { label: string; value: string | React.Rea
 }
 
 export default function DetailPaketModal({ isOpen, onClose, data }: DetailPaketModalProps) {
+    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
+
     if (!data) return null
 
     return (
@@ -61,16 +64,16 @@ export default function DetailPaketModal({ isOpen, onClose, data }: DetailPaketM
                     <div>
                         <p className="text-sm font-medium text-muted-foreground">Foto Paket</p>
                         <div className="mt-2">
-                            {data.pathFoto ? (
+                            {data.urlFoto ? (
                                 <a
-                                    href={data.pathFoto}
+                                    href={baseUrl + data.pathFoto}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="block relative aspect-video w-full rounded-lg overflow-hidden border group"
                                     title="Klik untuk melihat gambar penuh"
                                 >
                                     <Image
-                                        src={data.pathFoto}
+                                        src={baseUrl + data.urlFoto}
                                         alt={`Foto untuk ${data.nama}`}
                                         fill
                                         className="object-cover transition-transform duration-300 group-hover:scale-105"

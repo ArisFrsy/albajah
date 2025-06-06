@@ -95,7 +95,7 @@ function InsertSubPaketPage() {
         };
 
         try {
-            const response = await fetch('/api/master/sub-paket', {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/master/sub-paket`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

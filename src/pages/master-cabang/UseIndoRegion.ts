@@ -4,23 +4,39 @@ import { Regencies } from "@/models/Regencies";
 import { set } from "date-fns";
 
 function getProvinceList() {
-  return fetch("/api/master/indo-region/provinces", {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
-    },
-  }).then((res) => res.json());
+  try {
+    return fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/master/indo-region/provinces`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    ).then((res) => res.json());
+  } catch (error) {
+    console.error("Error fetching provinces:", error);
+    // throw error; // Rethrow the error to be handled by the caller
+  }
 }
 
 function getRegencyList(provinceId: string) {
-  return fetch(`/api/master/indo-region/regencies/${provinceId}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
-    },
-  }).then((res) => res.json());
+  try {
+    return fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/master/indo-region/regencies/${provinceId}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    ).then((res) => res.json());
+  } catch (error) {
+    console.error("Error fetching regencies:", error);
+    // throw error; // Rethrow the error to be handled by the caller
+  }
 }
 
 export function useIndoRegion() {

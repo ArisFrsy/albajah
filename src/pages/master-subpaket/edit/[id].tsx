@@ -89,41 +89,47 @@ function EditSubPaketPage() {
     // 1. Efek untuk mengambil data sub-paket yang akan diedit
     useEffect(() => {
         if (id) {
-            setInitialLoading(true);
-            fetch(`/api/master/sub-paket/${id}`, {
-                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-            })
-                .then((res) => res.json())
-                .then((data) => {
-                    if (!data.data) throw new Error("Data tidak ditemukan");
-                    const p: SubPaket = data.data;
-
-                    // 2. Gunakan `form.reset()` untuk mengisi seluruh form dengan data dari API
-                    form.reset({
-                        namaSubPaket: p.namaSubPaket || '',
-                        idPaket: p.idPaket?.toString() || '',
-                        hargaIDR: p.hargaIDR || 0,
-                        hargaUSD: p.hargaUSD || 0,
-                        keberangkatan: p.keberangkatan?.split('T')[0] || '', // Format YYYY-MM-DD
-                        durasiHari: p.durasiHari || 0,
-                        penerbangan: p.penerbangan || '',
-                        hotelMekkah: p.hotelMekkah || '',
-                        hotelMadinah: p.hotelMadinah || '',
-                        fasilitas: p.fasilitas || '',
-                        perlengkapan: p.perlengkapan || '',
-                    });
-                    setHargaIDR(p.hargaIDR || 0);
-                    setHargaUSD(p.hargaUSD || 0);
-                    setHargaIDRDisplay(formatCurrency(p.hargaIDR, 'id-ID', 'IDR'));
-                    setHargaUSDDisplay(formatCurrency(p.hargaUSD, 'en-US', 'USD'));
-                    setFasilitasList(p.fasilitas ? p.fasilitas.split(',') : []);
-                    setPerlengkapanList(p.perlengkapan ? p.perlengkapan.split(',') : []);
-
+            try {
+                setInitialLoading(true);
+                fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/master/sub-paket/${id}`, {
+                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
                 })
-                .catch(() => {
-                    toast.error('Gagal memuat data sub paket.');
-                })
-                .finally(() => setInitialLoading(false));
+                    .then((res) => res.json())
+                    .then((data) => {
+                        if (!data.data) throw new Error("Data tidak ditemukan");
+                        const p: SubPaket = data.data;
+
+                        // 2. Gunakan `form.reset()` untuk mengisi seluruh form dengan data dari API
+                        form.reset({
+                            namaSubPaket: p.namaSubPaket || '',
+                            idPaket: p.idPaket?.toString() || '',
+                            hargaIDR: p.hargaIDR || 0,
+                            hargaUSD: p.hargaUSD || 0,
+                            keberangkatan: p.keberangkatan?.split('T')[0] || '', // Format YYYY-MM-DD
+                            durasiHari: p.durasiHari || 0,
+                            penerbangan: p.penerbangan || '',
+                            hotelMekkah: p.hotelMekkah || '',
+                            hotelMadinah: p.hotelMadinah || '',
+                            fasilitas: p.fasilitas || '',
+                            perlengkapan: p.perlengkapan || '',
+                        });
+                        setHargaIDR(p.hargaIDR || 0);
+                        setHargaUSD(p.hargaUSD || 0);
+                        setHargaIDRDisplay(formatCurrency(p.hargaIDR, 'id-ID', 'IDR'));
+                        setHargaUSDDisplay(formatCurrency(p.hargaUSD, 'en-US', 'USD'));
+                        setFasilitasList(p.fasilitas ? p.fasilitas.split(',') : []);
+                        setPerlengkapanList(p.perlengkapan ? p.perlengkapan.split(',') : []);
+
+                    })
+                    .catch(() => {
+                        toast.error('Gagal memuat data sub paket.');
+                    })
+                    .finally(() => setInitialLoading(false));
+            } catch (error) {
+                console.error('Error fetching sub-paket:', error);
+                toast.error('Gagal memuat data sub paket.');
+                setInitialLoading(false);
+            }
         }
     }, [id, form]);
 
@@ -132,48 +138,53 @@ function EditSubPaketPage() {
     }, []);
 
     const handleSubmit = async (values: z.infer<typeof formSchema>) => {
-        const confirmed = await confirmDialog({
-            title: 'Konfirmasi Perubahan',
-            description: 'Apakah Anda yakin ingin menyimpan perubahan ini?',
-            confirmText: 'Simpan',
-            cancelText: 'Batal',
-        });
-        if (!confirmed.confirmed) return;
+        try {
+            const confirmed = await confirmDialog({
+                title: 'Konfirmasi Perubahan',
+                description: 'Apakah Anda yakin ingin menyimpan perubahan ini?',
+                confirmText: 'Simpan',
+                cancelText: 'Batal',
+            });
+            if (!confirmed.confirmed) return;
 
-        const updatedSubPaket = {
-            idSubpaket: id as string,
-            ...values,
-            idPaket: parseInt(values.idPaket),
-            keberangkatan: new Date(values.keberangkatan).toISOString(),
-            hargaIDR: unformatCurrency(hargaIDR.toString()),
-            hargaUSD: unformatCurrency(hargaUSD.toString()),
-            fasilitas: fasilitasList.filter(f => f.trim() !== '').join(','),
-            perlengkapan: perlengkapanList.filter(p => p.trim() !== '').join(','),
-        };
+            const updatedSubPaket = {
+                idSubpaket: id as string,
+                ...values,
+                idPaket: parseInt(values.idPaket),
+                keberangkatan: new Date(values.keberangkatan).toISOString(),
+                hargaIDR: unformatCurrency(hargaIDR.toString()),
+                hargaUSD: unformatCurrency(hargaUSD.toString()),
+                fasilitas: fasilitasList.filter(f => f.trim() !== '').join(','),
+                perlengkapan: perlengkapanList.filter(p => p.trim() !== '').join(','),
+            };
 
-        const promise = fetch(`/api/master/sub-paket`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${localStorage.getItem('token')}`,
-            },
-            body: JSON.stringify(updatedSubPaket),
-        }).then(async (res) => {
-            if (!res.ok) {
-                const errorData = await res.json();
-                toast.error(errorData.message || 'Gagal memperbarui sub paket');
-            }
-            return res.json();
-        });
+            const promise = fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/master/sub-paket/` + id, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+                body: JSON.stringify(updatedSubPaket),
+            }).then(async (res) => {
+                if (!res.ok) {
+                    const errorData = await res.json();
+                    toast.error(errorData.message || 'Gagal memperbarui sub paket');
+                }
+                return res.json();
+            });
 
-        toast.promise(promise, {
-            loading: 'Menyimpan perubahan...',
-            success: () => {
-                router.push('/master-subpaket');
-                return 'Sub Paket berhasil diperbarui!';
-            },
-            error: (err) => err.message,
-        });
+            toast.promise(promise, {
+                loading: 'Menyimpan perubahan...',
+                success: () => {
+                    router.push('/master-subpaket');
+                    return 'Sub Paket berhasil diperbarui!';
+                },
+                error: (err) => err.message,
+            });
+        } catch (error) {
+            console.error('Error updating sub paket:', error);
+            toast.error('Terjadi kesalahan saat memperbarui sub paket.');
+        }
     };
 
     // Tampilkan loading jika data awal atau data paket belum siap

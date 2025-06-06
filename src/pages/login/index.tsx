@@ -77,7 +77,7 @@ export default function LoginPage() {
         setLoading(true)
 
         try {
-            const res = await fetch('/api/login', {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 // Kirim `values` langsung
@@ -108,6 +108,8 @@ export default function LoginPage() {
             //     title: 'Login Gagal',
             //     text: error.message || 'Terjadi kesalahan saat login.',
             // })
+
+            toast.error(error.message || 'Terjadi kesalahan saat login.')
         } finally {
             setLoading(false)
         }
@@ -118,7 +120,7 @@ export default function LoginPage() {
 
         setCounter((prev) => prev + 1)
         try {
-            const res = await fetch('/api/login/verify-code', {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/login/verify-code`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -146,6 +148,7 @@ export default function LoginPage() {
             //     title: 'Verifikasi Gagal',
             //     text: error.message || 'Terjadi kesalahan saat verifikasi.',
             // })
+            toast.error(error.message || 'Terjadi kesalahan saat verifikasi.')
         } finally {
             setLoading(false)
         }
@@ -160,7 +163,7 @@ export default function LoginPage() {
     const handleResendOtp = async () => {
         setLoading(true)
         try {
-            const res = await fetch('/api/login/resend-code', {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/login/resend-code`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -178,7 +181,12 @@ export default function LoginPage() {
 
                 setCounter(0)
             } else {
-                throw new Error(resData.message || 'Gagal mengirim ulang OTP')
+                toast.error(resData.message || 'Gagal mengirim ulang OTP')
+                // Swal.fire({
+                //     icon: 'error',
+                //     title: 'Gagal Mengirim Ulang OTP',
+                //     text: resData.message || 'Terjadi kesalahan saat mengirim ulang OTP.',
+                // })
             }
         } catch (error: any) {
             // Swal.fire({
@@ -186,6 +194,7 @@ export default function LoginPage() {
             //     title: 'Gagal Mengirim Ulang OTP',
             //     text: error.message || 'Terjadi kesalahan saat mengirim ulang OTP.',
             // })
+            toast.error(error.message || 'Terjadi kesalahan saat mengirim ulang OTP')
         } finally {
             setLoading(false)
         }

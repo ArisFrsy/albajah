@@ -59,7 +59,7 @@ function MasterSubPaket() {
 
         if (confirmed.confirmed) {
             try {
-                const response = await fetch(`/api/master/subpaket/${subPaket.idSubpaket}`, {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/master/sub-paket/${subPaket.idSubpaket}`, {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',
@@ -83,7 +83,7 @@ function MasterSubPaket() {
 
     const headers: Header<SubPaket>[] = [
         { column: "namaSubPaket", label: "Sub Paket", orderable: true, align: "left" },
-        { column: "Paket.nama", label: "Paket", orderable: true, align: "left" },
+        { column: "paket.nama", label: "Paket", orderable: true, align: "left" },
         { column: "hargaIDR", label: "IDR", orderable: true, align: "right" },
         { column: "hargaUSD", label: "USD", orderable: true, align: "right" },
         { column: "keberangkatan", label: "Keberangkatan", orderable: true, align: "left" },

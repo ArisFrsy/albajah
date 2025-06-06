@@ -60,7 +60,7 @@ function SettingProfilePage() {
     React.useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const res = await fetch('/api/user/' + decrypt(decryptId), {
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/user/` + decrypt(decryptId), {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem('token')}`,
                     },
@@ -86,59 +86,64 @@ function SettingProfilePage() {
     }, [form]);
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
-        const confirmed = await confirmDialog({
-            title: 'Konfirmasi Perubahan',
-            description: `Apakah Anda yakin ingin memperbarui profil dengan nama "${values.name}" dan email "${values.email}"?`,
-            confirmText: 'Perbarui',
-            cancelText: 'Batal',
-        });
+        try {
+            const confirmed = await confirmDialog({
+                title: 'Konfirmasi Perubahan',
+                description: `Apakah Anda yakin ingin memperbarui profil dengan nama "${values.name}" dan email "${values.email}"?`,
+                confirmText: 'Perbarui',
+                cancelText: 'Batal',
+            });
 
-        if (!confirmed.confirmed) {
-            return;
-        }
-
-        const payload: Record<string, string> = {
-            name: values.name,
-            email: values.email,
-        };
-
-        if (values.currentPassword && values.newPassword) {
-            payload.currentPassword = values.currentPassword;
-            payload.newPassword = values.newPassword;
-        }
-
-        const promise = fetch('/api/user/' + decrypt(decryptId), {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${localStorage.getItem('token')}`,
-            },
-            body: JSON.stringify(payload),
-        }).then(async (res) => {
-            if (!res.ok) {
-                toast.error('Gagal memperbarui profil');
-                if (res.status === 401) {
-                    localStorage.removeItem('token');
-                    window.location.href = '/login'; // redirect to login page
-                }
+            if (!confirmed.confirmed) {
+                return;
             }
-            return res.json();
-        });
 
-        toast.promise(promise, {
-            loading: 'Menyimpan...',
-            success: () => {
-                form.reset({
-                    name: values.name,
-                    email: values.email,
-                    currentPassword: '',
-                    newPassword: '',
-                    confirmPassword: '',
-                });
-                return 'Profil berhasil diperbarui!';
-            },
-            error: (err) => err.message,
-        });
+            const payload: Record<string, string> = {
+                name: values.name,
+                email: values.email,
+            };
+
+            if (values.currentPassword && values.newPassword && values.confirmPassword) {
+                payload.current_password = values.currentPassword;
+                payload.new_password = values.newPassword;
+                payload.new_password_confirmation = values.confirmPassword;
+            }
+
+            const promise = fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/user/` + decrypt(decryptId), {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+                body: JSON.stringify(payload),
+            }).then(async (res) => {
+                if (!res.ok) {
+                    toast.error('Gagal memperbarui profil');
+                    if (res.status === 401) {
+                        localStorage.removeItem('token');
+                        window.location.href = '/login'; // redirect to login page
+                    }
+                }
+                return res.json();
+            });
+
+            toast.promise(promise, {
+                loading: 'Menyimpan...',
+                success: () => {
+                    form.reset({
+                        name: values.name,
+                        email: values.email,
+                        currentPassword: '',
+                        newPassword: '',
+                        confirmPassword: '',
+                    });
+                    return 'Profil berhasil diperbarui!';
+                },
+                error: (err) => err.message,
+            });
+        } catch (error) {
+            toast.error((error as Error).message);
+        }
     };
 
     return (

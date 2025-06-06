@@ -17,7 +17,7 @@ function ViewBeritaPage() {
     const params = useParams();
     const decryptId = params?.id as string;
     const id = decryptId ? decrypt(decryptId) : '';
-
+    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
     const [berita, setBerita] = useState<Berita | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -28,28 +28,34 @@ function ViewBeritaPage() {
         setLoading(true);
         setError(null);
 
-        fetch(`/api/master/berita/${id}`, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('token')}`,
-            },
-        })
-            .then(async (res) => {
-                if (!res.ok) {
-                    const errorData = await res.json();
-                    throw new Error(errorData.message || 'Gagal mengambil data berita');
-                }
-                return res.json();
+        try {
+            fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/master/berita/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
             })
-            .then((data) => {
-                setBerita(data.data);
-            })
-            .catch((err: Error) => {
-                console.error("Error fetching berita:", err);
-                setError(err.message);
-            })
-            .finally(() => {
-                setLoading(false);
-            });
+                .then(async (res) => {
+                    if (!res.ok) {
+                        const errorData = await res.json();
+                        throw new Error(errorData.message || 'Gagal mengambil data berita');
+                    }
+                    return res.json();
+                })
+                .then((data) => {
+                    setBerita(data.data);
+                })
+                .catch((err: Error) => {
+                    console.error("Error fetching berita:", err);
+                    setError(err.message);
+                })
+                .finally(() => {
+                    setLoading(false);
+                });
+        } catch (err) {
+            console.error("Unexpected error:", err);
+            setError('Terjadi kesalahan saat mengambil data berita.');
+            setLoading(false);
+        }
     }, [id]);
 
     return (
@@ -70,10 +76,10 @@ function ViewBeritaPage() {
                             <CardTitle className="text-3xl font-bold">{berita.judul}</CardTitle>
                         </CardHeader>
                         <CardContent className=''>
-                            {berita.imagePath && (
+                            {berita.urlImage && (
                                 <div className="mb-4">
                                     <Image
-                                        src={berita.imagePath}
+                                        src={baseUrl + berita.urlImage}
                                         alt={berita.judul}
                                         width={100}
                                         height={100}

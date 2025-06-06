@@ -6,4 +6,5 @@ export interface Paket {
   createdAt?: Date;
   updatedAt?: Date;
   pathFoto?: string; // Path to the uploaded file, if applicable
+  urlFoto?: string; // URL to the uploaded file, if applicable
 }

@@ -18,7 +18,9 @@ export function useCabangPagination(initialPage = 1, initialLimit = 10) {
   const fetchCabang = async () => {
     try {
       setLoading(true);
-      let url = `/api/master/cabang?page=${page}&perPage=${limit}&orderBy=${orderByField}&orderDir=${orderByDirection}&search=${encodeURIComponent(
+      let url = `${
+        process.env.NEXT_PUBLIC_API_BASE_URL
+      }/api/master/cabang?page=${page}&perPage=${limit}&orderBy=${orderByField}&orderDir=${orderByDirection}&search=${encodeURIComponent(
         search
       )}`;
       if (idProvinsiFilter) {
