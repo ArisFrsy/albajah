@@ -36,8 +36,8 @@ export default function DetailCabangModal({ isOpen, onClose, data }: DetailCaban
 
                 {/* Menggunakan Grid untuk layout yang rapi dan konsisten */}
                 <div className="grid gap-y-5 py-4">
-                    <DetailItem label="Provinsi" value={data.provinces?.name || '-'} />
-                    <DetailItem label="Kabupaten/Kota" value={data.regencies?.name || '-'} />
+                    <DetailItem label="Provinsi" value={data.provinsi?.name || '-'} />
+                    <DetailItem label="Kabupaten/Kota" value={data.kabupaten?.name || '-'} />
                     <DetailItem label="Penanggung Jawab" value={data.penanggungjawab || '-'} />
                     <DetailItem
                         label="Email"
