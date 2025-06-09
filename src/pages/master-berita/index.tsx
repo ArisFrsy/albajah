@@ -50,6 +50,27 @@ function MasterBerita() {
 
     const headers: Header<Berita>[] = [
         { column: "judul", label: "Judul", orderable: true, align: "left" },
+        // render dengan dangerouslySetInnerHTML dan limit 100 karakter
+        {
+            column: "deskripsi",
+            label: "Deskripsi",
+            orderable: true,
+            align: "left",
+            render: (row: Berita) => {
+                const deskripsi = row.deskripsi ?? ""; // default ke string kosong jika undefined
+
+                return (
+                    <div
+                        className="text-sm text-gray-700"
+                        dangerouslySetInnerHTML={{
+                            __html: deskripsi.length > 100 ? deskripsi.substring(0, 100) + "..." : deskripsi,
+                        }}
+                    />
+                );
+            },
+        }
+        ,
+
         {
             column: 'actions', // this is allowed because we define 'actions' in Header<T>
             label: 'Actions',

@@ -6,24 +6,12 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import ReCAPTCHA from 'react-google-recaptcha'
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/router'
-// import Swal from 'sweetalert2'
 import Head from 'next/head'
-import Spinner from '@/components/Spinner'
+import Spinner from '@/components/Spinner' // Asumsi komponen ini ada
 import { Button } from '@/components/ui/button'
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { OtpModal } from '@/hooks/OtpModal'
+import { OtpModal } from '@/hooks/OtpModal' // Asumsi komponen ini ada
 import { toast, Toaster } from 'sonner'
-// Hapus 'Label' dari 'ui/label', karena kita akan pakai dari 'ui/form'
-// import { Label } from '@/components/ui/label'
-
-// Impor komponen Form dari shadcn/ui
 import {
     Form,
     FormControl,
@@ -32,9 +20,10 @@ import {
     FormLabel,
     FormMessage,
 } from '@/components/ui/form'
-// import { set } from 'date-fns'
 
-// Skema form tidak berubah, sudah benar
+
+
+// Skema form Zod tidak berubah
 const formSchema = z.object({
     email: z.string().email({ message: 'Format email tidak valid.' }),
     password: z
@@ -50,8 +39,6 @@ export default function LoginPage() {
     const [loginEmail, setLoginEmail] = useState('')
     const [counter, setCounter] = useState(0)
 
-    // 1. Inisialisasi form menggunakan `useForm` dari react-hook-form
-    // Ini adalah pola yang direkomendasikan shadcn
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -60,55 +47,33 @@ export default function LoginPage() {
         },
     })
 
-    // 2. Fungsi onSubmit sekarang menerima `values` dari form
+    // --- Semua fungsi logika (onSubmit, handleVerifyOtp, etc.) tetap sama ---
     async function onSubmit(values: z.infer<typeof formSchema>) {
-        // console.log('Form data:', values)
         const captcha = recaptchaRef.current?.getValue()
-
         if (!captcha) {
             toast.error('Silakan selesaikan CAPTCHA terlebih dahulu.')
-            setLoading(false)
-            return null
-        } else {
-            toast.success('CAPTCHA berhasil diselesaikan.')
+            return;
         }
-
         setLoading(true)
-
         try {
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                // Kirim `values` langsung
                 body: JSON.stringify(values),
             })
-
             const resData = await res.json()
-
             if (res.ok && resData.success) {
                 localStorage.setItem('token', resData.token)
                 localStorage.setItem('user', JSON.stringify(resData.user))
                 setLoginEmail(values.email)
-                // Swal.fire({
-                //     icon: 'success',
-                //     title: 'Login berhasil!',
-                //     text: 'Anda akan diarahkan...',
-                // })
-                // router.push('/verify-code')
-
-                setIsModalOpen(true) // Buka modal OTP jika login sukses
-                setCounter(0) // Reset counter untuk pengiriman ulang OTP
+                setIsModalOpen(true)
+                setCounter(0)
             } else {
                 throw new Error(resData.message || 'Login gagal')
             }
-        } catch {
-            // Swal.fire({
-            //     icon: 'error',
-            //     title: 'Login Gagal',
-            //     text: error.message || 'Terjadi kesalahan saat login.',
-            // })
-
-            toast.error('Terjadi kesalahan saat login.')
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Terjadi kesalahan saat login.';
+            toast.error(errorMessage)
         } finally {
             setLoading(false)
         }
@@ -116,38 +81,24 @@ export default function LoginPage() {
 
     const handleVerifyOtp = async (otp: string) => {
         setLoading(true)
-
         setCounter((prev) => prev + 1)
         try {
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/login/verify-code`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    email: loginEmail, // Kirim email yang sudah disimpan
-                    code: otp          // Gunakan key 'code' sesuai permintaan
-                })
+                body: JSON.stringify({ email: loginEmail, code: otp })
             })
-
             const resData = await res.json()
-
             if (res.ok && resData.success) {
                 localStorage.setItem('token', resData.token)
-                // Swal.fire({
-                //     icon: 'success',
-                //     title: 'Verifikasi Berhasil',
-                //     text: 'Anda akan diarahkan...',
-                // })
+                toast.success('Verifikasi Berhasil! Mengarahkan ke dashboard...');
                 router.push('/dashboard')
             } else {
                 toast.error(resData.message || 'Verifikasi gagal')
             }
-        } catch {
-            // Swal.fire({
-            //     icon: 'error',
-            //     title: 'Verifikasi Gagal',
-            //     text: error.message || 'Terjadi kesalahan saat verifikasi.',
-            // })
-            toast.error('Terjadi kesalahan saat verifikasi.')
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Terjadi kesalahan saat verifikasi.';
+            toast.error(errorMessage)
         } finally {
             setLoading(false)
         }
@@ -155,6 +106,7 @@ export default function LoginPage() {
 
     useEffect(() => {
         if (counter > 3) {
+            toast.error('Anda telah mencoba verifikasi sebanyak 3 kali. Silakan coba lagi nanti.');
             setIsModalOpen(false)
         }
     }, [counter])
@@ -165,35 +117,18 @@ export default function LoginPage() {
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/login/resend-code`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    email: loginEmail, // Gunakan email yang sudah disimpan
-                }),
+                body: JSON.stringify({ email: loginEmail }),
             });
-
             const resData = await res.json()
-
             if (res.ok && resData.success) {
-                // Swal.fire({
-                //     icon: 'success',
-                //     title: 'Kode OTP baru telah dikirim.',
-                // })
-
+                toast.success('Kode OTP baru telah dikirim.');
                 setCounter(0)
             } else {
                 toast.error(resData.message || 'Gagal mengirim ulang OTP')
-                // Swal.fire({
-                //     icon: 'error',
-                //     title: 'Gagal Mengirim Ulang OTP',
-                //     text: resData.message || 'Terjadi kesalahan saat mengirim ulang OTP.',
-                // })
             }
-        } catch {
-            // Swal.fire({
-            //     icon: 'error',
-            //     title: 'Gagal Mengirim Ulang OTP',
-            //     text: error.message || 'Terjadi kesalahan saat mengirim ulang OTP.',
-            // })
-            toast.error('Terjadi kesalahan saat mengirim ulang OTP')
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Terjadi kesalahan saat mengirim ulang OTP.';
+            toast.error(errorMessage);
         } finally {
             setLoading(false)
         }
@@ -203,25 +138,30 @@ export default function LoginPage() {
     return (
         <>
             <Head>
-                <title>Login | My App</title>
+                <title>Sign In | My App</title>
             </Head>
 
-            <div className="min-h-screen flex items-center justify-center bg-muted px-4">
-                <Card className="w-full max-w-md">
-                    <CardHeader>
-                        <CardTitle>Login</CardTitle>
-                        <CardDescription>
-                            Masukkan email dan password untuk masuk ke akun Anda.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        {/* 3. Bungkus form dengan komponen <Form> dari shadcn */}
+            <div className="min-h-screen w-full flex items-center justify-center bg-gray-100 p-4">
+                <div className="w-full max-w-4xl grid grid-cols-1 lg:grid-cols-2 bg-white rounded-lg shadow-xl overflow-hidden">
+
+                    {/* Kolom Kiri: Form Login */}
+                    <div className="p-8 md:p-12">
+                        <div className="mb-8">
+                            <h2 className="text-3xl font-bold text-gray-900">Sign In</h2>
+                            <p className="text-gray-500 mt-2">Enter your credentials to access your account.</p>
+                        </div>
+
+
+                        <div className="relative my-8">
+                            <div className="absolute inset-0 flex items-center">
+                                <span className="w-full border-t"></span>
+                            </div>
+                            <div className="relative flex justify-center text-xs uppercase">
+                            </div>
+                        </div>
+
                         <Form {...form}>
-                            <form
-                                onSubmit={form.handleSubmit(onSubmit)}
-                                className="space-y-6"
-                            >
-                                {/* 4. Gunakan <FormField> untuk setiap input */}
+                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                                 <FormField
                                     control={form.control}
                                     name="email"
@@ -229,54 +169,63 @@ export default function LoginPage() {
                                         <FormItem>
                                             <FormLabel>Email</FormLabel>
                                             <FormControl>
-                                                <Input
-                                                    type="email"
-                                                    // placeholder="contoh@email.com"
-                                                    {...field}
-                                                />
+                                                <Input type="email" placeholder="admin@email.com" {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
                                     )}
                                 />
-
                                 <FormField
                                     control={form.control}
                                     name="password"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Password</FormLabel>
+                                            <div className="flex justify-between items-center">
+                                                <FormLabel>Password</FormLabel>
+                                                {/* <Link href="#" className="text-sm font-medium text-green-600 hover:underline">
+                                                    Forgot Password?
+                                                </Link> */}
+                                            </div>
                                             <FormControl>
-                                                <Input
-                                                    type="password"
-                                                    // placeholder="******"
-                                                    {...field}
-                                                />
+                                                <Input type="password" placeholder="******" {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
                                     )}
                                 />
-
                                 <ReCAPTCHA
                                     ref={recaptchaRef}
-                                    sitekey={
-                                        '6LeNi04rAAAAAASa2iwBAbTXjRLNIT3dsIXMZ05s'
-                                    }
-                                    className="mx-auto"
+                                    sitekey={'6LeNi04rAAAAAASa2iwBAbTXjRLNIT3dsIXMZ05s'}
+                                    className="flex justify-center"
                                 />
-
-                                <Button
-                                    type="submit"
-                                    className="w-full"
-                                    disabled={loading}
-                                >
-                                    {loading ? 'Memproses...' : 'Login'}
+                                <Button type="submit" className="w-full bg-green-600 hover:bg-green-700 text-white" disabled={loading}>
+                                    {loading ? 'Memproses...' : 'Sign In'}
                                 </Button>
+                                {/* <p className="text-center text-sm text-gray-500">
+                                    Don't have an account?{' '}
+                                    <Link href="#" className="font-medium text-green-600 hover:underline">
+                                        Sign Up
+                                    </Link>
+                                </p> */}
                             </form>
                         </Form>
-                    </CardContent>
-                </Card>
+                    </div>
+
+                    {/* Kolom Kanan: Kartu Welcome (dengan warna hijau) */}
+                    <div className="hidden lg:flex flex-col items-center justify-center bg-green-50 p-12 text-center border-l">
+                        <div className="flex items-center mb-6">
+                            {/* <Blocks className="h-12 w-12 text-green-600" /> */}
+                            <img src={"/images/logo_al-bahjah.png"} alt="Logo" className="h-12 w-12 text-green-600" />
+                        </div>
+                        <h3 className="text-2xl font-bold text-gray-900">Welcome Back!</h3>
+                        <p className="text-gray-600 mt-2 max-w-sm">
+                            Please sign in to your account by completing the necessary fields on the left.
+                        </p>
+                    </div>
+
+                </div>
+
+                {/* Modal dan komponen lainnya tetap di luar grid */}
                 <OtpModal
                     isOpen={isModalOpen}
                     setIsOpen={setIsModalOpen}

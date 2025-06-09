@@ -9,4 +9,6 @@ export interface Cabang {
   noTelepon: string;
   provinces?: Province;
   regencies?: Regencies;
+  provinsi?: Province;
+  kabupaten?: Regencies;
 }

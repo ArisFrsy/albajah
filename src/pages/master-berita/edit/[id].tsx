@@ -28,7 +28,7 @@ import { confirmDialog } from '@/lib/confirm-dialog';
 
 const formSchema = z.object({
     judul: z.string().min(10, { message: 'Judul berita minimal 10 karakter.' }),
-    deskripsi: z.string().min(50, { message: 'Konten berita minimal 50 karakter.' }),
+    deskripsi: z.string().min(50, { message: 'Konten berita minimal 50 karakter.' }).max(2000, { message: 'Konten berita maksimal 2000 karakter.' }),
     image: z.string().optional(),
 });
 

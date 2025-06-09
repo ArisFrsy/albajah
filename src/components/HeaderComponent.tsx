@@ -22,6 +22,11 @@ import { User } from '@/models/User';
 import { encrypt } from '@/lib/Encrypt';
 import Link from 'next/link';
 import { toast } from 'sonner';
+import { Plus, Pen, Trash, Info } from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
+import { id } from 'date-fns/locale'; // opsional untuk Bahasa Indonesia
+
+
 
 export default function HeaderComponent() {
     const profileMenuRef = useRef<HTMLButtonElement>(null);
@@ -52,6 +57,96 @@ export default function HeaderComponent() {
         }
     }, []);
 
+    const [notifications, setNotifications] = useState<any[]>([]); // eslint-disable-line @typescript-eslint/no-explicit-any
+    const [unreadCount, setUnreadCount] = useState(0);
+
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+
+        const fetchNotifications = async () => {
+            try {
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/notifications`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+
+                if (!res.ok) throw new Error('Gagal ambil notifikasi');
+
+                const data = await res.json();
+                setNotifications(data);
+                const unread = data.filter((n: any) => n.read_at === null); // eslint-disable-line @typescript-eslint/no-explicit-any
+                setUnreadCount(unread.length);
+            } catch {
+                toast.error('Gagal ambil notifikasi');
+            }
+        };
+
+        fetchNotifications();
+    }, []);
+
+    const handleReadNotification = async (id: string) => {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+
+        try {
+            await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/notifications/read/${id}`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            setNotifications((prev) =>
+                prev.map((n) =>
+                    n.id === id ? { ...n, read_at: new Date().toISOString() } : n
+                )
+            );
+            setUnreadCount((prev) => prev - 1);
+        } catch {
+            toast.error('Gagal update status notifikasi');
+        }
+    };
+
+
+    const handleMarkAllRead = async () => {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+
+        try {
+            await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/notifications/read-all`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            setNotifications((prev) =>
+                prev.map((n) => ({ ...n, read_at: new Date().toISOString() }))
+            );
+            setUnreadCount(0);
+            toast.success('Semua notifikasi ditandai dibaca');
+        } catch {
+            toast.error('Gagal menandai semua notifikasi');
+        }
+    };
+
+    const getIconAndColor = (type: string) => {
+        switch (type) {
+            case 'create':
+                return { icon: <Plus className="text-green-600 w-4 h-4" />, color: 'bg-green-100' };
+            case 'update':
+                return { icon: <Pen className="text-yellow-600 w-4 h-4" />, color: 'bg-yellow-100' };
+            case 'delete':
+                return { icon: <Trash className="text-red-600 w-4 h-4" />, color: 'bg-red-100' };
+            default:
+                return { icon: <Info className="text-blue-600 w-4 h-4" />, color: 'bg-blue-100' };
+        }
+    };
+
+
+
     return (
         <header className="sticky top-0 z-50 bg-white border-b border-gray-200 px-4 sm:px-6 py-3 flex items-center justify-between shadow-sm">
             <div className="text-lg font-semibold">Dashboard Admin</div>
@@ -59,15 +154,62 @@ export default function HeaderComponent() {
             <div className="flex items-center gap-4">
                 {/* Notification Bell */}
                 <div className="relative">
-                    <Button variant="ghost" size="icon" className="rounded-full">
-                        <Bell className="h-5 w-5 text-gray-600" />
-                    </Button>
-                    {/* {notifications > 0 && (
-                        <span className="absolute top-0 left-0 transform -translate-x-1 translate-y-0.5 inline-flex items-center justify-center px-1.5 h-[18px] min-w-[18px] text-[10px] font-bold leading-none text-white bg-red-500 rounded-full shadow-sm">
-                            +{notifications}
-                        </span>
-                    )} */}
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="rounded-full relative">
+                                <Bell className="h-5 w-5 text-gray-600" />
+                                {unreadCount > 0 && (
+                                    <span className="absolute top-0 right-0 transform translate-x-1 -translate-y-1 inline-flex items-center justify-center px-1.5 h-[18px] min-w-[18px] text-[10px] font-bold leading-none text-white bg-red-500 rounded-full shadow-sm">
+                                        {unreadCount}
+                                    </span>
+                                )}
+                            </Button>
+                        </DropdownMenuTrigger>
+
+                        <DropdownMenuContent className="w-72 max-h-96 overflow-y-auto">
+                            <DropdownMenuLabel>Notifikasi</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                                onClick={() => handleMarkAllRead()}
+                                className="text-sm text-indigo-600 font-semibold cursor-pointer"
+                            >
+                                Tandai semua sudah dibaca
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+
+                            {notifications.length === 0 ? (
+                                <div className="text-sm text-gray-500 p-3">Tidak ada notifikasi</div>
+                            ) : (
+                                <>
+                                    {notifications.map((notif) => {
+                                        const { icon, color } = getIconAndColor(notif.data.message.type);
+
+                                        return (
+                                            <div
+                                                key={notif.id}
+                                                className={`flex items-start gap-2 p-2 rounded-md ${color}`}
+                                                onClick={() => handleReadNotification(notif.id)}
+                                            >
+                                                {icon}
+                                                <div>
+                                                    <p className="text-sm">{notif.data.message.message}</p>
+                                                    <p className="text-xs text-gray-500">
+                                                        {formatDistanceToNow(new Date(notif.created_at), {
+                                                            addSuffix: true,
+                                                            locale: id, // gunakan locale Indonesia
+                                                        })}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+
+                                </>
+                            )}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </div>
+
 
                 {/* Profile Dropdown */}
                 <DropdownMenu>

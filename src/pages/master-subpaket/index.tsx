@@ -24,6 +24,7 @@ import {
 import { usePaketPagination } from "@/hooks/UsePaketPagination";
 import { Combobox } from "@/components/ui/combobox";
 import { Label } from "@/components/ui/label";
+import { formatCurrency } from "@/utils/formatCurrency";
 
 function MasterSubPaket() {
     const router = useRouter();
@@ -81,13 +82,35 @@ function MasterSubPaket() {
     const headers: Header<SubPaket>[] = [
         { column: "namaSubPaket", label: "Sub Paket", orderable: true, align: "left" },
         { column: "paket.nama", label: "Paket", orderable: true, align: "left" },
-        { column: "hargaIDR", label: "IDR", orderable: true, align: "right" },
-        { column: "hargaUSD", label: "USD", orderable: true, align: "right" },
-        { column: "keberangkatan", label: "Keberangkatan", orderable: true, align: "left" },
-        { column: "durasiHari", label: "Durasi", orderable: true, align: "right" },
-        { column: "penerbangan", label: "Penerbangan", orderable: true, align: "left" },
-        { column: "hotelMekkah", label: "Hotel Mekkah", orderable: true, align: "left" },
-        { column: "hotelMadinah", label: "Hotel Madinah", orderable: true, align: "left" },
+        {
+            column: "hargaIDR", label: "IDR", align: "right", render: (row: SubPaket) => (
+                formatCurrency(row.hargaIDR, 'id-ID', 'IDR')
+            )
+        },
+        {
+            column: "hargaUSD", label: "USD", align: "right", render: (row: SubPaket) => (
+                <>
+                    {formatCurrency(row.hargaUSD, 'en-US', 'USD')}
+                </>
+            )
+        },
+        {
+            column: "keberangkatan", label: "Keberangkatan", align: "left", render: (row: SubPaket) => (
+                new Date(row.keberangkatan).toLocaleDateString('id-ID', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                })
+            )
+        },
+        {
+            column: "durasiHari", label: "Durasi", orderable: true, align: "right", render: (row: SubPaket) => (
+                `${row.durasiHari} Hari`
+            )
+        },
+        // { column: "penerbangan", label: "Penerbangan", orderable: true, align: "left" },
+        // { column: "hotelMekkah", label: "Hotel Mekkah", orderable: true, align: "left" },
+        // { column: "hotelMadinah", label: "Hotel Madinah", orderable: true, align: "left" },
         // { column: "fasilitas", label: "Fasilitas", orderable: false, align: "left" },
         // { column: "perlengkapan", label: "Perlengkapan", orderable: false, align: "left" },
         {

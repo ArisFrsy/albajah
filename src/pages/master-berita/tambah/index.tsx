@@ -32,7 +32,7 @@ const TiptapEditor = dynamic(() => import('@/components/Editor'), {
 // Skema Zod tidak berubah
 const formSchema = z.object({
     judul: z.string().min(10, { message: 'Judul berita minimal 10 karakter.' }),
-    deskripsi: z.string().min(50, { message: 'Konten berita minimal 50 karakter.' }),
+    deskripsi: z.string().min(50, { message: 'Konten berita minimal 50 karakter.' }).max(2000, { message: 'Konten berita maksimal 2000 karakter.' }),
     gambar: z.string().optional(), // Gambar bisa berupa string URL atau base64
 });
 
@@ -82,6 +82,9 @@ function TambahBeritaPage() {
             formData.append('deskripsi', values.deskripsi);
             if (file) {
                 formData.append('image', file);
+            } else {
+                toast.error('Gambar berita harus diupload.');
+                return;
             }
 
             const promise = fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/master/berita`, {

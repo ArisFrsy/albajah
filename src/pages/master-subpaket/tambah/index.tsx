@@ -20,6 +20,26 @@ import { formatCurrency, unformatCurrency } from '@/utils/formatCurrency';
 import { Minus, Plus } from 'lucide-react';
 import { confirmDialog } from '@/lib/confirm-dialog';
 import { toast } from 'sonner';
+import { z } from 'zod'; // Impor Zod
+
+// Skema validasi Zod
+const subPaketSchema = z.object({
+    idPaket: z.string().min(1, { message: 'Paket wajib dipilih' }),
+    namaSubPaket: z.string().min(1, { message: 'Nama sub paket wajib diisi' }),
+    hargaIDR: z.number().gt(0, { message: 'Harga IDR harus lebih dari 0' }),
+    hargaUSD: z.number().gt(0, { message: 'Harga USD harus lebih dari 0' }),
+    keberangkatan: z.string().min(1, { message: 'Tanggal keberangkatan wajib diisi' }),
+    durasiHari: z.number().gt(0, { message: 'Durasi hari harus lebih dari 0' }),
+    penerbangan: z.string().min(1, { message: 'Penerbangan wajib diisi' }),
+    hotelMekkah: z.string().min(1, { message: 'Hotel Mekkah wajib diisi' }),
+    hotelMadinah: z.string().min(1, { message: 'Hotel Madinah wajib diisi' }),
+    fasilitasList: z.array(z.string()).min(1, { message: 'Fasilitas wajib diisi' }).refine(data => data.some(item => item.trim() !== ''), {
+        message: 'Minimal satu fasilitas harus diisi',
+    }),
+    perlengkapanList: z.array(z.string()).min(1, { message: 'Perlengkapan wajib diisi' }).refine(data => data.some(item => item.trim() !== ''), {
+        message: 'Minimal satu perlengkapan harus diisi',
+    }),
+});
 
 
 function InsertSubPaketPage() {
@@ -38,9 +58,9 @@ function InsertSubPaketPage() {
     const [fasilitasList, setFasilitasList] = useState<string[]>(['']);
     const [perlengkapanList, setPerlengkapanList] = useState<string[]>(['']);
 
-
     const [isClient, setIsClient] = useState(false);
     const [options, setOptions] = useState<{ value: number; label: string }[]>([]);
+    const [errors, setErrors] = useState<any>({}); // eslint-disable-line @typescript-eslint/no-explicit-any
 
     useEffect(() => {
         setIsClient(true);
@@ -54,14 +74,39 @@ function InsertSubPaketPage() {
                 value: p.idPaket,
                 label: p.nama,
             }));
-
             setOptions(paketOptions);
-
         }
     }, [paket]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        const formData = {
+            idPaket,
+            namaSubPaket,
+            hargaIDR,
+            hargaUSD,
+            keberangkatan,
+            durasiHari,
+            penerbangan,
+            hotelMekkah,
+            hotelMadinah,
+            fasilitasList,
+            perlengkapanList
+        };
+
+        const validationResult = subPaketSchema.safeParse(formData);
+
+        if (!validationResult.success) {
+            const formattedErrors: any = {}; // eslint-disable-line @typescript-eslint/no-explicit-any
+            validationResult.error.errors.forEach(err => {
+                formattedErrors[err.path[0]] = err.message;
+            });
+            setErrors(formattedErrors);
+            toast.error('Harap isi semua kolom yang wajib diisi.');
+            return;
+        }
+        setErrors({}); // Hapus error jika validasi berhasil
 
         const confirmed = await confirmDialog({
             title: 'Konfirmasi',
@@ -100,11 +145,10 @@ function InsertSubPaketPage() {
 
             if (!response.ok || !result.success) {
                 toast.error(result.message || 'Gagal menambahkan sub paket');
+            } else {
+                toast.success('Sub paket berhasil ditambahkan');
+                router.push('/master-subpaket');
             }
-
-            toast.success('Sub paket berhasil ditambahkan');
-
-            router.push('/master-subpaket');
         } catch {
             toast.error('Terjadi kesalahan saat menambahkan sub paket');
         }
@@ -115,6 +159,8 @@ function InsertSubPaketPage() {
         setIdPaket('');
         setHargaIDR(0);
         setHargaUSD(0);
+        setHargaIDRDisplay('');
+        setHargaUSDDisplay('');
         setKeberangkatan('');
         setDurasiHari(0);
         setPenerbangan('');
@@ -122,7 +168,7 @@ function InsertSubPaketPage() {
         setHotelMadinah('');
         setFasilitasList(['']);
         setPerlengkapanList(['']);
-
+        setErrors({}); // Reset error juga
     };
 
     if (!isClient) return <Loading />;
@@ -139,7 +185,8 @@ function InsertSubPaketPage() {
                         <div className='grid grid-cols-2 gap-4'>
                             <div className="space-y-2">
                                 <Label>Nama Sub Paket</Label>
-                                <Input value={namaSubPaket} onChange={(e) => setNamaSubPaket(e.target.value)} required />
+                                <Input value={namaSubPaket} onChange={(e) => setNamaSubPaket(e.target.value)} />
+                                {errors.namaSubPaket && <p className="text-red-500 text-xs mt-1">{errors.namaSubPaket}</p>}
                             </div>
 
                             <div className="space-y-2">
@@ -150,7 +197,7 @@ function InsertSubPaketPage() {
                                     onChange={(item) => setIdPaket(item.value.toString())}
                                     placeholder="Cari paket..."
                                 />
-
+                                {errors.idPaket && <p className="text-red-500 text-xs mt-1">{errors.idPaket}</p>}
                             </div>
                         </div>
 
@@ -165,8 +212,8 @@ function InsertSubPaketPage() {
                                         setHargaIDR(numeric);
                                         setHargaIDRDisplay(formatCurrency(numeric, 'id-ID', 'IDR'));
                                     }}
-                                    required
                                 />
+                                {errors.hargaIDR && <p className="text-red-500 text-xs mt-1">{errors.hargaIDR}</p>}
                             </div>
                             <div className="space-y-2">
                                 <Label>Harga USD</Label>
@@ -178,37 +225,41 @@ function InsertSubPaketPage() {
                                         setHargaUSD(numeric);
                                         setHargaUSDDisplay(formatCurrency(numeric, 'en-US', 'USD'));
                                     }}
-                                    required
                                 />
+                                {errors.hargaUSD && <p className="text-red-500 text-xs mt-1">{errors.hargaUSD}</p>}
                             </div>
                             <div className="space-y-2">
                                 <Label>Durasi Hari</Label>
-                                <Input type="number" value={durasiHari} onChange={(e) => setDurasiHari(Number(e.target.value))} required />
+                                <Input type="number" value={durasiHari} onChange={(e) => setDurasiHari(Number(e.target.value))} />
+                                {errors.durasiHari && <p className="text-red-500 text-xs mt-1">{errors.durasiHari}</p>}
                             </div>
                         </div>
 
                         <div className='grid grid-cols-2 gap-4'>
                             <div className="space-y-2">
                                 <Label>Keberangkatan</Label>
-                                <Input type="date" value={keberangkatan} onChange={(e) => setKeberangkatan(e.target.value)} required />
+                                <Input type="date" value={keberangkatan} onChange={(e) => setKeberangkatan(e.target.value)} />
+                                {errors.keberangkatan && <p className="text-red-500 text-xs mt-1">{errors.keberangkatan}</p>}
                             </div>
-
 
                             <div className="space-y-2">
                                 <Label>Penerbangan</Label>
-                                <Input value={penerbangan} onChange={(e) => setPenerbangan(e.target.value)} required />
+                                <Input value={penerbangan} onChange={(e) => setPenerbangan(e.target.value)} />
+                                {errors.penerbangan && <p className="text-red-500 text-xs mt-1">{errors.penerbangan}</p>}
                             </div>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
                                 <Label>Hotel Mekkah</Label>
-                                <Input value={hotelMekkah} onChange={(e) => setHotelMekkah(e.target.value)} required />
+                                <Input value={hotelMekkah} onChange={(e) => setHotelMekkah(e.target.value)} />
+                                {errors.hotelMekkah && <p className="text-red-500 text-xs mt-1">{errors.hotelMekkah}</p>}
                             </div>
 
                             <div className="space-y-2">
                                 <Label>Hotel Madinah</Label>
-                                <Input value={hotelMadinah} onChange={(e) => setHotelMadinah(e.target.value)} required />
+                                <Input value={hotelMadinah} onChange={(e) => setHotelMadinah(e.target.value)} />
+                                {errors.hotelMadinah && <p className="text-red-500 text-xs mt-1">{errors.hotelMadinah}</p>}
                             </div>
                         </div>
 
@@ -248,6 +299,7 @@ function InsertSubPaketPage() {
                                     )}
                                 </div>
                             ))}
+                            {errors.fasilitasList && <p className="text-red-500 text-xs mt-1">{errors.fasilitasList}</p>}
                         </div>
 
 
@@ -287,6 +339,7 @@ function InsertSubPaketPage() {
                                     )}
                                 </div>
                             ))}
+                            {errors.perlengkapanList && <p className="text-red-500 text-xs mt-1">{errors.perlengkapanList}</p>}
                         </div>
 
 

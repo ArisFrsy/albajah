@@ -82,10 +82,12 @@ export const Sidebar = () => {
                     <div className="px-4 py-6">
                         <div className="flex items-center justify-between mb-4">
                             <span className={clsx(
-                                'grid place-content-center rounded-lg text-sm font-semibold text-green-700 bg-green-100 h-10 transition-all duration-300',
+                                'grid place-content-center rounded-lg text-sm font-semibold text-green-700  h-14 transition-all duration-300',
                                 collapsed ? 'w-10' : 'w-32'
                             )}>
-                                {collapsed ? 'M' : 'MyApp Logo'}
+                                {collapsed ? 'A' : <>
+                                    <img src={"/images/logo_al-bahjah.png"} alt="Logo" className="h-12 w-12 text-green-600" />
+                                </>}
                             </span>
                             <button onClick={() => setCollapsed(!collapsed)} className="text-gray-500 hover:text-green-600 transition">
                                 {collapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}

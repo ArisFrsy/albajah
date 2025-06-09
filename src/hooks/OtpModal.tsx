@@ -111,15 +111,20 @@ export function OtpModal({ isOpen, setIsOpen, onVerify, onResend }: OtpModalProp
                 </DialogHeader>
                 <div className="flex items-center justify-center space-y-4 flex-col">
                     <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 w-full">
                             <FormField
                                 control={form.control}
                                 name="pin"
                                 render={({ field }) => (
-                                    <FormItem>
+                                    <FormItem className='flex flex-col items-center justify-center'>
                                         <FormLabel>Kode OTP</FormLabel>
                                         <FormControl>
-                                            <InputOTP maxLength={6} {...field}>
+                                            {/* Menambahkan style untuk focus ring berwarna hijau */}
+                                            <InputOTP
+                                                maxLength={6}
+                                                {...field}
+                                                className="focus-visible:ring-green-500"
+                                            >
                                                 <InputOTPGroup>
                                                     <InputOTPSlot index={0} />
                                                     <InputOTPSlot index={1} />
@@ -135,7 +140,12 @@ export function OtpModal({ isOpen, setIsOpen, onVerify, onResend }: OtpModalProp
                                 )}
                             />
 
-                            <Button type="submit" className="w-full" disabled={loading}>
+                            {/* Mengubah warna tombol menjadi hijau */}
+                            <Button
+                                type="submit"
+                                className="w-full bg-green-600 hover:bg-green-700 text-white"
+                                disabled={loading}
+                            >
                                 {loading ? 'Memverifikasi...' : 'Verifikasi'}
                             </Button>
                         </form>
@@ -149,7 +159,8 @@ export function OtpModal({ isOpen, setIsOpen, onVerify, onResend }: OtpModalProp
                         ) : (
                             <button
                                 onClick={handleResendCode}
-                                className="underline underline-offset-2 hover:text-primary"
+                                // Mengubah warna link menjadi hijau
+                                className="underline underline-offset-2 text-green-600 hover:text-green-700"
                             >
                                 Tidak menerima kode? Kirim ulang
                             </button>

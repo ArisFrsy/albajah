@@ -71,7 +71,7 @@ function ViewBeritaPage() {
                 ) : berita ? (
                     <>
                         <CardHeader>
-                            <CardTitle className="text-3xl font-bold">{berita.judul}</CardTitle>
+                            <CardTitle className="text-3xl text-center font-bold">{berita.judul}</CardTitle>
                         </CardHeader>
                         <CardContent className=''>
                             {berita.urlImage && (
