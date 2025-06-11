@@ -25,9 +25,11 @@ import {
 import { decrypt } from '@/lib/Encrypt';
 import { formatCurrency } from '@/utils/formatCurrency';
 import { toast } from 'sonner';
+import Image from 'next/image';
 
 
 function ViewSubPaketPage() {
+    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
     const router = useRouter();
     const params = useParams();
     const decryptId = params?.id as string;
@@ -115,6 +117,36 @@ function ViewSubPaketPage() {
                                 <DetailItem icon={<Clock />} label="Durasi" value={`${subPaket.durasiHari} hari`} />
                                 <DetailItem icon={<Tag />} label="Harga IDR" value={formatCurrency(subPaket.hargaIDR, 'id-ID', 'IDR')} />
                                 <DetailItem icon={<DollarSign />} label="Harga USD" value={formatCurrency(subPaket.hargaUSD, 'en-US', 'USD')} />
+
+                                {/* Menampilkan gambar jika ada, tambah icon untuk buka di tab baru */}
+                                {subPaket.urlFoto ? (
+                                    <div className="flex items-start gap-4">
+                                        <div className="flex-shrink-0 text-muted-foreground mt-1">
+                                            <Package size={20} />
+                                        </div>
+                                        <div>
+                                            <p className="text-sm text-muted-foreground font-medium">Image</p>
+                                            <a
+                                                href={baseUrl + subPaket.urlFoto}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="block relative aspect-video w-50 rounded-lg overflow-hidden border group my-2"
+                                                title="Klik untuk melihat gambar penuh"
+                                            >
+                                                <Image
+                                                    src={baseUrl + subPaket.urlFoto}
+                                                    alt={`Foto untuk ${subPaket.namaSubPaket}`}
+                                                    fill
+                                                    className="object-cover transition-transform duration-300 group-hover:scale-105"
+                                                />
+                                            </a>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center justify-center aspect-video w-full rounded-lg border border-dashed">
+                                        <p className="text-sm text-muted-foreground">Tidak ada gambar</p>
+                                    </div>
+                                )}
                             </div>
                         </section>
 

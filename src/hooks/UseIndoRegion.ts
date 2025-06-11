@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Province } from "@/models/Provinces";
 import { Regencies } from "@/models/Regencies";
 import { toast } from "sonner";
+import { Advertise } from "@/models/Advertise";
 
 function getProvinceList() {
   try {
@@ -39,9 +40,27 @@ function getRegencyList(provinceId: string) {
   }
 }
 
+function getAdvertisesList() {
+  try {
+    return fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/master/indo-region/advertises`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    ).then((res) => res.json());
+  } catch {
+    toast.error("Gagal mengambil daftar iklan. Silakan coba lagi.");
+  }
+}
+
 export function useIndoRegion() {
   const [provinces, setProvinces] = useState<Province[]>([]);
   const [regencies, setRegencies] = useState<Regencies[]>([]);
+  const [advertises, setAdvertises] = useState<Advertise[]>([]);
   const [selectedProvince, setSelectedProvince] = useState("");
   const [selectedRegency, setSelectedRegency] = useState("");
   const [loading, setLoading] = useState<boolean>(true);
@@ -59,6 +78,21 @@ export function useIndoRegion() {
       }
     }
     fetchProvinces();
+  }, []);
+
+  useEffect(() => {
+    async function fetchAdvertises() {
+      try {
+        setLoading(true);
+        const data = await getAdvertisesList();
+        setAdvertises(data.data);
+      } catch {
+        toast.error("Gagal mengambil daftar iklan. Silakan coba lagi.");
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchAdvertises();
   }, []);
 
   useEffect(() => {
@@ -89,5 +123,6 @@ export function useIndoRegion() {
     setLoading,
     selectedRegency,
     setSelectedRegency,
+    advertises,
   };
 }

@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 function MasterBerita() {
     const router = useRouter();
     const [order, setOrder] = useState<"asc" | "desc">("desc");
+    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
 
     const handleDelete = async (berita: Berita) => {
         const confirmed = await confirmDialog({
@@ -48,8 +49,23 @@ function MasterBerita() {
         }
     }
 
+    function stripHtmlWithSpace(html: string): string {
+        // Ganti <br> (atau <br/>) jadi spasi
+        const cleanHtml = html.replace(/<br\s*\/?>/gi, ' ');
+        const doc = new DOMParser().parseFromString(cleanHtml, 'text/html');
+        return doc.body.textContent || "";
+    }
+
+
+
     const headers: Header<Berita>[] = [
+        { column: 'no', label: 'No', orderable: false, align: 'left' },
         { column: "judul", label: "Judul", orderable: true, align: "left" },
+        {
+            column: 'foto', label: 'Foto', orderable: false, align: 'left', render: (row: Berita) => (
+                <img src={baseUrl + row.urlImage || '/images/no-image.png'} alt={row.urlImage} className="w-16 h-16 object-cover rounded" />
+            )
+        },
         // render dengan dangerouslySetInnerHTML dan limit 100 karakter
         {
             column: "deskripsi",
@@ -58,14 +74,12 @@ function MasterBerita() {
             align: "left",
             render: (row: Berita) => {
                 const deskripsi = row.deskripsi ?? ""; // default ke string kosong jika undefined
+                const strippedDeskripsi = stripHtmlWithSpace(deskripsi); // menghapus tag HTML
 
                 return (
-                    <div
-                        className="text-sm text-gray-700"
-                        dangerouslySetInnerHTML={{
-                            __html: deskripsi.length > 100 ? deskripsi.substring(0, 100) + "..." : deskripsi,
-                        }}
-                    />
+                    <>
+                        {strippedDeskripsi.length > 100 ? strippedDeskripsi.substring(0, 100) + "..." : strippedDeskripsi}
+                    </>
                 );
             },
         }
@@ -126,34 +140,42 @@ function MasterBerita() {
     return (
         <main className="flex-1 p-6 overflow-auto bg-gray-100" >
             <div className="bg-white rounded-lg shadow-md p-6 border border-gray-300 min-h-[calc(110vh-7rem)]">
-                <nav aria-label="Breadcrumb">
-                    <ol className="flex items-center gap-1 text-sm text-gray-700">
-                        <li>
-                            <a href="#" className="block transition-colors hover:text-gray-900"> Admin </a>
-                        </li>
-                        <li className="rtl:rotate-180">
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="size-4"
-                                viewBox="0 0 20 20"
-                                fill="currentColor"
-                            >
-                                <path
-                                    fillRule="evenodd"
-                                    d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                                    clipRule="evenodd"
-                                />
-                            </svg>
-                        </li>
-                        <li>
-                            <a href="#" className="block transition-colors hover:text-gray-900"> Master Berita </a>
-                        </li>
-                    </ol>
-                </nav>
-                <h1 className="mt-4 text-2xl font-bold text-gray-900 text-center">Master Berita</h1>
+                <div className="flex justify-between items-center">
+                    <nav aria-label="Breadcrumb">
+                        <ol className="flex items-center gap-1 text-sm text-gray-700">
+                            <li>
+                                <a href="#" className="block transition-colors hover:text-gray-900 text-base"> Admin </a>
+                            </li>
+                            <li className="rtl:rotate-180">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="size-4"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
+                                >
+                                    <path
+                                        fillRule="evenodd"
+                                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                                        clipRule="evenodd"
+                                    />
+                                </svg>
+                            </li>
+                            <li>
+                                <a href="#" className="block transition-colors hover:text-gray-900 text-base"> Master Berita </a>
+                            </li>
+                        </ol>
+                    </nav>
+
+                    <Link href="/master-berita/tambah" passHref>
+                        <div className="inline-block rounded-sm border border-green-600 px-6 py-2 text-sm font-medium text-green-600 hover:bg-green-600 hover:text-white focus:ring-3 focus:outline-hidden">
+                            <Plus className="inline mr-1" />
+                            Tambah Data
+                        </div>
+                    </Link>
+                </div>
+
                 {/* line separator */}
                 <hr className="my-4 border-gray-300" />
-                <br />
                 <div className="flex justify-between items-center mb-4">
                     {/* <a
                     className="inline-block rounded-sm border border-green-600 px-6 py-2 text-sm font-medium text-green-600 hover:bg-green-600 hover:text-white focus:ring-3 focus:outline-hidden"
@@ -174,16 +196,7 @@ function MasterBerita() {
                         />
                     </div>
 
-                    <Link href="/master-berita/tambah" passHref>
-                        <div className="inline-block rounded-sm border border-green-600 px-6 py-2 text-sm font-medium text-green-600 hover:bg-green-600 hover:text-white focus:ring-3 focus:outline-hidden">
-                            <Plus className="inline mr-1" />
-                            Tambah Data
-                        </div>
-                    </Link>
-
                 </div>
-
-                <br />
                 <div className="w-full overflow-x-auto">
                     <DataTable
                         data={berita}

@@ -28,6 +28,9 @@ import { decrypt } from '@/lib/Encrypt';
 import { Plus, Minus } from 'lucide-react';
 import { formatCurrency, unformatCurrency } from '@/utils/formatCurrency';
 import { confirmDialog } from '@/lib/confirm-dialog';
+import { useIndoRegion } from '@/hooks/UseIndoRegion';
+
+
 
 // Skema Zod yang disempurnakan untuk validasi array
 const formSchema = z.object({
@@ -37,9 +40,10 @@ const formSchema = z.object({
     hargaUSD: z.coerce.number().min(1, { message: 'Harga USD harus lebih dari 0.' }),
     keberangkatan: z.string().min(1, { message: 'Tanggal keberangkatan harus diisi.' }),
     durasiHari: z.coerce.number().min(1, { message: 'Durasi harus diisi (min. 1 hari).' }),
-    penerbangan: z.string().min(3, { message: 'Informasi penerbangan harus diisi.' }),
+    penerbangan: z.string().min(1, { message: 'Informasi penerbangan harus diisi.' }),
     hotelMekkah: z.string().min(3, { message: 'Informasi hotel Mekkah harus diisi.' }),
     hotelMadinah: z.string().min(3, { message: 'Informasi hotel Madinah harus diisi.' }),
+    file: z.instanceof(File).optional(), // File opsional, bisa diisi atau tidak
     fasilitas: z.array(z.object({ value: z.string() }))
         .min(1, { message: 'Minimal satu fasilitas harus ditambahkan.' })
         .refine(items => items.some(item => item.value.trim() !== ''), {
@@ -50,6 +54,8 @@ const formSchema = z.object({
         .refine(items => items.some(item => item.value.trim() !== ''), {
             message: 'Minimal satu perlengkapan harus diisi dan tidak boleh kosong.',
         }),
+
+
 });
 
 function EditSubPaketPage() {
@@ -64,8 +70,12 @@ function EditSubPaketPage() {
     const [hargaIDRDisplay, setHargaIDRDisplay] = useState('');
     const [hargaUSDDisplay, setHargaUSDDisplay] = useState('');
     const [initialLoading, setInitialLoading] = useState(true);
+    const [file, setFile] = useState<File | null>(null)
+    const [currentImage, setCurrentImage] = useState<string | null>(null);
+    const [listAdvertise, setListAdvertise] = useState<{ value: number; label: string }[]>([]);
 
     const { paket, loading: paketLoading } = usePaketPagination();
+    const { advertises } = useIndoRegion();
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -104,6 +114,14 @@ function EditSubPaketPage() {
         }
     }, [paket]);
 
+    // Mengambil data iklan (untuk combobox)
+    useEffect(() => {
+        if (advertises.length > 0) {
+            const advertiseOptions = advertises.map((ad) => ({ value: ad.id, label: ad.name }));
+            setListAdvertise(advertiseOptions);
+        }
+    }, [advertises]);
+
     // Mengambil data sub-paket yang akan diedit
     useEffect(() => {
         if (id) {
@@ -133,6 +151,7 @@ function EditSubPaketPage() {
                     // Set state tampilan harga
                     setHargaIDRDisplay(formatCurrency(p.hargaIDR, 'id-ID', 'IDR'));
                     setHargaUSDDisplay(formatCurrency(p.hargaUSD, 'en-US', 'USD'));
+                    setCurrentImage(p.urlFoto ? `${process.env.NEXT_PUBLIC_API_BASE_URL}${p.urlFoto}` : null);
                 })
                 .catch(() => toast.error('Gagal memuat data sub paket.'))
                 .finally(() => setInitialLoading(false));
@@ -164,11 +183,27 @@ function EditSubPaketPage() {
             fasilitas: values.fasilitas.map(f => f.value.trim()).filter(f => f).join(','),
             perlengkapan: values.perlengkapan.map(p => p.value.trim()).filter(p => p).join(','),
         };
+        // new form data untuk upload file
+        const formData = new FormData();
+        formData.append('namaSubPaket', updatedSubPaket.namaSubPaket);
+        formData.append('idPaket', updatedSubPaket.idPaket.toString());
+        formData.append('hargaIDR', updatedSubPaket.hargaIDR.toString());
+        formData.append('hargaUSD', updatedSubPaket.hargaUSD.toString());
+        formData.append('keberangkatan', updatedSubPaket.keberangkatan);
+        formData.append('durasiHari', updatedSubPaket.durasiHari.toString());
+        formData.append('penerbangan', updatedSubPaket.penerbangan);
+        formData.append('hotelMekkah', updatedSubPaket.hotelMekkah);
+        formData.append('hotelMadinah', updatedSubPaket.hotelMadinah);
+        formData.append('fasilitas', updatedSubPaket.fasilitas);
+        formData.append('perlengkapan', updatedSubPaket.perlengkapan);
+        if (file) {
+            formData.append('fileFoto', file);
+        }
 
         const promise = fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/master/sub-paket/${id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('token')}` },
-            body: JSON.stringify(updatedSubPaket),
+            method: 'POST',
+            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+            body: formData,
         }).then(async (res) => {
             if (!res.ok) {
                 const errorData = await res.json();
@@ -209,6 +244,46 @@ function EditSubPaketPage() {
                                 )} />
                             </div>
 
+                            <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
+                                {/* Field: Upload Foto */}
+                                <FormItem className="flex flex-col space-y-2">
+                                    <FormLabel className="text-sm font-medium text-gray-700">Upload Foto</FormLabel>
+                                    <div className="flex items-center gap-3">
+                                        <FormControl>
+                                            <Input
+                                                type="file"
+                                                accept="image/*"
+                                                className="w-full"
+                                                onChange={(e) => {
+                                                    const file = e.target.files?.[0] || null;
+                                                    setFile(file);
+                                                    if (file) {
+                                                        const reader = new FileReader();
+                                                        reader.onloadend = () => setCurrentImage(reader.result as string);
+                                                        reader.readAsDataURL(file);
+                                                    } else {
+                                                        setCurrentImage(null);
+                                                    }
+                                                }}
+                                            />
+                                        </FormControl>
+                                    </div>
+                                    <FormMessage />
+                                </FormItem>
+
+                                {/* Preview Gambar */}
+                                {currentImage && (
+                                    <div className="flex items-start justify-start">
+                                        <img
+                                            src={currentImage}
+                                            alt="Preview"
+                                            className="max-h-48 rounded-md object-cover border border-gray-200"
+                                        />
+                                    </div>
+                                )}
+                            </div>
+
+
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {/* Fields: Harga IDR & Harga USD */}
                                 <FormField control={form.control} name="hargaIDR" render={() => (
@@ -242,7 +317,10 @@ function EditSubPaketPage() {
                                     <FormItem><FormLabel>Durasi Hari</FormLabel><FormControl><Input type="number" min={1} {...field} /></FormControl><FormMessage /></FormItem>
                                 )} />
                                 <FormField control={form.control} name="penerbangan" render={({ field }) => (
-                                    <FormItem><FormLabel>Penerbangan</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                                    <FormItem><FormLabel>Penerbangan</FormLabel><FormControl>
+                                        <Combobox items={listAdvertise} value={field.value} onChange={(item) => field.onChange(item.value.toString())}
+                                            selectPlaceholder="Pilih Penerbangan..." searchPlaceholder="Cari Penerbangan..." />
+                                    </FormControl><FormMessage /></FormItem>
                                 )} />
                             </div>
 

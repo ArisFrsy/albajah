@@ -85,7 +85,9 @@ export const Sidebar = () => {
                                 'grid place-content-center rounded-lg text-sm font-semibold text-green-700  h-14 transition-all duration-300',
                                 collapsed ? 'w-10' : 'w-32'
                             )}>
-                                {collapsed ? 'A' : <>
+                                {collapsed ? <>
+                                    <img src={"/images/logo_al-bahjah.png"} alt="Logo" className="h-8 w-8 text-green-600" />
+                                </> : <>
                                     <img src={"/images/logo_al-bahjah.png"} alt="Logo" className="h-12 w-12 text-green-600" />
                                 </>}
                             </span>

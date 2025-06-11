@@ -27,6 +27,7 @@ import { Label } from "@/components/ui/label";
 import { formatCurrency } from "@/utils/formatCurrency";
 
 function MasterSubPaket() {
+    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
     const router = useRouter();
     const [order, setOrder] = useState<"asc" | "desc">("desc");
     const [showFilterModal, setShowFilterModal] = useState(false);
@@ -82,6 +83,11 @@ function MasterSubPaket() {
     const headers: Header<SubPaket>[] = [
         { column: "namaSubPaket", label: "Sub Paket", orderable: true, align: "left" },
         { column: "paket.nama", label: "Paket", orderable: true, align: "left" },
+        {
+            column: 'foto', label: 'Foto', orderable: false, align: 'left', render: (row: SubPaket) => (
+                <img src={baseUrl + row.urlFoto || '/images/no-image.png'} alt={row.namaSubPaket} className="w-16 h-16 object-cover rounded" />
+            )
+        },
         {
             column: "hargaIDR", label: "IDR", align: "right", render: (row: SubPaket) => (
                 formatCurrency(row.hargaIDR, 'id-ID', 'IDR')
@@ -169,34 +175,41 @@ function MasterSubPaket() {
 
     return (<main className="flex-1 p-6 overflow-auto bg-gray-100">
         <div className="bg-white rounded-lg shadow-md p-6 border border-gray-300 min-h-[calc(110vh-7rem)]">
-            <nav aria-label="Breadcrumb">
-                <ol className="flex items-center gap-1 text-sm text-gray-700">
-                    <li>
-                        <a href="#" className="block transition-colors hover:text-gray-900"> Admin </a>
-                    </li>
-                    <li className="rtl:rotate-180">
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="size-4"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                        >
-                            <path
-                                fillRule="evenodd"
-                                d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                                clipRule="evenodd"
-                            />
-                        </svg>
-                    </li>
-                    <li>
-                        <a href="#" className="block transition-colors hover:text-gray-900"> Master Sub Paket </a>
-                    </li>
-                </ol>
-            </nav>
-            <h1 className="mt-4 text-2xl font-bold text-gray-900 text-center">Master Sub Paket</h1>
+            <div className="flex items-center justify-between mb-4">
+                <nav aria-label="Breadcrumb">
+                    <ol className="flex items-center gap-1 text-sm text-gray-700">
+                        <li>
+                            <a href="#" className="block transition-colors hover:text-gray-900 text-base"> Admin </a>
+                        </li>
+                        <li className="rtl:rotate-180">
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="size-4"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                            >
+                                <path
+                                    fillRule="evenodd"
+                                    d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                                    clipRule="evenodd"
+                                />
+                            </svg>
+                        </li>
+                        <li>
+                            <a href="#" className="block transition-colors hover:text-gray-900 text-base"> Master Sub Paket </a>
+                        </li>
+                    </ol>
+                </nav>
+                <Link href="/master-subpaket/tambah" passHref>
+                    <div className="inline-block rounded-sm border border-green-600 px-6 py-2 text-sm font-medium text-green-600 hover:bg-green-600 hover:text-white focus:ring-3 focus:outline-hidden">
+                        <Plus className="inline mr-1" />
+                        Tambah Data
+                    </div>
+                </Link>
+            </div>
             {/* line separator */}
             <hr className="my-4 border-gray-300" />
-            <br />
+
             <div className="flex justify-between items-center mb-4">
                 {/* <a
                     className="inline-block rounded-sm border border-green-600 px-6 py-2 text-sm font-medium text-green-600 hover:bg-green-600 hover:text-white focus:ring-3 focus:outline-hidden"
@@ -226,18 +239,7 @@ function MasterSubPaket() {
 
                     {/* ✅ Tombol Filter */}
                 </div>
-
-
-                <Link href="/master-subpaket/tambah" passHref>
-                    <div className="inline-block rounded-sm border border-green-600 px-6 py-2 text-sm font-medium text-green-600 hover:bg-green-600 hover:text-white focus:ring-3 focus:outline-hidden">
-                        <Plus className="inline mr-1" />
-                        Tambah Data
-                    </div>
-                </Link>
-
             </div>
-
-            <br />
             <div className="w-full overflow-x-auto">
                 <DataTable
                     data={subPaket}

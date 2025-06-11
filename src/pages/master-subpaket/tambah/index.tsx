@@ -17,10 +17,11 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Combobox } from '@/components/ui/combobox';
 import { formatCurrency, unformatCurrency } from '@/utils/formatCurrency';
-import { Minus, Plus } from 'lucide-react';
+import { Minus, Plus, Settings2Icon } from 'lucide-react';
 import { confirmDialog } from '@/lib/confirm-dialog';
 import { toast } from 'sonner';
 import { z } from 'zod'; // Impor Zod
+import { useIndoRegion } from '@/hooks/UseIndoRegion';
 
 // Skema validasi Zod
 const subPaketSchema = z.object({
@@ -38,6 +39,9 @@ const subPaketSchema = z.object({
     }),
     perlengkapanList: z.array(z.string()).min(1, { message: 'Perlengkapan wajib diisi' }).refine(data => data.some(item => item.trim() !== ''), {
         message: 'Minimal satu perlengkapan harus diisi',
+    }),
+    file: z.instanceof(File).optional().refine(file => file === null || (file && file.size > 0), {
+        message: 'File harus berupa gambar dengan ukuran lebih dari 0',
     }),
 });
 
@@ -57,6 +61,8 @@ function InsertSubPaketPage() {
     const [hargaUSDDisplay, setHargaUSDDisplay] = useState('');
     const [fasilitasList, setFasilitasList] = useState<string[]>(['']);
     const [perlengkapanList, setPerlengkapanList] = useState<string[]>(['']);
+    const [file, setFile] = useState<File | null>(null)
+    const [listAdvertise, setListAdvertise] = useState<{ value: number; label: string }[]>([]);
 
     const [isClient, setIsClient] = useState(false);
     const [options, setOptions] = useState<{ value: number; label: string }[]>([]);
@@ -67,6 +73,14 @@ function InsertSubPaketPage() {
     }, []);
 
     const { paket, loading } = usePaketPagination(1, 1000);
+    const { advertises } = useIndoRegion();
+
+    useEffect(() => {
+        if (advertises.length > 0) {
+            const advertiseOptions = advertises.map((ad) => ({ value: ad.id, label: ad.name }));
+            setListAdvertise(advertiseOptions);
+        }
+    }, [advertises]);
 
     useEffect(() => {
         if (paket.length > 0) {
@@ -92,7 +106,8 @@ function InsertSubPaketPage() {
             hotelMekkah,
             hotelMadinah,
             fasilitasList,
-            perlengkapanList
+            perlengkapanList,
+            file,
         };
 
         const validationResult = subPaketSchema.safeParse(formData);
@@ -132,13 +147,29 @@ function InsertSubPaketPage() {
         };
 
         try {
+            // new form data with file if exists
+            const formData = new FormData();
+            formData.append('idPaket', newSubPaket.idPaket.toString());
+            formData.append('namaSubPaket', newSubPaket.namaSubPaket);
+            formData.append('hargaIDR', newSubPaket.hargaIDR.toString());
+            formData.append('hargaUSD', newSubPaket.hargaUSD.toString());
+            formData.append('keberangkatan', newSubPaket.keberangkatan);
+            formData.append('durasiHari', newSubPaket.durasiHari.toString());
+            formData.append('penerbangan', newSubPaket.penerbangan);
+            formData.append('hotelMekkah', newSubPaket.hotelMekkah);
+            formData.append('hotelMadinah', newSubPaket.hotelMadinah);
+            formData.append('fasilitas', fasilitasList.filter(f => f.trim() !== '').join(', '));
+            formData.append('perlengkapan', perlengkapanList.filter(p => p.trim() !== '').join(', '));
+            if (file) {
+                formData.append('fileFoto', file);
+            }
+
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/master/sub-paket`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
                     Authorization: `Bearer ${localStorage.getItem('token')}`,
                 },
-                body: JSON.stringify(newSubPaket),
+                body: formData,
             });
 
             const result = await response.json();
@@ -169,7 +200,38 @@ function InsertSubPaketPage() {
         setFasilitasList(['']);
         setPerlengkapanList(['']);
         setErrors({}); // Reset error juga
+        setFile(null);
     };
+
+    const setDefaultListPerlengkapan = () => {
+        setFasilitasList([
+            "Visa",
+            "Tiket PP",
+            "Hotel",
+            "Handling Makkah Madinah",
+            "City Tour Makkah 1x",
+            "City Tour Madinah 1x",
+            "Makan 3x",
+            "Manasik 1x",
+            "Perlengkapan",
+            "💧Zam zam 5 Lt",
+            "🚌 Bus Makkah Madinah",
+            "🎥 Dokumentasi",
+            "⛑ Include Travel Insurance selama Perjalanan Umroh",
+        ]);
+
+        setPerlengkapanList([
+            "🧳 Koper Bagasi 22inc - Kabin 14inc",
+            "🎒 Tas Pasport - tas sandal",
+            "👘 Kain Batik, (2m)",
+            "👳🏼 Kain Ihram + Sabuk",
+            "🧕🏻 Jilbab Syar'i",
+            "📗 Buku Panduan Doa",
+            "🔖 ID Card",
+            "🎀 Syal",
+        ]);
+    }
+
 
     if (!isClient) return <Loading />;
 
@@ -182,7 +244,7 @@ function InsertSubPaketPage() {
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={handleSubmit} className="space-y-4 text-sm">
-                        <div className='grid grid-cols-2 gap-4'>
+                        <div className='grid grid-cols-3 gap-4'>
                             <div className="space-y-2">
                                 <Label>Nama Sub Paket</Label>
                                 <Input value={namaSubPaket} onChange={(e) => setNamaSubPaket(e.target.value)} />
@@ -198,6 +260,24 @@ function InsertSubPaketPage() {
                                     placeholder="Cari paket..."
                                 />
                                 {errors.idPaket && <p className="text-red-500 text-xs mt-1">{errors.idPaket}</p>}
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label>Foto Sub Paket</Label>
+                                <Input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={(e) => {
+                                        if (e.target.files && e.target.files[0]) {
+                                            setFile(e.target.files[0]);
+                                        } else {
+                                            setFile(null);
+                                        }
+                                    }}
+                                />
+                                {file && <p className="text-xs text-gray-500 mt-1">File: {file.name}</p>}
+                                {errors.file && <p className="text-red-500 text-xs mt-1">{errors.file}</p>}
+
                             </div>
                         </div>
 
@@ -244,7 +324,12 @@ function InsertSubPaketPage() {
 
                             <div className="space-y-2">
                                 <Label>Penerbangan</Label>
-                                <Input value={penerbangan} onChange={(e) => setPenerbangan(e.target.value)} />
+                                <Combobox
+                                    items={listAdvertise}
+                                    value={penerbangan}
+                                    onChange={(item) => setPenerbangan(item.value.toString())}
+                                    placeholder="Cari penerbangan..."
+                                />
                                 {errors.penerbangan && <p className="text-red-500 text-xs mt-1">{errors.penerbangan}</p>}
                             </div>
                         </div>
@@ -263,8 +348,24 @@ function InsertSubPaketPage() {
                             </div>
                         </div>
 
+
                         <div className="space-y-2">
-                            <Label>Fasilitas</Label>
+                            <div className="grid grid-cols-2 gap-4">
+                                <Label>Fasilitas</Label>
+                                <div className='flex flex justify-end'>
+                                    <Button
+                                        type="button"
+                                        size="icon"
+                                        variant="ghost"
+                                        onClick={() => {
+                                            toast.success('Fasilitas dan Perlengkapan telah direset ke default.');
+                                            setDefaultListPerlengkapan();
+                                        }}
+                                    >
+                                        <Settings2Icon className="w-4 h-4" />
+                                    </Button>
+                                </div>
+                            </div>
                             {fasilitasList.map((item, index) => (
                                 <div key={index} className="flex items-center gap-2">
                                     <Input
@@ -301,7 +402,6 @@ function InsertSubPaketPage() {
                             ))}
                             {errors.fasilitasList && <p className="text-red-500 text-xs mt-1">{errors.fasilitasList}</p>}
                         </div>
-
 
                         <div className="space-y-2">
                             <Label>Perlengkapan</Label>

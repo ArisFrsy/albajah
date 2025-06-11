@@ -129,7 +129,12 @@ function DataTable<T extends Record<string, any // eslint-disable-line @typescri
                                         key={String(column)}
                                         className={`px-4 py-2 text-${align} text-gray-800`}
                                     >
-                                        {render ? render(row) : String(getNestedValue(row, String(column)) ?? '')}
+                                        {render
+                                            ? render(row)
+                                            : column === 'no'
+                                                ? (page - 1) * perPage + idx + 1
+                                                : String(getNestedValue(row, String(column)) ?? '')
+                                        }
                                     </td>
                                 ))}
                             </tr>
