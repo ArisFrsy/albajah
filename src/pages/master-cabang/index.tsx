@@ -81,7 +81,8 @@ function MasterCabang() {
         setSearch,
         fetchCabang,
         setIdKabupatenFilter,
-        setIdProvinsiFilter
+        setIdProvinsiFilter,
+        totalPage
     } = useCabangPagination();
 
     const headers: Header<Cabang>[] = [
@@ -326,6 +327,7 @@ function MasterCabang() {
                         order={order}
                         setOrderBy={setOrderByField}
                         setOrder={setOrder}
+                        totalPages={totalPage}
                     />
                 </div>
 

@@ -43,8 +43,8 @@ export function useBeritaPagination(initialPage = 1, initialLimit = 10) {
       }
 
       const data = await response.json();
-      setBerita(data.data || []);
-      setTotalPage(Math.ceil((data.total || 0) / limit));
+      setBerita(data.data.data || []);
+      setTotalPage(Math.ceil((data.data.total || 0) / limit));
     } catch {
       toast.error("Gagal mengambil data berita. Silakan coba lagi.");
     } finally {

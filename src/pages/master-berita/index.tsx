@@ -134,7 +134,8 @@ function MasterBerita() {
         orderByField,
         setOrderByField,
         loading,
-        setSearch
+        setSearch,
+        totalPage
     } = useBeritaPagination();
 
     return (
@@ -209,6 +210,7 @@ function MasterBerita() {
                         order={order}
                         setOrderBy={setOrderByField}
                         setOrder={setOrder}
+                        totalPages={totalPage}
                     />
                 </div>
 

@@ -48,8 +48,8 @@ export function useCabangPagination(initialPage = 1, initialLimit = 10) {
       }
 
       const data = await response.json();
-      setCabang(data.data || []);
-      setTotalPage(Math.ceil((data.total || 0) / limit));
+      setCabang(data.data.data || []);
+      setTotalPage(Math.ceil((data.data.total || 0) / limit));
     } catch {
       toast.error("Gagal mengambil data cabang. Silakan coba lagi.");
     } finally {

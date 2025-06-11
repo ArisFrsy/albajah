@@ -23,6 +23,7 @@ type DataTableProps<T> = {
     order?: 'asc' | 'desc'
     setOrderBy?: (_column: string | null) => void
     setOrder?: (_order: 'asc' | 'desc') => void
+    totalPages?: number
 }
 
 // Helper to access nested values like 'paket.nama'
@@ -44,8 +45,8 @@ function DataTable<T extends Record<string, any // eslint-disable-line @typescri
     order = 'asc',
     setOrderBy,
     setOrder,
+    totalPages = 1,
 }: DataTableProps<T>) {
-    const totalPages = Math.ceil(data.length / perPage)
 
     const sortedData = useMemo(() => {
         if (!orderBy) return data
@@ -74,8 +75,8 @@ function DataTable<T extends Record<string, any // eslint-disable-line @typescri
     }, [data, orderBy, order])
 
     const paginatedData = useMemo(() => {
-        return sortedData.slice((page - 1) * perPage, page * perPage)
-    }, [sortedData, page, perPage])
+        return sortedData
+    }, [sortedData])
 
     const handleSort = (col: string) => {
         if (!setOrderBy || !setOrder) return

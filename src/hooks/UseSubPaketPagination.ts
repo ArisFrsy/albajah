@@ -44,8 +44,8 @@ export function useSubPaketPagination(initialPage = 1, initialLimit = 10) {
       }
 
       const data = await response.json();
-      setSubPaket(data.data || []);
-      setTotalPage(Math.ceil((data.total || 0) / limit));
+      setSubPaket(data.data.data || []);
+      setTotalPage(Math.ceil((data.data.total || 0) / limit));
     } catch {
       toast.error("Gagal mengambil data sub-paket. Silakan coba lagi.");
     } finally {

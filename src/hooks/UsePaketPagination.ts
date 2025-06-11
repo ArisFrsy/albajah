@@ -42,8 +42,8 @@ export function usePaketPagination(initialPage = 1, initialLimit = 10) {
       }
 
       const data = await response.json();
-      setPaket(data.data || []);
-      setTotalPage(Math.ceil((data.total || 0) / limit));
+      setPaket(data.data.data || []);
+      setTotalPage(Math.ceil((data.data.total || 0) / limit));
     } catch {
       toast.error("Gagal mengambil data paket. Silakan coba lagi.");
     } finally {

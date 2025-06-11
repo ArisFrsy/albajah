@@ -35,7 +35,7 @@ function MasterPaketPage() {
         setShowDetailModal(true);
     }
 
-    const { paket, page, limit, setPage, setLimit, orderByField, setOrderByField, fetchPaket, loading, setLoading, setSearch } = usePaketPagination();
+    const { paket, page, limit, setPage, setLimit, orderByField, setOrderByField, fetchPaket, loading, setLoading, setSearch, totalPage } = usePaketPagination();
 
     const headers: Header<Paket>[] = [
         { column: 'no', label: 'No', orderable: false, align: 'left' },
@@ -288,6 +288,7 @@ function MasterPaketPage() {
                         order={order}
                         setOrderBy={setOrderByField}
                         setOrder={setOrder}
+                        totalPages={totalPage}
                     />
                 </div>
 

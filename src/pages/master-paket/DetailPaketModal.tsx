@@ -66,7 +66,7 @@ export default function DetailPaketModal({ isOpen, onClose, data }: DetailPaketM
                         <div className="mt-2">
                             {data.urlFoto ? (
                                 <a
-                                    href={baseUrl + data.pathFoto}
+                                    href={baseUrl + data.urlFoto}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="block relative aspect-video w-full rounded-lg overflow-hidden border group"

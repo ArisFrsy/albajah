@@ -170,6 +170,7 @@ function MasterSubPaket() {
         loading,
         setSearch,
         setIdPaketFilter,
+        totalPage
     } = useSubPaketPagination();
 
 
@@ -252,6 +253,7 @@ function MasterSubPaket() {
                     order={order}
                     setOrderBy={setOrderByField}
                     setOrder={setOrder}
+                    totalPages={totalPage}
                 />
             </div>
 
