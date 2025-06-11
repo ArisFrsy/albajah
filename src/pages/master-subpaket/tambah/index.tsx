@@ -256,8 +256,10 @@ function InsertSubPaketPage() {
                                 <Combobox
                                     items={options}
                                     value={idPaket}
-                                    onChange={(item) => setIdPaket(item.value.toString())}
-                                    placeholder="Cari paket..."
+                                    onChange={setIdPaket}
+                                    type='single'
+                                    selectPlaceholder="Cari paket..."
+                                    searchPlaceholder='Cari paket...'
                                 />
                                 {errors.idPaket && <p className="text-red-500 text-xs mt-1">{errors.idPaket}</p>}
                             </div>
@@ -327,8 +329,10 @@ function InsertSubPaketPage() {
                                 <Combobox
                                     items={listAdvertise}
                                     value={penerbangan}
-                                    onChange={(item) => setPenerbangan(item.value.toString())}
-                                    placeholder="Cari penerbangan..."
+                                    onChange={setPenerbangan}
+                                    type='multiple'
+                                    selectPlaceholder="Pilih penerbangan..."
+                                    searchPlaceholder='Cari penerbangan...'
                                 />
                                 {errors.penerbangan && <p className="text-red-500 text-xs mt-1">{errors.penerbangan}</p>}
                             </div>

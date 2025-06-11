@@ -155,7 +155,7 @@ function ViewSubPaketPage() {
                             <h3 className="text-lg font-semibold text-foreground mb-4">Jadwal & Akomodasi</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                                 <DetailItem icon={<Calendar />} label="Tanggal Keberangkatan" value={new Date(String(subPaket.keberangkatan)).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })} />
-                                <DetailItem icon={<Send />} label="Maskapai Penerbangan" value={subPaket.penerbangan || '-'} />
+                                <DetailItem icon={<Send />} label="Maskapai Penerbangan" value={subPaket.advertiseName || '-'} />
                                 <DetailItem icon={<Home />} label="Hotel Mekkah" value={subPaket.hotelMekkah || '-'} />
                                 <DetailItem icon={<Home />} label="Hotel Madinah" value={subPaket.hotelMadinah || '-'} />
                             </div>

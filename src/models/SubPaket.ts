@@ -14,4 +14,5 @@ export interface SubPaket {
   perlengkapan?: string;
   paket?: Paket;
   urlFoto?: string;
+  advertiseName?: string;
 }

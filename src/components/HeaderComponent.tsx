@@ -187,7 +187,7 @@ export default function HeaderComponent() {
                                         return (
                                             <div
                                                 key={notif.id}
-                                                className={`flex items-start gap-2 p-2 rounded-md ${color}`}
+                                                className={`flex items-start gap-2 p-2 rounded-md ${color} my-1 `}
                                                 onClick={() => handleReadNotification(notif.id)}
                                             >
                                                 {icon}

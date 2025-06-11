@@ -361,10 +361,10 @@ function MasterCabang() {
                             <Combobox
                                 items={listProvinsi}
                                 value={selectedProvince}
-                                onChange={(item) => (
-                                    setSelectedProvince(item.value.toString())
-                                )}
-                                placeholder="Cari Provinsi..."
+                                onChange={setSelectedProvince}
+                                type='single'
+                                selectPlaceholder="Pilih Provinsi"
+                                searchPlaceholder="Cari Provinsi"
                             />
                         </div>
                         <div className="space-y-2">
@@ -372,8 +372,10 @@ function MasterCabang() {
                             <Combobox
                                 items={listKabupaten}
                                 value={selectedRegency}
-                                onChange={(Item) => setSelectedRegency(Item.value.toString())}
-                                placeholder="Pilih Kabupaten/Kota"
+                                onChange={setSelectedRegency}
+                                type='single'
+                                selectPlaceholder="Pilih Kabupaten/Kota"
+                                searchPlaceholder="Cari Kabupaten/Kota"
                             />
                         </div>
 

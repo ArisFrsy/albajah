@@ -102,15 +102,19 @@ export default function EditCabangModal({
                         <Combobox
                             items={listProvinsi}
                             value={selectedProvince}
-                            onChange={(value) => setSelectedProvince(value.value.toString())}
-                            placeholder="Pilih Provinsi"
+                            onChange={setSelectedProvince}
+                            type='single'
+                            selectPlaceholder="Pilih Provinsi"
+                            searchPlaceholder='Cari Provinsi'
                         />
                         <Label htmlFor="regency">Kabupaten</Label>
                         <Combobox
                             items={listKabupaten}
                             value={selectedRegency}
-                            onChange={(value) => setSelectedRegency(value.value.toString())}
-                            placeholder="Pilih Kabupaten"
+                            onChange={setSelectedRegency}
+                            type='single'
+                            selectPlaceholder="Pilih Kabupaten/Kota"
+                            searchPlaceholder='Cari Kabupaten/Kota'
                         />
                         <Label htmlFor="penganggungJawab">Penanggung Jawab</Label>
                         <Input

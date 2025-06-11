@@ -287,8 +287,10 @@ function MasterSubPaket() {
                         <Combobox
                             items={options}
                             value={idPaket}
-                            onChange={(item) => setIdPaket(item.value.toString())}
-                            placeholder="Cari paket..."
+                            onChange={setIdPaket}
+                            type="single"
+                            selectPlaceholder="Pilih Paket"
+                            searchPlaceholder="Cari paket..."
                         />
 
                     </div>

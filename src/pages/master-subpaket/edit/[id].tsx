@@ -73,6 +73,8 @@ function EditSubPaketPage() {
     const [file, setFile] = useState<File | null>(null)
     const [currentImage, setCurrentImage] = useState<string | null>(null);
     const [listAdvertise, setListAdvertise] = useState<{ value: number; label: string }[]>([]);
+    const [idPaket, setIdPaket] = useState('');
+    const [penerbangan, setPenerbangan] = useState('');
 
     const { paket, loading: paketLoading } = usePaketPagination();
     const { advertises } = useIndoRegion();
@@ -152,6 +154,8 @@ function EditSubPaketPage() {
                     setHargaIDRDisplay(formatCurrency(p.hargaIDR, 'id-ID', 'IDR'));
                     setHargaUSDDisplay(formatCurrency(p.hargaUSD, 'en-US', 'USD'));
                     setCurrentImage(p.urlFoto ? `${process.env.NEXT_PUBLIC_API_BASE_URL}${p.urlFoto}` : null);
+                    setIdPaket(p.idPaket ? p.idPaket.toString() : '');
+                    setPenerbangan(p.penerbangan || '');
                 })
                 .catch(() => toast.error('Gagal memuat data sub paket.'))
                 .finally(() => setInitialLoading(false));
@@ -186,12 +190,12 @@ function EditSubPaketPage() {
         // new form data untuk upload file
         const formData = new FormData();
         formData.append('namaSubPaket', updatedSubPaket.namaSubPaket);
-        formData.append('idPaket', updatedSubPaket.idPaket.toString());
+        formData.append('idPaket', idPaket);
         formData.append('hargaIDR', updatedSubPaket.hargaIDR.toString());
         formData.append('hargaUSD', updatedSubPaket.hargaUSD.toString());
         formData.append('keberangkatan', updatedSubPaket.keberangkatan);
         formData.append('durasiHari', updatedSubPaket.durasiHari.toString());
-        formData.append('penerbangan', updatedSubPaket.penerbangan);
+        formData.append('penerbangan', penerbangan);
         formData.append('hotelMekkah', updatedSubPaket.hotelMekkah);
         formData.append('hotelMadinah', updatedSubPaket.hotelMadinah);
         formData.append('fasilitas', updatedSubPaket.fasilitas);
@@ -236,9 +240,9 @@ function EditSubPaketPage() {
                                 <FormField control={form.control} name="namaSubPaket" render={({ field }) => (
                                     <FormItem><FormLabel>Nama Sub Paket</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
                                 )} />
-                                <FormField control={form.control} name="idPaket" render={({ field }) => (
+                                <FormField control={form.control} name="idPaket" render={({ }) => (
                                     <FormItem><FormLabel>Pilih Paket Induk</FormLabel><FormControl>
-                                        <Combobox items={options} value={field.value} onChange={(item) => field.onChange(item.value.toString())}
+                                        <Combobox items={options} value={idPaket} onChange={setIdPaket} type='single'
                                             selectPlaceholder="Pilih paket..." searchPlaceholder="Cari paket..." />
                                     </FormControl><FormMessage /></FormItem>
                                 )} />
@@ -316,9 +320,9 @@ function EditSubPaketPage() {
                                 <FormField control={form.control} name="durasiHari" render={({ field }) => (
                                     <FormItem><FormLabel>Durasi Hari</FormLabel><FormControl><Input type="number" min={1} {...field} /></FormControl><FormMessage /></FormItem>
                                 )} />
-                                <FormField control={form.control} name="penerbangan" render={({ field }) => (
+                                <FormField control={form.control} name="penerbangan" render={({ }) => (
                                     <FormItem><FormLabel>Penerbangan</FormLabel><FormControl>
-                                        <Combobox items={listAdvertise} value={field.value} onChange={(item) => field.onChange(item.value.toString())}
+                                        <Combobox items={listAdvertise} value={penerbangan} type='multiple' onChange={setPenerbangan}
                                             selectPlaceholder="Pilih Penerbangan..." searchPlaceholder="Cari Penerbangan..." />
                                     </FormControl><FormMessage /></FormItem>
                                 )} />
