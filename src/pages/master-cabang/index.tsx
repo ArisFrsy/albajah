@@ -26,7 +26,6 @@ import {
 } from "@/components/ui/dialog";
 
 function MasterCabang() {
-    const [order, setOrder] = useState<"asc" | "desc">("asc");
     const [showModal, setShowModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDetailModal, setShowDetailModal] = useState(false);
@@ -82,13 +81,15 @@ function MasterCabang() {
         fetchCabang,
         setIdKabupatenFilter,
         setIdProvinsiFilter,
-        totalPage
+        totalPage,
+        setOrderByDirection,
+        orderByDirection
     } = useCabangPagination();
 
     const headers: Header<Cabang>[] = [
         { column: 'provinsi.name', label: 'Provinsi', align: 'left' },
         { column: 'kabupaten.name', label: 'Kabupaten', align: 'left' },
-        { column: 'penanggungjawab', label: 'Penanggung Jawab', align: 'left' },
+        { column: 'penanggungjawab', label: 'Penanggung Jawab', align: 'left', orderable: true },
         {
             column: 'email',
             label: 'Email',
@@ -324,9 +325,9 @@ function MasterCabang() {
                         setPage={setPage}
                         setPerPage={setLimit}
                         orderBy={orderByField}
-                        order={order}
+                        order={orderByDirection}
                         setOrderBy={setOrderByField}
-                        setOrder={setOrder}
+                        setOrder={setOrderByDirection}
                         totalPages={totalPage}
                     />
                 </div>

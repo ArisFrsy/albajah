@@ -19,7 +19,6 @@ import { Button } from "@/components/ui/button";
 
 function MasterPaketPage() {
     const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
-    const [order, setOrder] = useState<'asc' | 'desc'>('asc');
     const [showModal, setShowModal] = useState(false)
     const [showDetailModal, setShowDetailModal] = useState(false);
     const [selectedPaket, setSelectedPaket] = useState<Paket | null>(null);
@@ -35,7 +34,7 @@ function MasterPaketPage() {
         setShowDetailModal(true);
     }
 
-    const { paket, page, limit, setPage, setLimit, orderByField, setOrderByField, fetchPaket, loading, setLoading, setSearch, totalPage } = usePaketPagination();
+    const { paket, page, limit, setPage, setLimit, orderByField, setOrderByField, fetchPaket, loading, setLoading, setSearch, totalPage, setOrderByDirection, orderByDirection } = usePaketPagination();
 
     const headers: Header<Paket>[] = [
         { column: 'no', label: 'No', orderable: false, align: 'left' },
@@ -285,9 +284,9 @@ function MasterPaketPage() {
                         setPage={setPage}
                         setPerPage={setLimit}
                         orderBy={orderByField}
-                        order={order}
+                        order={orderByDirection}
                         setOrderBy={setOrderByField}
-                        setOrder={setOrder}
+                        setOrder={setOrderByDirection}
                         totalPages={totalPage}
                     />
                 </div>

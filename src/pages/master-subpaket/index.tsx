@@ -29,7 +29,6 @@ import { formatCurrency } from "@/utils/formatCurrency";
 function MasterSubPaket() {
     const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
     const router = useRouter();
-    const [order, setOrder] = useState<"asc" | "desc">("desc");
     const [showFilterModal, setShowFilterModal] = useState(false);
     const [options, setOptions] = useState<{ value: number; label: string }[]>([]);
     const [idPaket, setIdPaket] = useState('');
@@ -170,7 +169,9 @@ function MasterSubPaket() {
         loading,
         setSearch,
         setIdPaketFilter,
-        totalPage
+        totalPage,
+        orderByDirection,
+        setOrderByDirection
     } = useSubPaketPagination();
 
 
@@ -250,9 +251,9 @@ function MasterSubPaket() {
                     setPage={setPage}
                     setPerPage={setLimit}
                     orderBy={orderByField}
-                    order={order}
+                    order={orderByDirection}
                     setOrderBy={setOrderByField}
-                    setOrder={setOrder}
+                    setOrder={setOrderByDirection}
                     totalPages={totalPage}
                 />
             </div>

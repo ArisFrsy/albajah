@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useMemo } from 'react'
+import React from 'react'
 import { File } from 'lucide-react'
 
 
@@ -48,35 +48,7 @@ function DataTable<T extends Record<string, any // eslint-disable-line @typescri
     totalPages = 1,
 }: DataTableProps<T>) {
 
-    const sortedData = useMemo(() => {
-        if (!orderBy) return data
-
-        return [...data].sort((a, b) => {
-            const aVal = getNestedValue(a, orderBy)
-            const bVal = getNestedValue(b, orderBy)
-
-            if (aVal == null) return 1
-            if (bVal == null) return -1
-
-            if (typeof aVal === 'string' && typeof bVal === 'string') {
-                return order === 'asc'
-                    ? aVal.localeCompare(bVal)
-                    : bVal.localeCompare(aVal)
-            }
-
-            if (typeof aVal === 'number' && typeof bVal === 'number') {
-                return order === 'asc' ? aVal - bVal : bVal - aVal
-            }
-
-            return order === 'asc'
-                ? String(aVal).localeCompare(String(bVal))
-                : String(bVal).localeCompare(String(aVal))
-        })
-    }, [data, orderBy, order])
-
-    const paginatedData = useMemo(() => {
-        return sortedData
-    }, [sortedData])
+    const paginatedData = data;
 
     const handleSort = (col: string) => {
         if (!setOrderBy || !setOrder) return

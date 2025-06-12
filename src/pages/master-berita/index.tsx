@@ -3,7 +3,6 @@
 import withAuth from "@/components/withAuth";
 import DataTable from "@/components/DataTable";
 import { useRouter } from "next/router";
-import { useState } from "react";
 import { useBeritaPagination } from "@/hooks/UseBeritaPagination";
 import { Berita } from "@/models/Berita";
 import { Header } from "@/components/Header";
@@ -17,7 +16,6 @@ import { Button } from "@/components/ui/button";
 
 function MasterBerita() {
     const router = useRouter();
-    const [order, setOrder] = useState<"asc" | "desc">("desc");
     const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
 
     const handleDelete = async (berita: Berita) => {
@@ -135,7 +133,9 @@ function MasterBerita() {
         setOrderByField,
         loading,
         setSearch,
-        totalPage
+        totalPage,
+        setOrderByDirection,
+        orderByDirection,
     } = useBeritaPagination();
 
     return (
@@ -207,9 +207,9 @@ function MasterBerita() {
                         setPage={setPage}
                         setPerPage={setLimit}
                         orderBy={orderByField}
-                        order={order}
+                        order={orderByDirection}
                         setOrderBy={setOrderByField}
-                        setOrder={setOrder}
+                        setOrder={setOrderByDirection}
                         totalPages={totalPage}
                     />
                 </div>
