@@ -260,7 +260,7 @@ function MasterCabang() {
             <div className="bg-white rounded-lg shadow-md p-6 border border-gray-300 min-h-[calc(110vh-7rem)]">
                 <div className="flex items-center justify-between mb-4">
                     <nav aria-label="Breadcrumb">
-                        <ol className="flex items-center gap-1 text-sm text-gray-700">
+                        <ol className="flex items-center gap-1 text-sm text-gray-700 font-bold">
                             <li>
                                 <a href="#" className="block transition-colors hover:text-gray-900 text-base"> Admin </a>
                             </li>
@@ -284,7 +284,7 @@ function MasterCabang() {
                         </ol>
                     </nav>
                     <a
-                        className="inline-block rounded-sm border border-green-600 px-6 py-2 text-sm font-medium text-green-600 hover:bg-green-600 hover:text-white focus:ring-3 focus:outline-hidden"
+                        className="inline-block rounded-sm border border-green-600 px-6 py-2 text-sm font-bold text-green-600 hover:bg-green-600 hover:text-white focus:ring-3 focus:outline-hidden"
                         onClick={() => setShowModal(true)}
                     >
                         <Plus className="inline mr-1" />

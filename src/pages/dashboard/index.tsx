@@ -1,45 +1,75 @@
-'use client';
+"use client";
 
 import type { Metadata } from "next";
 import withAuth from "@/components/withAuth";
-import { EcommerceMetrics } from "@/components/ecommerce/EcommerceMetrics";
-import MonthlyTarget from "@/components/ecommerce/MonthlyTarget";
-import MonthlySalesChart from "@/components/ecommerce/MonthlySalesChart";
-import StatisticsChart from "@/components/ecommerce/StatisticsChart";
-// import RecentOrders from "@/components/ecommerce/RecentOrders";
-// import DemographicCard from "@/components/ecommerce/DemographicCard";
+import Link from "next/link";
 
-import React from "react";
-
+// Import ikon dari lucide-react
+import { Package, Layers, Building, Newspaper } from "lucide-react";
 
 export const metadata: Metadata = {
-    title:
-        "Next.js E-commerce Dashboard | TailAdmin - Next.js Dashboard Template",
-    description: "This is Next.js Home for TailAdmin Dashboard Template",
+  title: "Master Dashboard | TailAdmin - Next.js Dashboard Template",
+  description: "Halaman utama untuk manajemen master data",
 };
 
-function Ecommerce() {
-    return (
-        <main className="flex-1 p-6 overflow-auto bg-gray-100">
-            <div className="max-w-7xl mx-auto bg-white rounded-lg shadow-md p-6 border border-gray-300 min-h-[calc(110vh-6rem)]">
-                <div className="grid grid-cols-12 gap-4 md:gap-6">
-                    <div className="col-span-12 space-y-6 xl:col-span-7 text-gray-900" >
-                        <EcommerceMetrics />
+const menuItems = [
+  {
+    title: "Paket",
+    href: "/master-paket",
+    icon: <Package size={24} />,
+    description: "Kelola data paket layanan",
+  },
+  {
+    title: "Subpaket",
+    href: "/master-subpaket",
+    icon: <Layers size={24} />,
+    description: "Kelola subpaket terkait",
+  },
+  {
+    title: "Cabang",
+    href: "/master-cabang",
+    icon: <Building size={24} />,
+    description: "Daftar dan pengaturan cabang",
+  },
+  {
+    title: "Berita",
+    href: "/master-berita",
+    icon: <Newspaper size={24} />,
+    description: "Manajemen konten berita",
+  },
+];
 
-                        <MonthlySalesChart />
-                    </div>
-
-                    <div className="col-span-12 xl:col-span-5 text-gray-900">
-                        <MonthlyTarget />
-                    </div>
-
-                    <div className="col-span-12">
-                        <StatisticsChart />
-                    </div>
+function MasterDashboard() {
+  return (
+    <main className="flex-1 p-6 overflow-auto bg-background">
+      <div className="max-w-7xl mx-auto bg-card rounded-lg shadow-md p-6 border border-border">
+        <h1 className="text-2xl font-semibold text-foreground mb-6">
+          Menu Master Data
+        </h1>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          {menuItems.map((item, index) => (
+            <Link
+              key={index}
+              href={item.href}
+              className="block p-6 bg-white dark:bg-muted border border-border rounded-lg shadow hover:shadow-md transition-shadow duration-200"
+            >
+              <div className="flex items-center space-x-4">
+                <div className="text-primary">{item.icon}</div>
+                <div>
+                  <h3 className="text-lg font-medium text-foreground">
+                    {item.title}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    {item.description}
+                  </p>
                 </div>
-            </div>
-        </main>
-    );
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </main>
+  );
 }
 
-export default withAuth(Ecommerce);
+export default withAuth(MasterDashboard);

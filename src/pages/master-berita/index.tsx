@@ -143,7 +143,7 @@ function MasterBerita() {
             <div className="bg-white rounded-lg shadow-md p-6 border border-gray-300 min-h-[calc(110vh-7rem)]">
                 <div className="flex justify-between items-center">
                     <nav aria-label="Breadcrumb">
-                        <ol className="flex items-center gap-1 text-sm text-gray-700">
+                        <ol className="flex items-center gap-1 text-sm text-gray-700 font-bold">
                             <li>
                                 <a href="#" className="block transition-colors hover:text-gray-900 text-base"> Admin </a>
                             </li>
@@ -168,7 +168,7 @@ function MasterBerita() {
                     </nav>
 
                     <Link href="/master-berita/tambah" passHref>
-                        <div className="inline-block rounded-sm border border-green-600 px-6 py-2 text-sm font-medium text-green-600 hover:bg-green-600 hover:text-white focus:ring-3 focus:outline-hidden">
+                        <div className="inline-block rounded-sm border font-bold border-green-600 px-6 py-2 text-sm  text-green-600 hover:bg-green-600 hover:text-white focus:ring-3 focus:outline-hidden">
                             <Plus className="inline mr-1" />
                             Tambah Data
                         </div>
