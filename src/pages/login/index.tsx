@@ -160,6 +160,7 @@ export default function LoginPage() {
     <>
       <Head>
         <title>Admin Albahjah Travel - Masuk</title>
+        <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <div className="min-h-screen w-full flex items-center justify-center bg-gray-100 p-4">
