@@ -223,7 +223,7 @@ function InsertSubPaketPage() {
         setPerlengkapanList([
             "🧳 Koper Bagasi 22inc - Kabin 14inc",
             "🎒 Tas Pasport - tas sandal",
-            "👘 Kain Batik, (2m)",
+            "👘 Kain Batik (2m)",
             "👳🏼 Kain Ihram + Sabuk",
             "🧕🏻 Jilbab Syar'i",
             "📗 Buku Panduan Doa",
