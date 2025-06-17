@@ -101,11 +101,13 @@ function MasterSubPaket() {
         },
         {
             column: "keberangkatan", label: "Keberangkatan", align: "left", render: (row: SubPaket) => (
-                new Date(row.keberangkatan).toLocaleDateString('id-ID', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                })
+                <>
+                    {row.keberangkatan ? new Date(row.keberangkatan).toLocaleDateString('id-ID', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                    }) : "Invalid Date"}
+                </>
             )
         },
         {

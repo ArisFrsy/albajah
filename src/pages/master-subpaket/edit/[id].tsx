@@ -38,9 +38,10 @@ const formSchema = z.object({
     idPaket: z.string().min(1, { message: 'Paket harus dipilih.' }),
     hargaIDR: z.coerce.number().min(1, { message: 'Harga IDR harus lebih dari 0.' }),
     hargaUSD: z.coerce.number().min(1, { message: 'Harga USD harus lebih dari 0.' }),
-    keberangkatan: z.string().min(1, { message: 'Tanggal keberangkatan harus diisi.' }),
+    // keberangkatan optional, bisa diisi atau tidak
+    keberangkatan: z.string().optional(),
     durasiHari: z.coerce.number().min(1, { message: 'Durasi harus diisi (min. 1 hari).' }),
-    penerbangan: z.string().min(1, { message: 'Informasi penerbangan harus diisi.' }),
+    penerbangan: z.string().optional(),
     hotelMekkah: z.string().min(3, { message: 'Informasi hotel Mekkah harus diisi.' }),
     hotelMadinah: z.string().min(3, { message: 'Informasi hotel Madinah harus diisi.' }),
     file: z.instanceof(File).optional(), // File opsional, bisa diisi atau tidak
@@ -179,7 +180,7 @@ function EditSubPaketPage() {
             idSubpaket: id,
             ...values,
             idPaket: parseInt(values.idPaket),
-            keberangkatan: new Date(values.keberangkatan).toISOString(),
+            keberangkatan: values.keberangkatan ? new Date(values.keberangkatan).toISOString() : "", // Biarkan undefined jika tidak diisi
             // Ambil nilai dari 'values' yang sudah divalidasi
             hargaIDR: values.hargaIDR,
             hargaUSD: values.hargaUSD,
