@@ -32,7 +32,7 @@ const TiptapEditor = dynamic(() => import('@/components/Editor'), {
 // Skema Zod tidak berubah
 const formSchema = z.object({
     judul: z.string().min(10, { message: 'Judul berita minimal 10 karakter.' }),
-    deskripsi: z.string().min(50, { message: 'Konten berita minimal 50 karakter.' }).max(2000, { message: 'Konten berita maksimal 2000 karakter.' }),
+    deskripsi: z.string().min(50, { message: 'Konten berita minimal 50 karakter.' }).max(5000, { message: 'Konten berita maksimal 5000 karakter.' }),
     gambar: z.string().optional(), // Gambar bisa berupa string URL atau base64
 });
 
