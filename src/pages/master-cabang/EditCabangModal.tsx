@@ -74,6 +74,7 @@ export default function EditCabangModal({
       setPenganggungJawab(initialData.penanggungjawab || "");
       setEmail(initialData.email || "");
       setNoTelepon(initialData.noTelepon || "");
+      setAlamat(initialData.alamat || "");
       if (initialData) {
         setSelectedProvince(initialData.idProvinsi);
       }
