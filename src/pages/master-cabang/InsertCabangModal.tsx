@@ -24,14 +24,24 @@ export default function InsertCabangModal({
   onClose,
   onSubmit,
 }: InsertCabangModalProps) {
-  const [penganggungJawab, setPenganggungJawab] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [noTelepon, setNoTelepon] = useState<string>("");
-  const [listProvinsi, setListProvinsi] = useState<{ value: number; label: string }[]>([]);
-  const [listKabupaten, setListKabupaten] = useState<{ value: number; label: string }[]>([]);
-
-  const { provinces, regencies, selectedProvince, setSelectedProvince, selectedRegency, setSelectedRegency } = useIndoRegion();
-
+  const [alamat, setAlamat] = useState<string>("");
+  const [penganggungJawab, setPenganggungJawab] = useState<string>("");
+  const [listProvinsi, setListProvinsi] = useState<
+    { value: number; label: string }[]
+  >([]);
+  const [listKabupaten, setListKabupaten] = useState<
+    { value: number; label: string }[]
+  >([]);
+  const {
+    provinces,
+    regencies,
+    selectedProvince,
+    setSelectedProvince,
+    selectedRegency,
+    setSelectedRegency,
+  } = useIndoRegion();
 
   useEffect(() => {
     if (provinces.length > 0) {
@@ -39,10 +49,9 @@ export default function InsertCabangModal({
         value: parseInt(province.id),
         label: province.name,
       }));
-      setListProvinsi(provinceOptions)
+      setListProvinsi(provinceOptions);
     }
   }, [provinces]);
-
 
   useEffect(() => {
     if (selectedProvince) {
@@ -62,6 +71,7 @@ export default function InsertCabangModal({
       idProvinsi: selectedProvince,
       idKabupaten: selectedRegency,
       penanggungjawab: penganggungJawab,
+      alamat: alamat,
       email,
       noTelepon,
     };
@@ -69,6 +79,7 @@ export default function InsertCabangModal({
     setSelectedProvince("");
     setSelectedRegency("");
     setPenganggungJawab("");
+    setAlamat("");
     setEmail("");
     setNoTelepon("");
     onClose();
@@ -135,6 +146,17 @@ export default function InsertCabangModal({
               placeholder="Masukkan no telepon"
             />
           </div>
+          <div className="space-y-2">
+            <Label htmlFor="alamat">Alamat Cabang</Label>
+            <Input
+              id="alamat"
+              type="tel"
+              value={alamat}
+              onChange={(e) => setAlamat(e.target.value)}
+              required
+              placeholder="Masukkan Alamat Cabang"
+            />
+          </div>
           <Button type="submit" className="w-full">
             Tambah Cabang
           </Button>
@@ -148,6 +170,3 @@ export default function InsertCabangModal({
     </Dialog>
   );
 }
-
-
-

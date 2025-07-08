@@ -97,6 +97,7 @@ function MasterCabang() {
 
         },
         { column: 'noTelepon', label: 'No Telepon', align: 'left' },
+        { column: 'Alamat', label: 'Alamat', align: 'left' },
         {
             column: 'actions', // this is allowed because we define 'actions' in Header<T>
             label: 'Actions',
