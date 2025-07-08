@@ -7,6 +7,7 @@ export interface Cabang {
   penanggungjawab: string;
   email: string;
   noTelepon: string;
+  alamat?: string;
   provinces?: Province;
   regencies?: Regencies;
   provinsi?: Province;
