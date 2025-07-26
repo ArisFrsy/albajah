@@ -36,8 +36,8 @@ import { useIndoRegion } from '@/hooks/UseIndoRegion';
 const formSchema = z.object({
     namaSubPaket: z.string().min(3, { message: 'Nama sub paket harus diisi (min. 3 karakter).' }),
     idPaket: z.string().min(1, { message: 'Paket harus dipilih.' }),
-    hargaIDR: z.coerce.number().min(1, { message: 'Harga IDR harus lebih dari 0.' }),
-    hargaUSD: z.coerce.number().min(1, { message: 'Harga USD harus lebih dari 0.' }),
+    hargaIDR: z.coerce.number().gt(0, { message: 'Harga IDR harus lebih dari 0.' }),
+    hargaUSD: z.coerce.number().gt(0, { message: 'Harga USD harus lebih dari 0.' }).optional().nullable(),
     // keberangkatan optional, bisa diisi atau tidak
     keberangkatan: z.string().optional(),
     durasiHari: z.coerce.number().min(1, { message: 'Durasi harus diisi (min. 1 hari).' }),
@@ -69,7 +69,7 @@ function EditSubPaketPage() {
 
     // State HANYA untuk tampilan format mata uang
     const [hargaIDRDisplay, setHargaIDRDisplay] = useState('');
-    const [hargaUSDDisplay, setHargaUSDDisplay] = useState('');
+    const [hargaUSDDisplay, setHargaUSDDisplay] = useState<string | null>('');
     const [initialLoading, setInitialLoading] = useState(true);
     const [file, setFile] = useState<File | null>(null)
     const [currentImage, setCurrentImage] = useState<string | null>(null);
@@ -86,7 +86,7 @@ function EditSubPaketPage() {
             namaSubPaket: '',
             idPaket: '',
             hargaIDR: 0,
-            hargaUSD: 0,
+            hargaUSD: null,
             keberangkatan: '',
             durasiHari: 0,
             penerbangan: '',
@@ -141,7 +141,7 @@ function EditSubPaketPage() {
                         namaSubPaket: p.namaSubPaket || '',
                         idPaket: p.idPaket?.toString() || '',
                         hargaIDR: p.hargaIDR || 0,
-                        hargaUSD: p.hargaUSD || 0,
+                        hargaUSD: p.hargaUSD || null,
                         keberangkatan: p.keberangkatan?.split('T')[0] || '',
                         durasiHari: p.durasiHari || 0,
                         penerbangan: p.penerbangan || '',
@@ -153,7 +153,7 @@ function EditSubPaketPage() {
 
                     // Set state tampilan harga
                     setHargaIDRDisplay(formatCurrency(p.hargaIDR, 'id-ID', 'IDR'));
-                    setHargaUSDDisplay(formatCurrency(p.hargaUSD, 'en-US', 'USD'));
+                    setHargaUSDDisplay(p.hargaUSD ? formatCurrency(p.hargaUSD, 'en-US', 'USD') : null);
                     setCurrentImage(p.urlFoto ? `${process.env.NEXT_PUBLIC_API_BASE_URL}${p.urlFoto}` : null);
                     setIdPaket(p.idPaket ? p.idPaket.toString() : '');
                     setPenerbangan(p.penerbangan || '');
@@ -193,7 +193,9 @@ function EditSubPaketPage() {
         formData.append('namaSubPaket', updatedSubPaket.namaSubPaket);
         formData.append('idPaket', idPaket);
         formData.append('hargaIDR', updatedSubPaket.hargaIDR.toString());
-        formData.append('hargaUSD', updatedSubPaket.hargaUSD.toString());
+        if (updatedSubPaket.hargaUSD && updatedSubPaket.hargaUSD != null) {
+            formData.append('hargaUSD', updatedSubPaket.hargaUSD.toString());
+        }
         formData.append('keberangkatan', updatedSubPaket.keberangkatan);
         formData.append('durasiHari', updatedSubPaket.durasiHari.toString());
         formData.append('penerbangan', penerbangan);
@@ -303,7 +305,7 @@ function EditSubPaketPage() {
                                 )} />
                                 <FormField control={form.control} name="hargaUSD" render={() => (
                                     <FormItem><FormLabel>Harga USD</FormLabel><FormControl>
-                                        <Input value={hargaUSDDisplay}
+                                        <Input value={hargaUSDDisplay ? hargaUSDDisplay : ''}
                                             onChange={(e) => {
                                                 const numeric = unformatCurrency(e.target.value);
                                                 setHargaUSDDisplay(formatCurrency(numeric, 'en-US', 'USD'));

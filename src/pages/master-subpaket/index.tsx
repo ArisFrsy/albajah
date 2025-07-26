@@ -95,7 +95,7 @@ function MasterSubPaket() {
         {
             column: "hargaUSD", label: "USD", align: "right", render: (row: SubPaket) => (
                 <>
-                    {formatCurrency(row.hargaUSD, 'en-US', 'USD')}
+                    {row.hargaUSD ? formatCurrency(row.hargaUSD, 'en-US', 'USD') : '-'}
                 </>
             )
         },

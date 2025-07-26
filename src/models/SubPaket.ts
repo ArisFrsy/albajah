@@ -4,7 +4,7 @@ export interface SubPaket {
   idPaket: number; // Foreign key to Paket
   namaSubPaket: string;
   hargaIDR: number;
-  hargaUSD: number;
+  hargaUSD?: number | null;
   keberangkatan: string;
   durasiHari: number;
   penerbangan: string;

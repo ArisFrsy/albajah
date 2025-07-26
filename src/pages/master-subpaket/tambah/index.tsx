@@ -28,7 +28,7 @@ const subPaketSchema = z.object({
     idPaket: z.string().min(1, { message: 'Paket wajib dipilih' }),
     namaSubPaket: z.string().min(1, { message: 'Nama sub paket wajib diisi' }),
     hargaIDR: z.number().gt(0, { message: 'Harga IDR harus lebih dari 0' }),
-    hargaUSD: z.number().gt(0, { message: 'Harga USD harus lebih dari 0' }),
+    hargaUSD: z.number().gt(0, { message: 'Harga USD harus lebih dari 0' }).optional().nullable(),
     keberangkatan: z.string().optional(),
     durasiHari: z.number().gt(0, { message: 'Durasi hari harus lebih dari 0' }),
     penerbangan: z.string().optional(),
@@ -51,7 +51,7 @@ function InsertSubPaketPage() {
     const [namaSubPaket, setNamaSubPaket] = useState('');
     const [idPaket, setIdPaket] = useState('');
     const [hargaIDR, setHargaIDR] = useState(0);
-    const [hargaUSD, setHargaUSD] = useState(0);
+    const [hargaUSD, setHargaUSD] = useState<number | null>(null);
     const [keberangkatan, setKeberangkatan] = useState('');
     const [durasiHari, setDurasiHari] = useState(0);
     const [penerbangan, setPenerbangan] = useState('');
@@ -152,7 +152,9 @@ function InsertSubPaketPage() {
             formData.append('idPaket', newSubPaket.idPaket.toString());
             formData.append('namaSubPaket', newSubPaket.namaSubPaket);
             formData.append('hargaIDR', newSubPaket.hargaIDR.toString());
-            formData.append('hargaUSD', newSubPaket.hargaUSD.toString());
+            if (newSubPaket.hargaUSD && newSubPaket.hargaUSD !== null) {
+                formData.append('hargaUSD', newSubPaket.hargaUSD.toString());
+            }
             formData.append('keberangkatan', newSubPaket.keberangkatan);
             formData.append('durasiHari', newSubPaket.durasiHari.toString());
             formData.append('penerbangan', newSubPaket.penerbangan);
@@ -189,7 +191,7 @@ function InsertSubPaketPage() {
         setNamaSubPaket('');
         setIdPaket('');
         setHargaIDR(0);
-        setHargaUSD(0);
+        setHargaUSD(null);
         setHargaIDRDisplay('');
         setHargaUSDDisplay('');
         setKeberangkatan('');
@@ -304,7 +306,7 @@ function InsertSubPaketPage() {
                                     onChange={(e) => {
                                         const value = e.target.value;
                                         const numeric = unformatCurrency(value);
-                                        setHargaUSD(numeric);
+                                        setHargaUSD(numeric ? numeric : null);
                                         setHargaUSDDisplay(formatCurrency(numeric, 'en-US', 'USD'));
                                     }}
                                 />
