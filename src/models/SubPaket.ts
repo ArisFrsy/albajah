@@ -10,6 +10,7 @@ export interface SubPaket {
   penerbangan: string;
   hotelMekkah: string;
   hotelMadinah: string;
+  asalKeberangkatan: string;
   fasilitas?: string;
   perlengkapan?: string;
   paket?: Paket;

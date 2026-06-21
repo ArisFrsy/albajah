@@ -57,51 +57,68 @@ function ViewBeritaPage() {
     }, [id]);
 
     return (
-        <main className="flex-1 p-6 overflow-auto bg-gray-100">
-            <Card className="bg-white rounded-lg shadow-md p-6 border border-gray-300 min-h-[calc(110vh-7rem)]">
-                {loading ? (
-                    <div className="flex justify-center items-center p-20">
-                        <Loading />
-                    </div>
-                ) : error ? (
-                    <div className="p-10 text-center text-red-600">
-                        <p className="mb-4 text-lg font-semibold">Error: {error}</p>
-                        <Button onClick={() => router.push('/master-berita')}>Kembali</Button>
-                    </div>
-                ) : berita ? (
-                    <>
-                        <CardHeader>
-                            <CardTitle className="text-3xl text-center font-bold">{berita.judul}</CardTitle>
-                        </CardHeader>
-                        <CardContent className=''>
-                            {berita.urlImage && (
-                                <div className="mb-4">
-                                    <Image
-                                        src={baseUrl + berita.urlImage}
-                                        alt={berita.judul}
-                                        width={100}
-                                        height={100}
-                                        className="w-auto h-auto rounded-lg object-cover text-center mx-auto border border-gray-200 shadow-sm"
-                                        style={{ maxWidth: 'auto', maxHeight: '400px' }}
-                                    />
-                                </div>
-                            )}
-                            <article className="border border-gray-200 px-4 mx-4 prose max-w-none mb-8" dangerouslySetInnerHTML={{ __html: berita.deskripsi || "" }} />
-                            <div className="flex justify-end">
-                                <Button variant="outline" onClick={() => router.push('/master-berita')}>
-                                    Kembali
-                                </Button>
-                            </div>
-                        </CardContent>
-                    </>
-                ) : (
-                    <div className="p-10 text-center text-gray-600">
-                        <p className="mb-4 text-lg font-semibold">Berita tidak ditemukan.</p>
-                        <Button type="submit" onClick={() => router.push('/master-berita')}>Kembali</Button>
-                    </div>
+      <main className="flex-1 p-6 overflow-auto bg-gray-100">
+        <Card className="bg-white rounded-lg shadow-md p-6 border border-gray-300 min-h-[calc(110vh-7rem)]">
+          {loading ? (
+            <div className="flex justify-center items-center p-20">
+              <Loading />
+            </div>
+          ) : error ? (
+            <div className="p-10 text-center text-red-600">
+              <p className="mb-4 text-lg font-semibold">Error: {error}</p>
+              <Button onClick={() => router.push("/master-berita")}>
+                Kembali
+              </Button>
+            </div>
+          ) : berita ? (
+            <>
+              <CardHeader>
+                <CardTitle className="text-3xl text-center font-bold">
+                  {berita.judul}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="">
+                {berita.urlImage && (
+                  <div className="mb-4">
+                    <Image
+                      src={baseUrl + berita.urlImage}
+                      alt={berita.judul}
+                      width={100}
+                      height={100}
+                      className="w-auto h-auto rounded-lg object-cover text-center mx-auto border border-gray-200 shadow-sm"
+                      style={{ maxWidth: "auto", maxHeight: "400px" }}
+                    />
+                  </div>
                 )}
-            </Card>
-        </main>
+                <article
+                  className="rich-text-content border border-gray-200 px-4 mx-4 mb-8"
+                  dangerouslySetInnerHTML={{ __html: berita.deskripsi || "" }}
+                />
+                <div className="flex justify-end">
+                  <Button
+                    variant="outline"
+                    onClick={() => router.push("/master-berita")}
+                  >
+                    Kembali
+                  </Button>
+                </div>
+              </CardContent>
+            </>
+          ) : (
+            <div className="p-10 text-center text-gray-600">
+              <p className="mb-4 text-lg font-semibold">
+                Berita tidak ditemukan.
+              </p>
+              <Button
+                type="submit"
+                onClick={() => router.push("/master-berita")}
+              >
+                Kembali
+              </Button>
+            </div>
+          )}
+        </Card>
+      </main>
     );
 }
 
