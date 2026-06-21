@@ -220,7 +220,7 @@ export default function LoginPage() {
                 {process.env.NODE_ENV === "production" && (
                   <ReCAPTCHA
                     ref={recaptchaRef}
-                    sitekey={"6LeZE84rAAAAAKub-IGayl6V-p40A5l4VnV63-ef"}
+                    sitekey={"6LdySCstAAAAAEmdkOdX_EDSpdCvMEtMRfVnHuMi"}
                     className="flex justify-center"
                   />
                 )}
